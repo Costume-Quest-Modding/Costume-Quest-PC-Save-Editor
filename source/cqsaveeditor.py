@@ -2,6 +2,7 @@ import tkinter as tk
 import re
 import shutil
 import os
+import sys
 from tkinter import filedialog, messagebox, ttk
 from ttkthemes import ThemedTk
 from datetime import datetime
@@ -160,6 +161,8 @@ BATTLE_ITEM_NAMES = {
     "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs"
 }
 
+# Get the directory where the script is located
+BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 
 # ==================== Theme Functions ====================
 
@@ -1086,6 +1089,7 @@ for tab in ("Quests",):
 
 # Menu, icon, mainloop
 create_menu()
-root.iconbitmap('icon.ico')
+icon_path = os.path.join(BASE_DIR, 'icon.ico')
+root.iconbitmap(icon_path)
 apply_theme("dark" if dark_mode_enabled else "light")
 root.mainloop()
