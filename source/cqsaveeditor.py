@@ -469,18 +469,10 @@ def save_changes():
         new_world_path = WORLD_PATHS.get(AppState.selected_world.get(), WORLD_PATHS["Suburbs"])
         updated_text = re.sub(r'(Level=)[^;]+;', r'\1' + new_world_path + ';', AppState.save_text_data)
 
-        # Save Battle Items
-        for item_key, entry in getattr(battle_stamps_frame, "entries", {}).items():
-            val = entry.get().strip()
-            if not val.isdigit():
-                messagebox.showerror("Invalid input", f"{BATTLE_ITEM_NAMES[item_key]} has invalid amount '{val}'")
-                return
-            pattern = re.compile(
-                rf'(BattleItem_{item_key}=InventoryItem\{{[^}}]*?CurrentAmount=)(\d+)(;[^}}]*\}})'
-            )
-            updated_text = pattern.sub(rf'\g<1>{val}\g<3>', updated_text, count=1)
+        # Start from the current save data
+        updated_text = AppState.save_text_data
 
-        # Save Cards
+        # Update card values using regex
         for card_num, entry in cards_frame.entries.items():
             val = entry.get().strip()
             if not val.isdigit():
@@ -491,30 +483,6 @@ def save_changes():
             )
             updated_text = pattern.sub(rf'\g<1>{val}\g<3>', updated_text, count=1)
 
-        updated_text = update_save_data(
-            updated_text,
-            new_world,
-            new_total,
-            new_candy,
-            selected_costumes,
-            xp,
-            robotjumps,
-            monsterbashes,
-            suburbsbobbing,
-            mallbobbing,
-            countrybobbing,
-            player_pos,
-            camera_pos
-        )
-
-        with open(path, "wb") as f:
-            f.write(AppState.save_header)
-            f.write(updated_text.encode("utf-8"))
-        messagebox.showinfo("Success", "Save file updated!")
-    except Exception as e:
-        messagebox.showerror("Error", f"Failed to save: {e}")
-
-        
         # Save Battle Items
         for item_key, entry in getattr(battle_stamps_frame, "entries", {}).items():
             val = entry.get().strip()
@@ -541,27 +509,6 @@ def save_changes():
             player_pos,
             camera_pos
         )
-
-        ##save cards to 
-        try:
-            # Validate inputs and update card amounts in the save data string
-            for card_num, entry in cards_frame.entries.items():
-                val = entry.get().strip()
-                ##check for none digits in card data
-                if not val.isdigit():
-                    messagebox.showerror("Invalid input", f"Card {card_num} has invalid amount '{val}'")
-                    return
-
-                ##Search for regular expression match
-                pattern = re.compile(
-                    rf'(TrickyTreatCard_{card_num}=InventoryItem\{{[^}}]*CurrentAmount=)(\d+)(;[^}}]*\}})'
-                )
-
-                ##Replaces card amount.
-                updated_text = pattern.sub(rf'\g<1>{val}\g<3>', updated_text, count=1)
-
-        except:
-            messagebox.showerror("Error", f"Failed to save: {e}")
 
         with open(path, "wb") as f:
             f.write(AppState.save_header)
