@@ -2,7 +2,7 @@
 A Python GUI save editor/viewer for the Costume Quest PC Steam release. Must use an existing save file otherwise saving is disabled.
 
 ## Current Features
-- Save As... to a .json or .txt file.
+- Save As... to a .json, .txt or a regular binary file.
 - Save Backups.
 - Light/Dark Mode toggle.
 
