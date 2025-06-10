@@ -37,7 +37,7 @@ jobs:
     - name: Upload executable as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: cqsaveeditor
+        name: cqsaveeditor-windows
         path: dist/cqsaveeditor.exe
 
   build-linux:
@@ -66,5 +66,5 @@ jobs:
     - name: Upload executable as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: cqsaveeditor
+        name: cqsaveeditor-linux
         path: dist/cqsaveeditor
