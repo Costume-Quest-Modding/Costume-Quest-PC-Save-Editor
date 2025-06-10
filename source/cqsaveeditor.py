@@ -418,10 +418,8 @@ def open_save():
 
 def update_save_data(
     text,
-    new_level,
-    new_candy,
     new_total,
-    new_world_path,
+    new_candy,
     costumes,
     xp,
     robotjumps,
@@ -432,10 +430,8 @@ def update_save_data(
     player_pos,
     camera_pos
 ):
-        text = update_or_add_field(text, "Level", new_level)
-        text = update_or_add_field(text, "CandyAmount", new_candy)
         text = update_or_add_field(text, "TotalCandyAmount", new_total)
-        text = update_or_add_field(text, "World", new_world_path)
+        text = update_or_add_field(text, "CandyAmount", new_candy)
         costume_str = ",".join([c for c in costumes if c])
         text = re.sub(r"EquippedCostumes=\[[^\]]*\];", f"EquippedCostumes=[{costume_str}];", text)
         text = update_or_add_field(text, "ExperiencePoints", xp)
@@ -453,18 +449,14 @@ def save_changes():
     if not path:
         messagebox.showerror("Error", "No save file loaded.")
         return
-    
-    updated_text = AppState.save_text_data
-
     try:
         new_candy = int(AppState.candy_var.get())
         new_total = int(AppState.total_candy_var.get())
-        xp = int(AppState.xp_var.get())
-        AppState.level_var.set(str(calculate_level_from_xp(xp)))
-        new_level = int(AppState.level_var.get())
         AppState.original_candy_value = new_candy
         AppState.last_total_candy = new_total
         selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
+        xp = int(AppState.xp_var.get())
+        AppState.level_var.set(str(calculate_level_from_xp(xp)))
         robotjumps = int(AppState.robotjumps_var.get())
         monsterbashes = int(AppState.monsterbashes_var.get())
         suburbsbobbing = int(AppState.suburbsbobbing_var.get())
@@ -499,12 +491,10 @@ def save_changes():
 
         updated_text = update_save_data(
             updated_text,
-            new_level,
-            xp,
-            new_candy,
             new_total,
-            new_world_path,
+            new_candy,
             selected_costumes,
+            xp,
             robotjumps,
             monsterbashes,
             suburbsbobbing,
@@ -521,6 +511,60 @@ def save_changes():
     except Exception as e:
         messagebox.showerror("Error", f"Failed to save: {e}")
 
+        
+        # Save Battle Items
+        for item_key, entry in getattr(battle_stamps_frame, "entries", {}).items():
+            val = entry.get().strip()
+            if not val.isdigit():
+                messagebox.showerror("Invalid input", f"{BATTLE_ITEM_NAMES[item_key]} has invalid amount '{val}'")
+                return
+            pattern = re.compile(
+                rf'(BattleItem_{item_key}=InventoryItem\{{[^}}]*?CurrentAmount=)(\d+)(;[^}}]*\}})'
+            )
+            updated_text = pattern.sub(rf'\g<1>{val}\g<3>', updated_text, count=1)
+
+        updated_text = update_save_data(
+            new_total,
+            new_candy,
+            selected_costumes,
+            xp,
+            robotjumps,
+            monsterbashes,
+            suburbsbobbing,
+            mallbobbing,
+            countrybobbing,
+            player_pos,
+            camera_pos
+        )
+
+        ##save cards to 
+        try:
+            # Validate inputs and update card amounts in the save data string
+            for card_num, entry in cards_frame.entries.items():
+                val = entry.get().strip()
+                ##check for none digits in card data
+                if not val.isdigit():
+                    messagebox.showerror("Invalid input", f"Card {card_num} has invalid amount '{val}'")
+                    return
+
+                ##Search for regular expression match
+                pattern = re.compile(
+                    rf'(TrickyTreatCard_{card_num}=InventoryItem\{{[^}}]*CurrentAmount=)(\d+)(;[^}}]*\}})'
+                )
+
+                ##Replaces card amount.
+                updated_text = pattern.sub(rf'\g<1>{val}\g<3>', updated_text, count=1)
+
+        except:
+            messagebox.showerror("Error", f"Failed to save: {e}")
+
+        with open(path, "wb") as f:
+            f.write(AppState.save_header)
+            f.write(updated_text.encode("utf-8"))
+        messagebox.showinfo("Success", "Save file updated!")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to save: {e}")
+
 def save_as():
     if not AppState.save_text_data:
         messagebox.showerror("Error", "No save file loaded.")
@@ -528,21 +572,18 @@ def save_as():
     path = filedialog.asksaveasfilename(
         title="Save As",
         defaultextension=".",
-        filetypes=[("JSON File", "*.json"),
-                   ("Text File", "*.txt"),
-                   ("All Files", "*.*")]
+        filetypes=[("All Files", "*.*")]
     )
     if not path:
         return
     try:
         new_candy = int(AppState.candy_var.get())
         new_total = int(AppState.total_candy_var.get())
-        xp = int(AppState.xp_var.get())
-        AppState.level_var.set(str(calculate_level_from_xp(xp)))
-        new_level = int(AppState.level_var.get())
         AppState.original_candy_value = new_candy
         AppState.last_total_candy = new_total
         selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
+        xp = int(AppState.xp_var.get())
+        AppState.level_var.set(str(calculate_level_from_xp(xp)))
         robotjumps = int(AppState.robotjumps_var.get())
         monsterbashes = int(AppState.monsterbashes_var.get())
         suburbsbobbing = int(AppState.suburbsbobbing_var.get())
@@ -577,12 +618,10 @@ def save_as():
 
         updated_text = update_save_data(
             updated_text,
-            new_level,
-            xp,
-            new_candy,
             new_total,
-            new_world_path,
+            new_candy,
             selected_costumes,
+            xp,
             robotjumps,
             monsterbashes,
             suburbsbobbing,
@@ -592,50 +631,57 @@ def save_as():
             camera_pos
         )
 
-        if path.endswith(".json"):
-            data = {
-                "Level": new_level,
-                "ExperiencePoints": xp,
-                "CandyAmount": new_candy,
-                "TotalCandyAmount": new_total,
-                "World": new_world_path,
-                "PlayerPosition": player_pos,
-                "CameraPosition": camera_pos,
-                "EquippedCostumes": selected_costumes,
-                "RobotRampJumps": robotjumps,
-                "MonsterPailBashes": monsterbashes,
-                "SuburbsBobbingHighScore": suburbsbobbing,
-                "MallBobbingHighScore": mallbobbing,
-                "CountryBobbingHighScore": countrybobbing
-            }
-            with open(path, "w", encoding="utf-8") as f:
-                import json
-                json.dump(data, f, indent=4)
-            messagebox.showinfo("Saved", f"File successfully saved to:\n{path}")
-        elif path.endswith(".txt"):
-            data = [
-                f"Level: {new_level}",
-                f"Experience Points: {xp}",
-                f"Current Candy: {new_candy}",
-                f"Total Candy: {new_total}",
-                f"World: {new_world_path}",
-                f"PlayerPosition: {player_pos}",
-                f"CameraPosition: {camera_pos}",
-                f"Equipped Costumes: {', '.join(selected_costumes)}",
-                f"RobotRampJumps: {robotjumps}",
-                f"MonsterPailBashes: {monsterbashes}",
-                f"SuburbsBobbingHighScore: {suburbsbobbing}",
-                f"MallBobbingHighScore: {mallbobbing}",
-                f"CountryBobbingHighScore: {countrybobbing}"
-            ]
-            with open(path, "w", encoding="utf-8") as f:
-                f.write("\n".join(data))
-            messagebox.showinfo("Saved", f"File successfully saved to:\n{path}")
-        else:
-            with open(path, "wb") as f:
-                f.write(AppState.save_header)
-                f.write(updated_text.encode("utf-8"))
-            messagebox.showinfo("Saved", f"File successfully saved to:\n{path}")
+        with open(path, "wb") as f:
+            f.write(AppState.save_header)
+            f.write(updated_text.encode("utf-8"))
+        messagebox.showinfo("Saved", f"File successfully saved to:\n{path}")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to save: {e}")
+
+        # Start from the current save data
+        updated_text = AppState.save_text_data
+
+        # Update card values using regex
+        for card_num, entry in cards_frame.entries.items():
+            val = entry.get().strip()
+            if not val.isdigit():
+                messagebox.showerror("Invalid input", f"Card {card_num} has invalid amount '{val}'")
+                return
+            pattern = re.compile(
+                rf'(TrickyTreatCard_{card_num}=InventoryItem\{{[^}}]*CurrentAmount=)(\d+)(;[^}}]*\}})'
+            )
+            updated_text = pattern.sub(rf'\g<1>{val}\g<3>', updated_text, count=1)
+
+        
+        # Save Battle Items
+        for item_key, entry in getattr(battle_stamps_frame, "entries", {}).items():
+            val = entry.get().strip()
+            if not val.isdigit():
+                messagebox.showerror("Invalid input", f"{BATTLE_ITEM_NAMES[item_key]} has invalid amount '{val}'")
+                return
+            pattern = re.compile(
+                rf'(BattleItem_{item_key}=InventoryItem\{{[^}}]*?CurrentAmount=)(\d+)(;[^}}]*\}})'
+            )
+            updated_text = pattern.sub(rf'\g<1>{val}\g<3>', updated_text, count=1)
+
+        updated_text = update_save_data(
+            new_total,
+            new_candy,
+            selected_costumes,
+            xp,
+            robotjumps,
+            monsterbashes,
+            suburbsbobbing,
+            mallbobbing,
+            countrybobbing,
+            player_pos,
+            camera_pos
+        )
+
+        with open(path, "wb") as f:
+            f.write(AppState.save_header)
+            f.write(updated_text.encode("utf-8"))
+        messagebox.showinfo("Saved", f"File successfully saved to:\n{path}")
     except Exception as e:
         messagebox.showerror("Error", f"Failed to save: {e}")
 
@@ -861,6 +907,9 @@ row += 1
 # Vector editors
 player_position_frame = create_vector_editor(summary_frame, "Player Position:", AppState.player_position_vars)
 player_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+AppState.player_position_vars[0].set(-21.371645)
+AppState.player_position_vars[1].set(2.9657931)
+AppState.player_position_vars[2].set(33.355339)
 row += 1
 
 camera_position_frame = create_vector_editor(summary_frame, "Camera Position:", AppState.camera_position_vars)
@@ -947,6 +996,9 @@ row += 1
 # Vector editors
 player_position_frame = create_vector_editor(world_frame, "Player Position:", AppState.player_position_vars)
 player_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+AppState.player_position_vars[0].set(-21.371645)
+AppState.player_position_vars[1].set(2.9657931)
+AppState.player_position_vars[2].set(33.355339)
 row += 1
 
 camera_position_frame = create_vector_editor(world_frame, "Camera Position:", AppState.camera_position_vars)
