@@ -818,7 +818,7 @@ AppState.monsterbashes_var = tk.StringVar(value="0")
 AppState.suburbsbobbing_var = tk.StringVar(value="0")
 AppState.mallbobbing_var = tk.StringVar(value="0")
 AppState.countrybobbing_var = tk.StringVar(value="0")
-AppState.selected_world = tk.StringVar(value="Suburbs")
+AppState.selected_world = tk.StringVar(value="")
 AppState.costume_vars = [tk.StringVar(value=opt) for opt in COSTUME_OPTIONS[:3]]
 AppState.player_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
 AppState.camera_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
@@ -907,9 +907,6 @@ row += 1
 # Vector editors
 player_position_frame = create_vector_editor(summary_frame, "Player Position:", AppState.player_position_vars)
 player_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
-AppState.player_position_vars[0].set(-21.371645)
-AppState.player_position_vars[1].set(2.9657931)
-AppState.player_position_vars[2].set(33.355339)
 row += 1
 
 camera_position_frame = create_vector_editor(summary_frame, "Camera Position:", AppState.camera_position_vars)
@@ -996,9 +993,6 @@ row += 1
 # Vector editors
 player_position_frame = create_vector_editor(world_frame, "Player Position:", AppState.player_position_vars)
 player_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
-AppState.player_position_vars[0].set(-21.371645)
-AppState.player_position_vars[1].set(2.9657931)
-AppState.player_position_vars[2].set(33.355339)
 row += 1
 
 camera_position_frame = create_vector_editor(world_frame, "Camera Position:", AppState.camera_position_vars)
