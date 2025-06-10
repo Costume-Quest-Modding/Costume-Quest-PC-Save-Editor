@@ -1,6 +1,8 @@
 # Costume-Quest-PC-Save-Editor
 A Python GUI save editor/viewer for the Costume Quest PC Steam release. Must use an existing save file otherwise saving is disabled.
 
+_Note: Currently, DLC save files are not supported. This will most likely be supported in the future._
+
 ## Current Features
 - Save As... to a .json, .txt or a regular binary file.
 - Save Backups.
