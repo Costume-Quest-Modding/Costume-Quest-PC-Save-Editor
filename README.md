@@ -1,7 +1,11 @@
 # Costume-Quest-PC-Save-Editor
-A Python GUI save editor for the Costume Quest Steam version. Let's you edit any existing save.
+A Python GUI save editor/viewer for the Costume Quest PC Steam release. Must use an existing save file otherwise saving is disabled.
 
 ## Current Features
+- Save As... to a .json or .txt file.
+- Save Backups.
+- Light/Dark Mode toggle.
+
 Can edit:
 - Player Level
 - Experience Points
@@ -12,8 +16,8 @@ Can edit:
 - Equipped Costumes (for each character)
 - Cards
 - Battle Stamps
-  - Toggle for setting all battle stamp amounts to "0" or "1"
-  - Percentage bar (keeps track of stamps left to collect/purchase)
+  - Toggle for setting all battle stamp amounts to "0" or "1".
+  - Percentage bar. (keeps track of stamps left to collect/purchase)
 
 Can view:
   - Total Candy
@@ -27,7 +31,7 @@ Can view:
 - Costume Pieces
 - Quests
 
-## Later On Features
+## Future Planned Features
 - Locations Select.
 - World Progression %
 - Presets for speedrunners.
