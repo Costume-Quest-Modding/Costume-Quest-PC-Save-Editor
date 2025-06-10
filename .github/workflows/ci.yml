@@ -28,9 +28,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install PyInstaller
-      run: pip install pyinstaller
-
     - name: Build with PyInstaller
       run: pyinstaller --onefile --icon=source/icon.ico source/cqsaveeditor.py
 
