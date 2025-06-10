@@ -418,32 +418,34 @@ def open_save():
 
 def update_save_data(
     text,
-    new_world,
-    new_total,
-    new_candy,
-    costumes,
+    new_level,
     xp,
+    new_candy,
+    new_total,
+    new_world,
+    player_pos,
+    camera_pos,
+    costumes,
     robotjumps,
     monsterbashes,
     suburbsbobbing,
     mallbobbing,
-    countrybobbing,
-    player_pos,
-    camera_pos
+    countrybobbing
 ):
-        text = update_or_add_field(text, "World", new_world)
-        text = update_or_add_field(text, "TotalCandyAmount", new_total)
+        text = update_or_add_field(text, "Level", new_level)
+        text = update_or_add_field(text, "ExperiencePoints", xp)
         text = update_or_add_field(text, "CandyAmount", new_candy)
+        text = update_or_add_field(text, "TotalCandyAmount", new_total)
+        text = update_or_add_field(text, "World", new_world)
+        text = update_or_add_field(text, "PlayerPosition", player_pos)
+        text = update_or_add_field(text, "CameraPosition", camera_pos)
         costume_str = ",".join([c for c in costumes if c])
         text = re.sub(r"EquippedCostumes=\[[^\]]*\];", f"EquippedCostumes=[{costume_str}];", text)
-        text = update_or_add_field(text, "ExperiencePoints", xp)
         text = update_or_add_field(text, "RobotRampJumos", robotjumps)
         text = update_or_add_field(text, "MonsterPailBashes", monsterbashes)
         text = update_or_add_field(text, "SuburbsBobbingHighScore", suburbsbobbing)
         text = update_or_add_field(text, "MallBobbingHighScore", mallbobbing)
         text = update_or_add_field(text, "CountryBobbingHighScore", countrybobbing)
-        text = update_or_add_field(text, "PlayerPosition", player_pos)
-        text = update_or_add_field(text, "CameraPosition", camera_pos)
         return text
 
 def save_changes():
@@ -458,7 +460,8 @@ def save_changes():
         AppState.last_total_candy = new_total
         selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
         xp = int(AppState.xp_var.get())
-        new_world = int(AppState.level_var.get())
+        new_level = int(AppState.level_var.get())
+        new_world = (AppState.selected_world.get())
         robotjumps = int(AppState.robotjumps_var.get())
         monsterbashes = int(AppState.monsterbashes_var.get())
         suburbsbobbing = int(AppState.suburbsbobbing_var.get())
@@ -496,18 +499,19 @@ def save_changes():
 
         updated_text = update_save_data(
             updated_text,
-            new_world,
-            new_total,
-            new_candy,
-            selected_costumes,
+            new_level,
             xp,
+            new_candy,
+            new_total,
+            new_world,
+            player_pos,
+            camera_pos,
+            selected_costumes,
             robotjumps,
             monsterbashes,
             suburbsbobbing,
             mallbobbing,
-            countrybobbing,
-            player_pos,
-            camera_pos
+            countrybobbing
         )
 
         with open(path, "wb") as f:
@@ -537,7 +541,8 @@ def save_as():
         AppState.last_total_candy = new_total
         selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
         xp = int(AppState.xp_var.get())
-        new_world = int(AppState.level_var.get())
+        new_level = int(AppState.level_var.get())
+        new_world = (AppState.selected_world.get())
         robotjumps = int(AppState.robotjumps_var.get())
         monsterbashes = int(AppState.monsterbashes_var.get())
         suburbsbobbing = int(AppState.suburbsbobbing_var.get())
@@ -575,34 +580,36 @@ def save_as():
 
         updated_text = update_save_data(
             updated_text,
-            new_world,
-            new_total,
-            new_candy,
-            selected_costumes,
+            new_level,
             xp,
+            new_candy,
+            new_total,
+            new_world,
+            player_pos,
+            camera_pos,
+            selected_costumes,
             robotjumps,
             monsterbashes,
             suburbsbobbing,
             mallbobbing,
-            countrybobbing,
-            player_pos,
-            camera_pos
+            countrybobbing
         )
 
         if path.endswith(".json"):
             data = {
-                "Level": new_world,
+                "Level": new_level,
                 "ExperiencePoints": xp,
-                "TotalCandyAmount": new_total,
                 "CandyAmount": new_candy,
+                "TotalCandyAmount": new_total,
+                "World": new_world,
+                "PlayerPosition": player_pos,
+                "CameraPosition": camera_pos,
                 "EquippedCostumes": selected_costumes,
                 "RobotRampJumps": robotjumps,
                 "MonsterPailBashes": monsterbashes,
                 "SuburbsBobbingHighScore": suburbsbobbing,
                 "MallBobbingHighScore": mallbobbing,
-                "CountryBobbingHighScore": countrybobbing,
-                "PlayerPosition": player_pos,
-                "CameraPosition": camera_pos
+                "CountryBobbingHighScore": countrybobbing
             }
             with open(path, "w", encoding="utf-8") as f:
                 import json
@@ -610,18 +617,19 @@ def save_as():
 
         elif path.endswith(".txt"):
             data = [
-                f"Level: {new_world}",
+                f"Level: {new_level}",
                 f"Experience Points: {xp}",
-                f"Total Candy: {new_total}",
-                f"Current Candy: {new_candy}",
+                f"Current Candy Amount: {new_candy}",
+                f"Total Candy Amount: {new_total}",
+                f"World: {new_world}",
+                f"Player Position: {player_pos}",
+                f"Camera Position: {camera_pos}",
                 f"Equipped Costumes: {', '.join(selected_costumes)}",
-                f"RobotRampJumps: {robotjumps}",
-                f"MonsterPailBashes: {monsterbashes}",
-                f"SuburbsBobbingHighScore: {suburbsbobbing}",
-                f"MallBobbingHighScore: {mallbobbing}",
-                f"CountryBobbingHighScore: {countrybobbing}",
-                f"PlayerPosition: {player_pos}",
-                f"CameraPosition: {camera_pos}"
+                f"Robot Ramp Jumps: {robotjumps}",
+                f"Monster Pail Bashes: {monsterbashes}",
+                f"Suburbs Bobbing High Score: {suburbsbobbing}",
+                f"Mall Bobbing High Score: {mallbobbing}",
+                f"Country Bobbing High Score: {countrybobbing}"
             ]
             with open(path, "w", encoding="utf-8") as f:
                 f.write("\n".join(data))
