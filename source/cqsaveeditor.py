@@ -1040,7 +1040,14 @@ for tab in ("Quests",):
 
 # Menu, icon, mainloop
 create_menu()
-icon_path = os.path.join(BASE_DIR, 'icon.ico')
+
+# checking if the script is running from a pyinstaller generated exe or from loose script files
+
+if getattr(sys, 'frozen', False):
+    icon_path = os.path.join(sys._MEIPASS, 'icon.ico')
+else:
+    icon_path = os.path.join(BASE_DIR, 'icon.ico')
+
 root.iconbitmap(icon_path)
 apply_theme("dark" if dark_mode_enabled else "light")
 root.mainloop()
