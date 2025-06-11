@@ -1,13 +1,16 @@
 name: Create Release from Artifacts
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["Build Executable with PyInstaller"]
+    types:
+      - completed
 
 jobs:
   download-and-release:
     runs-on: ubuntu-latest
+
+    if: startsWith(github.event.workflow_run.head_branch, '')
 
     steps:
     - name: Grab Windows Build
