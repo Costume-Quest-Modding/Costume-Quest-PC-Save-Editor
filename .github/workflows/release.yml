@@ -10,7 +10,7 @@ jobs:
   download-and-release:
     runs-on: ubuntu-latest
 
-    if: startsWith(github.event.workflow_run.head_branch, '')
+    if: startsWith(github.event.workflow_run.head_ref, 'v')
 
     steps:
     - name: Grab Windows Build
