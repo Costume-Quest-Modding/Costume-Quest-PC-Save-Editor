@@ -1113,9 +1113,11 @@ def update_applebobbing_progress():
 
 # Now create the Apple Bobbing entries
 for label_text, var in misc_stats:
-    # Score label
-    ttk.Label(hundotracker_frame, text=label_text).grid(row=row, column=0, sticky="w", padx=40, pady=5)
-    ttk.Label(hundotracker_frame, textvariable=var, relief="sunken", width=10, anchor="w").grid(row=row, column=1, sticky="w", padx=25, pady=5)
+    # Remove "High Score" from label text
+    display_label = label_text.replace(" High Score:", "")
+        
+    # Only show the location name
+    ttk.Label(hundotracker_frame, text=display_label).grid(row=row, column=0, sticky="w", padx=40, pady=5)
 
     # Completed/incomplete status
     def make_status_var(v=var, threshold=bobbing_thresholds[label_text]):
