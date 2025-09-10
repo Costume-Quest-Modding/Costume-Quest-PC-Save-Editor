@@ -796,9 +796,11 @@ frames = {
     "Summary": ttk.Frame(notebook),
     "Stats": ttk.Frame(notebook),
     "World/Location": ttk.Frame(notebook),
+    "Battle Stamps": ttk.Frame(notebook),
+    "Cards": ttk.Frame(notebook),
     "Costumes": ttk.Frame(notebook),
     "Quests": ttk.Frame(notebook),
-    "Cards": ttk.Frame(notebook)
+    "100% Tracker": ttk.Frame(notebook),
 }
 
 for name, frame in frames.items():
@@ -918,9 +920,6 @@ candy_entry = ttk.Entry(stats_frame, textvariable=AppState.candy_var, width=33)
 grid_label_widget(stats_frame, row, "Current Candy:", candy_entry)
 row += 1
 
-ttk.Label(stats_frame, text="Misc. Stats").grid(row=row, column=0, sticky="w", padx=10, pady=5)
-row += 1
-
 # Misc stats data: label text and associated variables
 misc_stats = [
     ("Total Candy:", AppState.total_candy_var),
@@ -930,11 +929,6 @@ misc_stats = [
     ("Autumn Haven Mall Bobbing High Score:", AppState.mallbobbing_var),
     ("Fall Valley Bobbing High Score:", AppState.countrybobbing_var),
 ]
-
-for label_text, var in misc_stats:
-    ttk.Label(stats_frame, text=label_text).grid(row=row, column=0, sticky="w", padx=25, pady=5)
-    ttk.Label(stats_frame, textvariable=var, relief="sunken", width=28, anchor="w").grid(row=row, column=1, sticky="w", padx=25, pady=5)
-    row += 1
 
 # --- World/Location Frame ---
 world_frame = frames["World/Location"]
@@ -989,8 +983,7 @@ for i in range(54):
 
 
 # --- Battle Items Frame ---
-battle_stamps_frame = ttk.Frame(notebook)
-notebook.add(battle_stamps_frame, text="Battle Stamps")
+battle_stamps_frame = frames["Battle Stamps"]
 
 battle_stamps_frame.entries = {}
 battle_stamps_frame.progress_var = tk.DoubleVar()
@@ -1032,6 +1025,88 @@ progress_bar.grid(row=21, column=0, columnspan=2, padx=10, pady=10, sticky="w")
 progress_label = ttk.Label(battle_stamps_frame, text="Collected: 0 / 0 (0%)")
 progress_label.grid(row=21, column=2, columnspan=4, sticky="w")
 
+# --- 100% Tracker Frame ---
+hundotracker_frame = frames["100% Tracker"]
+row = 0
+ttk.Label(hundotracker_frame, text="").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Apple Bobbing:").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+
+# Misc stats data
+misc_stats = [
+    ("Suburbs High Score:", AppState.suburbsbobbing_var),
+    ("Autumn Haven Mall High Score:", AppState.mallbobbing_var),
+    ("Fall Valley High Score:", AppState.countrybobbing_var),
+]
+
+# Thresholds per world
+bobbing_thresholds = {
+    "Suburbs High Score:": 30,
+    "Autumn Haven Mall High Score:": 35,
+    "Fall Valley High Score:": 40,
+}
+
+# Separate dictionary just for Apple Bobbing
+hundotracker_frame.applebobbing_entries = {}
+
+# Progress bar setup
+hundotracker_frame.progress_var = tk.DoubleVar()
+
+applebobbingprogress = ttk.Label(hundotracker_frame, text="Completed: 0 / 0 (0%)")
+applebobbingprogress.grid(row=row, column=0, columnspan=4, padx=10, pady=10, sticky="w")
+
+applebobbingprogressbar = ttk.Progressbar(hundotracker_frame, variable=hundotracker_frame.progress_var, maximum=100, length=200)
+applebobbingprogressbar.grid(row=row, column=1, columnspan=2, padx=10, pady=10, sticky="w")
+row += 1
+
+# Define the progress update function first
+def update_applebobbing_progress():
+    total = len(hundotracker_frame.applebobbing_entries)
+    collected = sum(1 for var, threshold in hundotracker_frame.applebobbing_entries.values()
+                    if int(var.get() or 0) >= threshold)
+    percentage = (collected / total) * 100 if total > 0 else 0
+    hundotracker_frame.progress_var.set(percentage)
+    applebobbingprogress.config(text=f"Completed: {collected} / {total} ({percentage:.0f}%)")
+
+# Now create the Apple Bobbing entries
+for label_text, var in misc_stats:
+    # Score label
+    ttk.Label(hundotracker_frame, text=label_text).grid(row=row, column=0, sticky="w", padx=25, pady=5)
+    ttk.Label(hundotracker_frame, textvariable=var, relief="sunken", width=10, anchor="w").grid(row=row, column=1, sticky="w", padx=25, pady=5)
+
+    # Completed/incomplete status
+    def make_status_var(v=var, threshold=bobbing_thresholds[label_text]):
+        s = tk.StringVar()
+        def update_status(*_):
+            score = int(v.get() or 0)
+            s.set("✅ Completed" if score >= threshold else "❌ Incomplete")
+            update_applebobbing_progress()  # update progress dynamically
+        v.trace_add("write", update_status)
+        update_status()
+        return s
+
+    status_var = make_status_var()
+    ttk.Label(hundotracker_frame, textvariable=status_var).grid(row=row, column=2, sticky="w", padx=10, pady=5)
+
+    # Store variable + threshold in the Apple Bobbing dict
+    hundotracker_frame.applebobbing_entries[label_text] = (var, bobbing_thresholds[label_text])
+
+    row += 1
+
+# Initial update
+update_applebobbing_progress()
+
+# Remaining categories
+ttk.Label(hundotracker_frame, text="Battle Stamps").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Costumes").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Creepy Treat Cards").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Level").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Quests").grid(row=row, column=0, sticky="w", padx=10, pady=5)
 
 # --- WIP Tabs ---
 for tab in ("Quests",):
