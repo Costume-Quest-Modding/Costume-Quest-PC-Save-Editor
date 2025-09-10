@@ -823,13 +823,13 @@ notebook.pack(fill="both", expand=True)
 
 frames = {
     "Summary": ttk.Frame(notebook),
+    "100% Tracker": ttk.Frame(notebook),
     "Stats": ttk.Frame(notebook),
     "World/Location": ttk.Frame(notebook),
     "Battle Stamps": ttk.Frame(notebook),
     "Cards": ttk.Frame(notebook),
     "Costumes": ttk.Frame(notebook),
     "Quests": ttk.Frame(notebook),
-    "100% Tracker": ttk.Frame(notebook),
 }
 
 for name, frame in frames.items():
@@ -1072,7 +1072,7 @@ row += 1
 
 bobbing_label = ttk.Label(hundotracker_frame, text="Apple Bobbing:")
 bobbing_label.grid(row=row, column=0, sticky="w", padx=25, pady=5)
-ToolTip(bobbing_label, "Complete 3 rounds of Apple Bobbing at each location, doing so will complete these quests!")
+ToolTip(bobbing_label, "Complete 3 rounds of Apple Bobbing at each location, doing so will complete these quests!\nFirst 2 rounds give Candy, 3rd gives a Creepy Treat Card.")
 row += 1
 
 # Misc stats data
