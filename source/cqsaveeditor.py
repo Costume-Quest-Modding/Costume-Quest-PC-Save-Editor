@@ -249,6 +249,35 @@ class AppState:
     camera_position_vars = [tk.DoubleVar(), tk.DoubleVar(), tk.DoubleVar()]
     save_path = None
 
+# ==================== ToolTips ====================
+
+class ToolTip:
+    def __init__(self, widget, text):
+        self.widget = widget
+        self.text = text
+        self.tipwindow = None
+        widget.bind("<Enter>", self.show_tip)
+        widget.bind("<Leave>", self.hide_tip)
+
+    def show_tip(self, event=None):
+        if self.tipwindow or not self.text:
+            return
+        x, y, cx, cy = self.widget.bbox("insert")  # get widget bounding box
+        x += self.widget.winfo_rootx() + 20
+        y += self.widget.winfo_rooty() + 10
+        self.tipwindow = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)  # removes window decorations
+        tw.wm_geometry(f"+{x}+{y}")
+        label = tk.Label(tw, text=self.text, justify='left',
+                         background="#ffffe0", relief='solid', borderwidth=1,
+                         font=("tahoma", "8", "normal"))
+        label.pack(ipadx=1)
+
+    def hide_tip(self, event=None):
+        if self.tipwindow:
+            self.tipwindow.destroy()
+            self.tipwindow = None
+
 # ==================== Utility Functions ====================
 
 def calculate_level_from_xp(xp):
@@ -1028,9 +1057,22 @@ progress_label.grid(row=21, column=2, columnspan=4, sticky="w")
 # --- 100% Tracker Frame ---
 hundotracker_frame = frames["100% Tracker"]
 row = 0
-ttk.Label(hundotracker_frame, text="").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+
+# Remaining categories
+ttk.Label(hundotracker_frame, text="Battle Stamps").grid(row=row, column=0, sticky="w", padx=10, pady=5)
 row += 1
-ttk.Label(hundotracker_frame, text="Apple Bobbing:").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+ttk.Label(hundotracker_frame, text="Costumes").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Creepy Treat Cards").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Level").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+ttk.Label(hundotracker_frame, text="Quests").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+row += 1
+
+bobbing_label = ttk.Label(hundotracker_frame, text="Apple Bobbing:")
+bobbing_label.grid(row=row, column=0, sticky="w", padx=25, pady=5)
+ToolTip(bobbing_label, "Complete 3 rounds of Apple Bobbing at each location, doing so will complete these quests!")
 row += 1
 
 # Misc stats data
@@ -1054,10 +1096,10 @@ hundotracker_frame.applebobbing_entries = {}
 hundotracker_frame.progress_var = tk.DoubleVar()
 
 applebobbingprogress = ttk.Label(hundotracker_frame, text="Completed: 0 / 0 (0%)")
-applebobbingprogress.grid(row=row, column=0, columnspan=4, padx=10, pady=10, sticky="w")
+applebobbingprogress.grid(row=row, column=0, columnspan=4, padx=40, pady=10, sticky="w")
 
 applebobbingprogressbar = ttk.Progressbar(hundotracker_frame, variable=hundotracker_frame.progress_var, maximum=100, length=200)
-applebobbingprogressbar.grid(row=row, column=1, columnspan=2, padx=10, pady=10, sticky="w")
+applebobbingprogressbar.grid(row=row, column=1, columnspan=2, padx=40, pady=10, sticky="w")
 row += 1
 
 # Define the progress update function first
@@ -1072,7 +1114,7 @@ def update_applebobbing_progress():
 # Now create the Apple Bobbing entries
 for label_text, var in misc_stats:
     # Score label
-    ttk.Label(hundotracker_frame, text=label_text).grid(row=row, column=0, sticky="w", padx=25, pady=5)
+    ttk.Label(hundotracker_frame, text=label_text).grid(row=row, column=0, sticky="w", padx=40, pady=5)
     ttk.Label(hundotracker_frame, textvariable=var, relief="sunken", width=10, anchor="w").grid(row=row, column=1, sticky="w", padx=25, pady=5)
 
     # Completed/incomplete status
@@ -1096,17 +1138,6 @@ for label_text, var in misc_stats:
 
 # Initial update
 update_applebobbing_progress()
-
-# Remaining categories
-ttk.Label(hundotracker_frame, text="Battle Stamps").grid(row=row, column=0, sticky="w", padx=10, pady=5)
-row += 1
-ttk.Label(hundotracker_frame, text="Costumes").grid(row=row, column=0, sticky="w", padx=10, pady=5)
-row += 1
-ttk.Label(hundotracker_frame, text="Creepy Treat Cards").grid(row=row, column=0, sticky="w", padx=10, pady=5)
-row += 1
-ttk.Label(hundotracker_frame, text="Level").grid(row=row, column=0, sticky="w", padx=10, pady=5)
-row += 1
-ttk.Label(hundotracker_frame, text="Quests").grid(row=row, column=0, sticky="w", padx=10, pady=5)
 
 # --- WIP Tabs ---
 for tab in ("Quests",):
