@@ -45,7 +45,7 @@ class AppState:
         cls.suburbsbobbing_var = tk.StringVar(value="0")
         cls.mallbobbing_var = tk.StringVar(value="0")
         cls.countrybobbing_var = tk.StringVar(value="0")
-        cls.selected_world = tk.StringVar(value="")
+        cls.selected_world = tk.StringVar(value="Suburbs")
         # default to empty costume slots (UI will set defaults)
         cls.costume_vars = [tk.StringVar(value="") for _ in range(3)]
         cls.player_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
