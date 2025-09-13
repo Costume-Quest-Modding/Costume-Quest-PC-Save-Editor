@@ -107,8 +107,19 @@ def create_menu(root, frames_refs):
     menu_bar.add_cascade(label="Options", menu=options_menu)
 
     help_menu = make_menu(menu_bar)
-    help_menu.add_command(label="How to Use", command=lambda: messagebox.showinfo("How to Use", "Use the main tabs to navigate..."))
-    help_menu.add_command(label="About", command=lambda: messagebox.showinfo("About", "Costume Quest PC Save Editor\nVersion Beta"))
+    help_menu.add_command(
+        label="How to Use",
+        command=lambda: messagebox.showinfo(
+            "How to Use",
+            "Use the main tabs to navigate. Use the dropdown tabs/textboxes to edit save file information.\n\n"
+            "'File Options'\n\n"
+            "'Open' - Open existing save file.\n\n"
+            "'Save' - Save changes to current save.\n\n"
+            "'Save As...' - Choose where to save your file.\n(Try saving as a .json or .txt)\n\n"
+            "'Backup Save File' - Makes a backup of currently loaded save."
+        )
+    )
+    help_menu.add_command(label="About", command=lambda: messagebox.showinfo("About", "Costume Quest PC Save Editor\nAlpha Version by DeathMaster001"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
 
     root.config(menu=menu_bar)
@@ -128,8 +139,7 @@ def create_tabs(root):
     frames = {
         "Summary": ttk.Frame(notebook),
         "100% Tracker": ttk.Frame(notebook),
-        "Stats": ttk.Frame(notebook),
-        "World/Location": ttk.Frame(notebook),
+        "Stats & World": ttk.Frame(notebook),
         "Battle Stamps": ttk.Frame(notebook),
         "Cards": ttk.Frame(notebook),
         "Costumes": ttk.Frame(notebook),
@@ -210,9 +220,9 @@ def create_tabs(root):
         )
         row += 1
 
-    # ---------- Stats Frame ----------
-    stats_frame = frames["Stats"]
-    ttk.Label(stats_frame, text="Main Stats").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    # ---------- Stats & World Frame ----------
+    stats_frame = frames["Stats & World"]
+    ttk.Label(stats_frame, text="Stats").grid(row=row, column=0, sticky="w", padx=10, pady=5)
     row += 1
 
     ttk.Label(stats_frame, text="Level:").grid(row=row, column=0, sticky="w", padx=25, pady=5)
@@ -234,16 +244,20 @@ def create_tabs(root):
 
     ttk.Label(stats_frame, text="Current Candy:").grid(row=row, column=0, sticky="w", padx=25, pady=5)
     ttk.Entry(stats_frame, textvariable=saveio.AppState.candy_var, width=33).grid(row=row, column=1, padx=25, pady=5, sticky="w")
+    row += 2
+
+    ttk.Label(stats_frame, text="World and Position").grid(row=row, column=0, padx=10, pady=5, sticky="w")
+    row += 1
+    ttk.Label(stats_frame, text="World:").grid(row=row, column=0, padx=25, pady=5, sticky="w")
+    ttk.Combobox(stats_frame, textvariable=saveio.AppState.selected_world, values=list(WORLD_PATHS.keys()), width=31, state="readonly").grid(row=row, column=1, padx=25, pady=5, sticky="w")
     row += 1
 
-    # ---------- World/Location Frame ----------
-    world_frame = frames["World/Location"]
-    ttk.Label(world_frame, text="World:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
-    ttk.Combobox(world_frame, textvariable=saveio.AppState.selected_world, values=list(WORLD_PATHS.keys()), width=30, state="readonly").grid(row=0, column=1, padx=10, pady=5, sticky="w")
-    player_position_frame2 = create_vector_editor(world_frame, "Player Position:", saveio.AppState.player_position_vars)
-    player_position_frame2.grid(row=1, column=0, columnspan=2, sticky="w", padx=25, pady=5)
-    camera_position_frame2 = create_vector_editor(world_frame, "Camera Position:", saveio.AppState.camera_position_vars)
-    camera_position_frame2.grid(row=2, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+    player_position_frame2 = create_vector_editor(stats_frame, "Player Position:", saveio.AppState.player_position_vars)
+    player_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=40, pady=5)
+    row += 1
+
+    camera_position_frame2 = create_vector_editor(stats_frame, "Camera Position:", saveio.AppState.camera_position_vars)
+    camera_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=40, pady=5)
 
     # ---------- Costumes Frame ----------
     costumes_frame = frames["Costumes"]
