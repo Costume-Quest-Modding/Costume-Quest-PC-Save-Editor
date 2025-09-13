@@ -190,8 +190,9 @@ def create_tabs(root):
     camera_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 1
 
-    ttk.Label(summary_frame, text="Costumes:").grid(row=row, column=0, sticky="w", padx=25)
+    ttk.Label(summary_frame, text="Costumes:").grid(row=row, column=0, sticky="w", padx=25, pady=5)
     row += 1
+    ttk.Label(summary_frame, text="Equipped Costumes:").grid(row=row, column=0, padx=35, pady=5)
 
     saveio.AppState.costume_display_vars = [tk.StringVar() for _ in NAMES]
     for i, name in enumerate(NAMES):
@@ -363,7 +364,7 @@ def create_tabs(root):
         r += 1
     # Initial update
     update_applebobbing_progress()
-    
+
     # Quests tab placeholder
     ttk.Label(frames["Quests"], text="Not implemented yet.", anchor="center", justify="center").pack(expand=True, fill='both')
 
