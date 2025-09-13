@@ -73,10 +73,13 @@ class ToolTip:
 def create_vector_editor(parent, label_text, variables, state="normal"):
     frame = ttk.Frame(parent)
     frame.columnconfigure(1, weight=1)
-    ttk.Label(frame, text=label_text).grid(row=0, column=0, sticky="w", padx=(10, 5))
+    ttk.Label(frame, text=label_text).grid(row=0, column=0, sticky="w")
     for i, (axis, var) in enumerate(zip(["X", "Y", "Z"], variables)):
-        ttk.Label(frame, text=f"{axis}:").grid(row=i + 1, column=0, padx=10, pady=2, sticky="e")
-        ttk.Entry(frame, textvariable=var, state=state).grid(row=i + 1, column=1, padx=5, pady=2, sticky="we")
+        ttk.Label(frame, text=f"{axis}:").grid(row=i + 1, column=1, padx=10, pady=2)
+        if state == "readonly":  # use label instead of entry
+            ttk.Label(frame, textvariable=var).grid(row=i + 1, column=2, padx=10, pady=2, sticky="w")
+        else:  # normal editable entry
+            ttk.Entry(frame, textvariable=var, state=state).grid(row=i + 1, column=2, padx=10, pady=2, sticky="w")
     return frame
 
 # ---------- UI builder ----------
@@ -192,11 +195,11 @@ def create_tabs(root):
     ttk.Label(summary_frame, textvariable=saveio.AppState.selected_world, width=33).grid(row=row, column=1, padx=25)
     row += 1
 
-    player_position_frame = create_vector_editor(summary_frame, "Player Position:", saveio.AppState.player_position_vars)
+    player_position_frame = create_vector_editor(summary_frame, "Player Position:", saveio.AppState.player_position_vars, state="readonly")
     player_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 2
 
-    camera_position_frame = create_vector_editor(summary_frame, "Camera Position:", saveio.AppState.camera_position_vars)
+    camera_position_frame = create_vector_editor(summary_frame, "Camera Position:", saveio.AppState.camera_position_vars, state="readonly")
     camera_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 1
 
@@ -253,11 +256,11 @@ def create_tabs(root):
     row += 1
 
     player_position_frame2 = create_vector_editor(stats_frame, "Player Position:", saveio.AppState.player_position_vars)
-    player_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=40, pady=5)
+    player_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 1
 
     camera_position_frame2 = create_vector_editor(stats_frame, "Camera Position:", saveio.AppState.camera_position_vars)
-    camera_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=40, pady=5)
+    camera_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
 
     # ---------- Costumes Frame ----------
     costumes_frame = frames["Costumes"]
