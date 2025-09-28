@@ -7,8 +7,8 @@ from ttkthemes import ThemedTk
 def main():
     root = ThemedTk(theme="winxpblue")
     root.title("Costume Quest PC Save Editor")
-    root.geometry("800x600")
-    root.minsize(800, 600)
+    root.geometry("800x900")
+    root.minsize(800, 900)
 
     # initialize Tk variables inside AppState
     saveio.AppState.init_vars(root)

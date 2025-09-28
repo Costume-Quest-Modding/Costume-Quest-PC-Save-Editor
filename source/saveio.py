@@ -32,6 +32,7 @@ class AppState:
     costume_vars = None
     player_position_vars = None
     camera_position_vars = None
+    card_vars = None
 
     @classmethod
     def init_vars(cls, root):
@@ -50,6 +51,7 @@ class AppState:
         cls.costume_vars = [tk.StringVar(value="") for _ in range(3)]
         cls.player_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
         cls.camera_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
+        cls.card_vars = {i + 1: tk.IntVar(value=0) for i in range(54)}
 
 # ---------------- utility / parsing ----------------
 def on_candy_change(*args):
@@ -249,10 +251,13 @@ def open_save_dialog():
     return True
 
 def populate_entries_from_state(cards_entries, battle_entries):
-    """Given UI entry widget maps, fill them from AppState.save_text_data"""
+    """Given UI entry widget maps, fill them from AppState.save_text_data."""
     if not AppState.save_text_data:
         return
-    # battle items
+
+    AppState.loading_save = True  # Prevent traces from firing prematurely
+
+    # --- Update battle items ---
     for match in BATTLE_ITEM_PATTERN.finditer(AppState.save_text_data):
         item_key = match.group(2)
         current_amount = match.group(3)
@@ -260,13 +265,34 @@ def populate_entries_from_state(cards_entries, battle_entries):
             entry = battle_entries[item_key]
             entry.delete(0, tk.END)
             entry.insert(0, current_amount)
-    # creepytreat cards
+
+    # --- Update creepy treat cards ---
     for match in CARD_PATTERN.finditer(AppState.save_text_data):
         card_num = int(match.group(2))
-        current_amount = match.group(3)
+        current_amount = int(match.group(3))
         if card_num in cards_entries:
-            cards_entries[card_num].delete(0, tk.END)
-            cards_entries[card_num].insert(0, current_amount)
+            entry = cards_entries[card_num]
+            entry.delete(0, tk.END)
+            entry.insert(0, str(current_amount))
+
+        # Update card_vars to reflect collected status
+        if card_num in AppState.card_vars:
+            AppState.card_vars[card_num].set(1 if current_amount > 0 else 0)
+
+    # --- Force a refresh of card gallery ---
+    # This ensures labels update immediately after loading
+    for card_num, var in AppState.card_vars.items():
+        var.set(var.get())  # triggers trace_add to update image
+
+    AppState.loading_save = False
+
+    # --- Optional: update 100% tracker progress bar if exists ---
+    try:
+        from ui import tracker_frame  # adjust if your frame is named differently
+        if hasattr(tracker_frame, "update_progress"):
+            tracker_frame.update_progress()
+    except Exception:
+        pass  # fail silently if UI not yet ready
 
 def _replace_card_values_in_text(text, cards_entries):
     updated = text

@@ -3,6 +3,11 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkthemes import ThemedTk
 import saveio
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
+from saveio import AppState
+from PIL import Image, ImageTk
 from constants import THEMES, NAMES, COSTUME_OPTIONS, CARD_NAMES, BATTLE_ITEM_NAMES, WORLD_PATHS
 
 # keep a module-level theme name
@@ -81,6 +86,121 @@ def create_vector_editor(parent, label_text, variables, state="normal"):
         else:  # normal editable entry
             ttk.Entry(frame, textvariable=var, state=state).grid(row=i + 1, column=2, padx=10, pady=2, sticky="w")
     return frame
+
+def create_card_gallery(parent, card_names, collected_dict, images_path="images/cards", thumb_size=(64, 64)):
+    """
+    Displays a gallery of cards (read-only).
+    Uses collected_dict {card_num: tk.IntVar()} to decide grey/colored.
+    Horizontal scroll with 4 rows and 9 visible columns.
+    """
+    import os
+    from PIL import Image, ImageTk
+    import tkinter as tk
+    from tkinter import ttk
+
+    NUM_ROWS = 4
+    VISIBLE_COLUMNS = 9
+
+    # Canvas width set so 9 cards fit before scrolling
+    canvas_width = (thumb_size[0] + 21) * VISIBLE_COLUMNS
+    canvas_height = (thumb_size[1] + 45) * NUM_ROWS
+
+    canvas = tk.Canvas(parent, width=canvas_width, height=canvas_height, highlightthickness=0)
+    h_scrollbar = ttk.Scrollbar(parent, orient="horizontal", command=canvas.xview)
+    scroll_frame = ttk.Frame(canvas)
+
+    scroll_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
+    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+    canvas.configure(xscrollcommand=h_scrollbar.set)
+
+    canvas.grid(row=0, column=0, sticky="nsew")
+    h_scrollbar.grid(row=1, column=0, sticky="ew")
+
+    # Keep references
+    parent._images = []
+    parent._labels = {}
+
+    # Progress tracking
+    parent.progress_var = tk.DoubleVar()
+    progress_label = ttk.Label(parent, text="Collected: 0 / 0 (0%)")
+    progress_label.grid(row=2, column=0, sticky="w", padx=10, pady=5)
+    progress = ttk.Progressbar(parent, variable=parent.progress_var, maximum=100, length=300)
+    progress.grid(row=3, column=0, sticky="w", padx=10, pady=5)
+
+    def update_progress():
+        total = len(collected_dict)
+        collected = sum(var.get() for var in collected_dict.values())
+        percent = (collected / total * 100) if total else 0
+        parent.progress_var.set(percent)
+        progress_label.config(text=f"Collected: {collected} / {total} ({percent:.0f}%)")
+
+        # Update card images
+        for card_num, lbl in parent._labels.items():
+            thumb_tk, grey_tk = lbl._images
+            var = collected_dict.get(card_num)
+            if var:
+                lbl.config(image=thumb_tk if var.get() else grey_tk)
+
+    for i in range(54):
+        card_num = i + 1
+        card_name = card_names.get(card_num, f"Card {card_num}")
+        img_path = os.path.join(images_path, f"trickcard_{card_num:03}.png")
+
+        if os.path.exists(img_path):
+            img = Image.open(img_path)
+            thumb = img.resize(thumb_size, Image.Resampling.LANCZOS)
+            grey = Image.eval(thumb, lambda px: int(px * 0.3 + 100))
+            thumb_tk = ImageTk.PhotoImage(thumb)
+            grey_tk = ImageTk.PhotoImage(grey)
+            parent._images.extend([thumb_tk, grey_tk])
+
+            var = collected_dict.setdefault(card_num, tk.IntVar(value=0))
+            var.trace_add("write", lambda *args: update_progress())
+
+            lbl = ttk.Label(
+                scroll_frame,
+                image=grey_tk if var.get() == 0 else thumb_tk,
+                text=card_name,
+                compound="top"
+            )
+            lbl._images = (thumb_tk, grey_tk)
+
+            # Layout: 4 rows, increment columns horizontally
+            lbl.grid(row=i % NUM_ROWS, column=i // NUM_ROWS, padx=8, pady=8)
+            parent._labels[card_num] = lbl
+
+            # Hover popup
+            def show_popup(event, img=img, name=card_name, lbl=lbl):
+                if hasattr(lbl, "_popup") and lbl._popup:
+                    lbl._popup.destroy()
+                top = tk.Toplevel(parent)
+                top.wm_overrideredirect(True)
+                x = event.x_root + 20
+                y = event.y_root + 20
+                top.geometry(f"+{x}+{y}")
+                big = img.resize((img.width, img.height), Image.Resampling.LANCZOS)
+                big_tk = ImageTk.PhotoImage(big)
+                parent._images.append(big_tk)
+                tk.Label(top, image=big_tk, text=name, compound="top").pack()
+                lbl._popup = top
+
+            def hide_popup(event, lbl=lbl):
+                if hasattr(lbl, "_popup") and lbl._popup:
+                    lbl._popup.destroy()
+                    lbl._popup = None
+
+            lbl.bind("<Enter>", show_popup)
+            lbl.bind("<Leave>", hide_popup)
+
+        else:
+            ttk.Label(scroll_frame, text=f"{card_name}\n(Missing)").grid(row=i % NUM_ROWS, column=i // NUM_ROWS, padx=8, pady=8)
+
+    update_progress()
+    parent.update_progress = update_progress
+    return parent.progress_var
 
 # ---------- UI builder ----------
 def create_menu(root, frames_refs):
@@ -232,7 +352,7 @@ def create_tabs(root):
     level_dropdown = ttk.Combobox(
         stats_frame,
         textvariable=saveio.AppState.level_var,
-        values=[""] + [str(i) for i in range(1, 11)],
+        values=[""] + [str(i) for i in range(1, 15)],
         width=31,
         state="readonly",
     )
@@ -326,14 +446,29 @@ def create_tabs(root):
     # ---------- 100% tracker frame ----------
     tracker_frame = frames["100% Tracker"]
     ttk.Label(tracker_frame, text="Battle Stamps").grid(row=0, column=0, sticky="w", padx=10, pady=5)
-    ttk.Label(tracker_frame, text="Costumes").grid(row=1, column=0, sticky="w", padx=10, pady=5)
-    ttk.Label(tracker_frame, text="Creepy Treat Cards").grid(row=2, column=0, sticky="w", padx=10, pady=5)
-    ttk.Label(tracker_frame, text="Level").grid(row=3, column=0, sticky="w", padx=10, pady=5)
-    ttk.Label(tracker_frame, text="Quests").grid(row=4, column=0, sticky="w", padx=10, pady=5)
+    row += 1
+    ttk.Label(tracker_frame, text="Costumes").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    row += 1
+    # Creepy Treats Tracker
+    ttk.Label(tracker_frame, text="Creepy Treat Cards").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    row += 1
+    tracker_frame.cards_frame = ttk.Frame(tracker_frame)
+    tracker_frame.cards_frame.grid(row=row, column=0, columnspan=4, sticky="nsew", padx=20, pady=10)
+    row += 1
+    tracker_frame.card_progress = create_card_gallery(tracker_frame.cards_frame, CARD_NAMES, AppState.card_vars, images_path=CARDS_DIR)
 
+    #Level Tracker
+
+    ttk.Label(tracker_frame, text="Level").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    row += 1
+    #Quests
+    ttk.Label(tracker_frame, text="Quests").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    row += 1
     bobbing_label = ttk.Label(tracker_frame, text="Apple Bobbing:")
-    bobbing_label.grid(row=5, column=0, sticky="w", padx=25, pady=5)
+    bobbing_label.grid(row=row, column=0, sticky="w", padx=25, pady=5)
     ToolTip(bobbing_label, "Complete 3 rounds of Apple Bobbing at each location, doing so will complete these quests!\nFirst 2 rounds give Candy, 3rd gives a Creepy Treat Card.")
+    row += 1
+    
     misc_stats1 = [
         ("Suburbs High Score:", saveio.AppState.suburbsbobbing_var),
         ("Autumn Haven Mall High Score:", saveio.AppState.mallbobbing_var),
@@ -349,9 +484,10 @@ def create_tabs(root):
     tracker_frame.applebobbing_entries = {}
     tracker_frame.progress_var = tk.DoubleVar()
     applebobbingprogress = ttk.Label(tracker_frame, text="Completed: 0 / 0 (0%)")
-    applebobbingprogress.grid(row=6, column=0, columnspan=4, padx=40, pady=10, sticky="w")
+    applebobbingprogress.grid(row=row, column=0, columnspan=4, padx=40, pady=10, sticky="w")
     applebobbingprogressbar = ttk.Progressbar(tracker_frame, variable=tracker_frame.progress_var, maximum=100, length=200)
-    applebobbingprogressbar.grid(row=6, column=1, columnspan=2, padx=40, pady=10, sticky="w")
+    applebobbingprogressbar.grid(row=row, column=1, columnspan=2, padx=40, pady=10, sticky="w")
+    row += 1
 
     def update_applebobbing_progress():
         total = len(tracker_frame.applebobbing_entries)
@@ -361,7 +497,7 @@ def create_tabs(root):
         tracker_frame.progress_var.set(percentage)
         applebobbingprogress.config(text=f"Completed: {collected} / {total} ({percentage:.0f}%)")
     
-    r = 7
+    r = 14
     for label_text, var in misc_stats1:
         display_label = label_text.replace(" High Score:", "")
         ttk.Label(tracker_frame, text=display_label).grid(row=r, column=0, sticky="w", padx=40, pady=5)
