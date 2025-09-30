@@ -393,6 +393,28 @@ def create_tabs(root):
     cards_frame = frames["Cards"]
     cards_frame.entries = {}
     cards_per_col = 18
+
+    cards_frame.progress_var = tk.DoubleVar()
+    cards_frame.toggle_all_var = tk.IntVar()
+
+
+    def update_cards_progress():
+        total = len(cards_frame.entries)
+        collected = sum(1 for e in cards_frame.entries.values() if e.get().strip().isdigit() and int(e.get().strip()) > 0)
+        percentage = (collected / total) * 100 if total > 0 else 0
+        cards_frame.progress_var.set(percentage)
+        if hasattr(cards_frame, "progress_label"):
+            cards_frame.progress_label.config(text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
+
+    def toggle_all_cards():
+        val = "1" if cards_frame.toggle_all_var.get() else "0"
+        for entry in cards_frame.entries.values():
+            entry.delete(0, tk.END)
+            entry.insert(0, val)
+        update_cards_progress()
+
+    ttk.Checkbutton(cards_frame, text="Toggle All", variable=cards_frame.toggle_all_var, command=toggle_all_cards).grid(row=0, column=0, columnspan=4, pady=10)
+
     for i in range(54):
         card_num = i + 1
         col = i // cards_per_col * 2
@@ -522,7 +544,6 @@ def create_tabs(root):
     ttk.Label(frames["Quests"], text="Not implemented yet.", anchor="center", justify="center").pack(expand=True, fill='both')
 
     # return the notebook and a map of frames so main can keep references
-    frames["Cards"] = cards_frame
     frames["Battle Stamps"] = battle_frame
     frames["100% Tracker"] = tracker_frame
     return notebook, frames
