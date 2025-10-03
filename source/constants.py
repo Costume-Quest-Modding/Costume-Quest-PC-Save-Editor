@@ -11,6 +11,22 @@ XP_THRESHOLDS = {
 
 NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
+DEBUG_TELEPORTS = {
+    "Suburbs": {
+        "Bobbing for Apples": (126.0, 4.0, 60.0),
+        "Second Storm Drain": (157.0, 3.5, -5.0),
+        "Cemetery/Scarecrow": (67.0, 9.0, -77.0),
+    },
+    "Autumn Haven Mall": {
+        "temp": (0.0, 0.0, 0.0),
+        "temp": (0.0, 0.0, 0.0),
+    },
+    "Fall Valley": {
+        "Carnival": (-8.0, 6.3, 62.0),
+        "Scarecrow": (33.0, 6.0, 41.0),
+    },
+}
+
 WORLD_PATHS = {
     "Suburbs": "worlds/cq_suburbs/cq_suburbs",
     "Autumn Haven Mall": "worlds/cq_mall_interior/cq_mall_interior",
