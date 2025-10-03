@@ -359,15 +359,33 @@ def create_menu(root, frames_refs):
         label="How to Use",
         command=lambda: messagebox.showinfo(
             "How to Use",
-            "Use the main tabs to navigate. Use the dropdown tabs/textboxes to edit save file information.\n\n"
-            "'File Options'\n\n"
-            "'Open' - Open existing save file.\n\n"
-            "'Save' - Save changes to current save.\n\n"
-            "'Save As...' - Choose where to save your file.\n(Try saving as a .json or .txt)\n\n"
-            "'Backup Save File' - Makes a backup of currently loaded save."
+            "=== Costume Quest Save Editor Help ===\n\n"
+            "Navigation:\n"
+            " - Use the main tabs to access different sections (Summary, Stats, Cards, etc.).\n"
+            " - Click on entries or dropdowns to edit your save file values.\n\n"
+            "File Menu:\n"
+            " - Open: Load a Costume Quest save file.\n"
+            " - Save: Save changes to the current file.\n"
+            " - Save As...: Save to a new file location (.json or .txt allowed).\n"
+            " - Backup Save File: Make a backup of your current save.\n\n"
+            "View Menu:\n"
+            " - Show/Hide 100% Tracker: Opens a separate window to track completion.\n\n"
+            "Options Menu:\n"
+            " - Toggle Light/Dark Mode: Switches editor themes.\n\n"
+            "Tips:\n"
+            " - Hover over labels for more info (tooltips).\n"
+            " - Ensure you save changes before closing the editor."
         )
     )
-    help_menu.add_command(label="About", command=lambda: messagebox.showinfo("About", "Costume Quest PC Save Editor\nAlpha Version by DeathMaster001"))
+    help_menu.add_command(
+    label="About",
+    command=lambda: messagebox.showinfo(
+        "About",
+        "Costume Quest PC Save Editor - Alpha Version\n"
+        "Made by: DeathMaster001\n\n"
+        "This program allows you to view and edit Costume Quest PC save files. Use responsibly!"
+        )
+    )
     menu_bar.add_cascade(label="Help", menu=help_menu)
 
     root.config(menu=menu_bar)
