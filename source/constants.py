@@ -12,7 +12,7 @@ XP_THRESHOLDS = {
 NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
 WORLD_PATHS = {
-    "Suburbs": "worlds/cq_suburbs/cq_suburbs.leveldata",
+    "Suburbs": "worlds/cq_suburbs/cq_suburbs",
     "Autumn Haven Mall": "worlds/cq_mall_interior/cq_mall_interior",
     "Fall Valley": "worlds/cq_fallvalley/cq_fallvalley",
 }

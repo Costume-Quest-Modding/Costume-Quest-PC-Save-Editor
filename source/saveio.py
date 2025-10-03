@@ -54,6 +54,30 @@ class AppState:
         cls.card_vars = {i + 1: tk.IntVar(value=0) for i in range(54)}
 
 # ---------------- utility / parsing ----------------
+
+def get_level_path_from_selected_world():
+    """Return the correct Level= world path string based on selected world."""
+    world_name = AppState.selected_world.get()
+    return WORLD_PATHS.get(world_name, WORLD_PATHS["Suburbs"])
+
+def update_current_candy(text, new_value):
+    "Update only the CurrentCandy field without touching other MaxCandyAmount fields."
+    candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
+    if not candy_matches:
+        # No CandyAmount found, append new field
+        insert_point = text.find("EquippedCostumes=")
+        new_line = f"CandyAmount={new_value};\n"
+        if insert_point != -1:
+            return text[:insert_point] + new_line + text[insert_point:]
+        else:
+            return text.strip() + "\n" + new_line
+
+    # Replace only the last occurrence
+    last_match = candy_matches[-1]
+    start, end = last_match.span(1)  # only the number itself
+    updated_text = text[:start] + str(new_value) + text[end:]
+    return updated_text
+
 def on_candy_change(*args):
     if AppState.loading_save:
         return
@@ -103,29 +127,33 @@ def extract_vector3(pattern, text):
 def update_or_add_field(text, field_name, new_value):
     """
     Update or insert field into save text. Handles vector fields (PlayerPosition, CameraPosition) specially.
+    Works for numbers and strings.
     """
     is_vector = field_name in ["PlayerPosition", "CameraPosition"]
+    
     if is_vector and isinstance(new_value, (tuple, list)):
         value_str = f"<{new_value[0]},{new_value[1]},{new_value[2]}>"
         pattern = fr"{field_name}=<[-.\d]+,[-.\d]+,[-.\d]+>"
         replacement = f"{field_name}={value_str}"
-    else:
-        # numeric or string - ensure terminator semicolon
-        if isinstance(new_value, str) and not new_value.endswith(";"):
-            if ";" in new_value:
-                value_str = new_value
-            else:
-                value_str = f"{new_value};"
-        else:
-            value_str = str(new_value)
-            if not value_str.endswith(";"):
-                value_str = value_str + ";"
-        # pattern allows decimals too
+    elif isinstance(new_value, (int, float)):
+        # numeric field
+        value_str = str(new_value)
+        if not value_str.endswith(";"):
+            value_str += ";"
         pattern = fr"{field_name}\s*=\s*-?\d+(?:\.\d+)?;"
+        replacement = f"{field_name}={value_str}"
+    else:
+        # string field
+        value_str = str(new_value)
+        if not value_str.endswith(";"):
+            value_str += ";"
+        # match any existing line that starts with field_name=
+        pattern = fr"{field_name}\s*=\s*.*?;"
         replacement = f"{field_name}={value_str}"
 
     if re.search(pattern, text):
         return re.sub(pattern, replacement, text)
+    
     # insert before EquippedCostumes if possible, else append
     insert_point = text.find("EquippedCostumes=")
     insert_text = replacement if replacement.endswith("\n") else replacement + "\n"
@@ -140,7 +168,6 @@ def update_save_data(
     xp,
     new_candy,
     new_total,
-    new_world_path,
     player_pos,
     camera_pos,
     costumes,
@@ -150,15 +177,14 @@ def update_save_data(
     mallbobbing,
     countrybobbing
 ):
-    text = update_or_add_field(text, "Level", new_level)
+    level_path = get_level_path_from_selected_world()
+    text = update_or_add_field(text, "Level", level_path)
     text = update_or_add_field(text, "ExperiencePoints", xp)
     text = update_or_add_field(text, "CandyAmount", new_candy)
     text = update_or_add_field(text, "TotalCandyAmount", new_total)
-    text = update_or_add_field(text, "World", new_world_path)
     text = update_or_add_field(text, "PlayerPosition", player_pos)
     text = update_or_add_field(text, "CameraPosition", camera_pos)
     costume_str = ",".join([c for c in costumes if c])
-    # replace full EquippedCostumes block if present
     text = re.sub(r"EquippedCostumes=\[[^\]]*\];", f"EquippedCostumes=[{costume_str}];", text)
     text = update_or_add_field(text, "RobotRampJumos", robotjumps)
     text = update_or_add_field(text, "MonsterPailBashes", monsterbashes)
@@ -181,13 +207,9 @@ def extract_save_data(text):
     countrybobbing = extract_int(r"CountryBobbingHighScore=(\d+)", text)
     player_position = extract_vector3(r"PlayerPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
     camera_position = extract_vector3(r"CameraPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
+
     match = re.search(r"Level=([^;]+);", text)
-    world = None
-    if match:
-        path = match.group(1)
-        world = next((k for k, v in WORLD_PATHS.items() if v == path), "Suburbs")
-    else:
-        world = "Suburbs"
+    world = next((k for k, v in WORLD_PATHS.items() if v in match.group(1)), "Suburbs") if match else "Suburbs"
     return (
         total, candy, costumes, xp,
         robot_jumps, monster_bashes,
@@ -332,30 +354,27 @@ def save_changes(cards_entries, battle_entries):
         selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
         xp = int(AppState.xp_var.get())
         new_level = int(AppState.level_var.get())
-        new_world_path = WORLD_PATHS.get(AppState.selected_world.get(), WORLD_PATHS["Suburbs"])
         robotjumps = int(AppState.robotjumps_var.get())
         monsterbashes = int(AppState.monsterbashes_var.get())
         suburbsbobbing = int(AppState.suburbsbobbing_var.get())
         mallbobbing = int(AppState.mallbobbing_var.get())
         countrybobbing = int(AppState.countrybobbing_var.get())
-
         player_pos = tuple(var.get() for var in AppState.player_position_vars)
         camera_pos = tuple(var.get() for var in AppState.camera_position_vars)
 
         updated_text = AppState.save_text_data
 
-        # Update card values and battle items first
+        # --- Update card values and battle items ---
         updated_text = _replace_card_values_in_text(updated_text, cards_entries)
         updated_text = _replace_battle_values_in_text(updated_text, battle_entries)
 
-        # Now update general fields
+        # --- Update core fields ---
         updated_text = update_save_data(
             updated_text,
             new_level,
             xp,
             new_candy,
             new_total,
-            new_world_path,
             player_pos,
             camera_pos,
             selected_costumes,
@@ -366,22 +385,27 @@ def save_changes(cards_entries, battle_entries):
             countrybobbing
         )
 
-        # write file (preserve header)
+        # --- Write file preserving header ---
         with open(path, "wb") as f:
             f.write(AppState.save_header)
             f.write(updated_text.encode("utf-8"))
-        # update in-memory copy
+
+        # --- Update in-memory copy ---
         AppState.save_text_data = updated_text
         messagebox.showinfo("Success", "Save file updated!")
         return True
+
     except Exception as e:
         messagebox.showerror("Error", f"Failed to save: {e}")
         return False
 
+
 def save_as(cards_entries, battle_entries):
+    """Export save data to user-chosen file (.json, .txt, or binary)"""
     if not AppState.save_text_data:
         messagebox.showerror("Error", "No save file loaded.")
         return False
+
     path = filedialog.asksaveasfilename(
         title="Save As",
         defaultextension=".",
@@ -389,8 +413,9 @@ def save_as(cards_entries, battle_entries):
     )
     if not path:
         return False
+
     try:
-        # Build updated_text the same way as save_changes
+        # --- Build updated_text from UI ---
         updated_text = AppState.save_text_data
         updated_text = _replace_card_values_in_text(updated_text, cards_entries)
         updated_text = _replace_battle_values_in_text(updated_text, battle_entries)
@@ -400,7 +425,6 @@ def save_as(cards_entries, battle_entries):
         selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
         xp = int(AppState.xp_var.get())
         new_level = int(AppState.level_var.get())
-        new_world_path = WORLD_PATHS.get(AppState.selected_world.get(), WORLD_PATHS["Suburbs"])
         robotjumps = int(AppState.robotjumps_var.get())
         monsterbashes = int(AppState.monsterbashes_var.get())
         suburbsbobbing = int(AppState.suburbsbobbing_var.get())
@@ -409,13 +433,13 @@ def save_as(cards_entries, battle_entries):
         player_pos = tuple(var.get() for var in AppState.player_position_vars)
         camera_pos = tuple(var.get() for var in AppState.camera_position_vars)
 
+        # --- Update core fields ---
         updated_text = update_save_data(
             updated_text,
             new_level,
             xp,
             new_candy,
             new_total,
-            new_world_path,
             player_pos,
             camera_pos,
             selected_costumes,
@@ -426,6 +450,7 @@ def save_as(cards_entries, battle_entries):
             countrybobbing
         )
 
+        # --- Export based on file type ---
         if path.endswith(".json"):
             import json
             data = {
@@ -433,7 +458,6 @@ def save_as(cards_entries, battle_entries):
                 "ExperiencePoints": xp,
                 "CandyAmount": new_candy,
                 "TotalCandyAmount": new_total,
-                "World": new_world_path,
                 "PlayerPosition": player_pos,
                 "CameraPosition": camera_pos,
                 "EquippedCostumes": selected_costumes,
@@ -445,16 +469,16 @@ def save_as(cards_entries, battle_entries):
             }
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
+
         elif path.endswith(".txt"):
             data = [
                 f"Level: {new_level}",
                 f"Experience Points: {xp}",
                 f"Current Candy Amount: {new_candy}",
                 f"Total Candy Amount: {new_total}",
-                f"World: {new_world_path}",
                 f"Player Position: {player_pos}",
                 f"Camera Position: {camera_pos}",
-                f"Equipped Costumes: {', '.join(selected_costumes)}",
+                f"EquippedCostumes: {', '.join(selected_costumes)}",
                 f"Robot Ramp Jumps: {robotjumps}",
                 f"Monster Pail Bashes: {monsterbashes}",
                 f"Suburbs Bobbing High Score: {suburbsbobbing}",
@@ -463,12 +487,16 @@ def save_as(cards_entries, battle_entries):
             ]
             with open(path, "w", encoding="utf-8") as f:
                 f.write("\n".join(data))
+
         else:
+            # fallback binary save
             with open(path, "wb") as f:
                 f.write(AppState.save_header)
                 f.write(updated_text.encode("utf-8"))
+
         messagebox.showinfo("Saved", f"File successfully saved to:\n{path}")
         return True
+
     except Exception as e:
         messagebox.showerror("Error", f"Failed to save: {e}")
         return False
