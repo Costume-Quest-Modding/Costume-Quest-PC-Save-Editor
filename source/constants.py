@@ -13,17 +13,26 @@ NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
 DEBUG_TELEPORTS = {
     "Suburbs": {
+        "Reynold & Wren's House": (-25.5, 3.3, 33.3),
         "Bobbing for Apples": (126.0, 4.0, 60.0),
+        "First Storm Drain": (117.0, 3.5, 161.0),
         "Second Storm Drain": (157.0, 3.5, -5.0),
         "Cemetery/Scarecrow": (67.0, 9.0, -77.0),
     },
     "Autumn Haven Mall": {
-        "temp": (0.0, 0.0, 0.0),
-        "temp": (0.0, 0.0, 0.0),
+        "Mall Entrance": (-103.5, 55.5, 119.5),
+        "Central Station": (153.1, 39.4, -185.6),
+        "Mall (Second Floor)": (194.0, 38.5, -140.0),
+        "Mall (Third Floor)": (117.5, 45.0, -147.0),
     },
     "Fall Valley": {
+        "Vine Cage": (-22.5, 37.5, 117.3),
+        "Fry Stand": (-49.0, 2.5, -32.0),
         "Carnival": (-8.0, 6.3, 62.0),
         "Scarecrow": (33.0, 6.0, 41.0),
+        "Maze (Center)": (106.5, 3.5, 38.0),
+        "Maze (End)": (60.0, 5.0, 93.5),
+        "Dorsilla/Big Bones": (-12.0, 36.0, 122.0),
     },
 }
 
