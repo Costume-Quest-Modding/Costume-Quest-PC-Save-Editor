@@ -4,6 +4,7 @@ import saveio
 import ui
 from ttkthemes import ThemedTk
 
+
 def main():
     root = ThemedTk(theme="winxpblue")
     root.title("Costume Quest PC Save Editor")
@@ -33,6 +34,7 @@ def main():
             pass
 
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()

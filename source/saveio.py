@@ -9,6 +9,7 @@ from constants import (
     BATTLE_ITEM_PATTERN, BATTLE_ITEM_NAMES
 )
 
+
 class AppState:
     # storage
     save_header = b""
@@ -55,10 +56,12 @@ class AppState:
 
 # ---------------- utility / parsing ----------------
 
+
 def get_level_path_from_selected_world():
     """Return the correct Level= world path string based on selected world."""
     world_name = AppState.selected_world.get()
     return WORLD_PATHS.get(world_name, WORLD_PATHS["Suburbs"])
+
 
 def update_current_candy(text, new_value):
     "Update only the CurrentCandy field without touching other MaxCandyAmount fields."
@@ -78,6 +81,7 @@ def update_current_candy(text, new_value):
     updated_text = text[:start] + str(new_value) + text[end:]
     return updated_text
 
+
 def on_candy_change(*args):
     if AppState.loading_save:
         return
@@ -92,6 +96,7 @@ def on_candy_change(*args):
     except ValueError:
         pass
 
+
 def update_xp_from_level(*args):
     try:
         level = int(AppState.level_var.get())
@@ -99,6 +104,7 @@ def update_xp_from_level(*args):
         AppState.xp_var.set(str(xp))
     except ValueError:
         AppState.level_var.set("")
+
 
 def update_level_from_xp(*args):
     try:
@@ -108,15 +114,18 @@ def update_level_from_xp(*args):
     except ValueError:
         pass
 
+
 def calculate_level_from_xp(xp):
     for lvl in sorted(XP_THRESHOLDS, reverse=True):
         if xp >= XP_THRESHOLDS[lvl]:
             return lvl
     return 1
 
+
 def extract_int(pattern, text, default=0):
     match = re.search(pattern, text)
     return int(match.group(1)) if match else default
+
 
 def extract_vector3(pattern, text):
     match = re.search(pattern, text)
@@ -124,13 +133,14 @@ def extract_vector3(pattern, text):
         return tuple(float(match.group(i)) for i in range(1, 4))
     return (0.0, 0.0, 0.0)
 
+
 def update_or_add_field(text, field_name, new_value):
     """
     Update or insert field into save text. Handles vector fields (PlayerPosition, CameraPosition) specially.
     Works for numbers and strings.
     """
     is_vector = field_name in ["PlayerPosition", "CameraPosition"]
-    
+
     if is_vector and isinstance(new_value, (tuple, list)):
         value_str = f"<{new_value[0]},{new_value[1]},{new_value[2]}>"
         pattern = fr"{field_name}=<[-.\d]+,[-.\d]+,[-.\d]+>"
@@ -153,14 +163,16 @@ def update_or_add_field(text, field_name, new_value):
 
     if re.search(pattern, text):
         return re.sub(pattern, replacement, text)
-    
+
     # insert before EquippedCostumes if possible, else append
     insert_point = text.find("EquippedCostumes=")
-    insert_text = replacement if replacement.endswith("\n") else replacement + "\n"
+    insert_text = replacement if replacement.endswith(
+        "\n") else replacement + "\n"
     if insert_point != -1:
         return text[:insert_point] + insert_text + text[insert_point:]
     else:
         return text.strip() + "\n" + insert_text
+
 
 def update_save_data(
     text,
@@ -185,7 +197,8 @@ def update_save_data(
     text = update_or_add_field(text, "PlayerPosition", player_pos)
     text = update_or_add_field(text, "CameraPosition", camera_pos)
     costume_str = ",".join([c for c in costumes if c])
-    text = re.sub(r"EquippedCostumes=\[[^\]]*\];", f"EquippedCostumes=[{costume_str}];", text)
+    text = re.sub(r"EquippedCostumes=\[[^\]]*\];",
+                  f"EquippedCostumes=[{costume_str}];", text)
     text = update_or_add_field(text, "RobotRampJumos", robotjumps)
     text = update_or_add_field(text, "MonsterPailBashes", monsterbashes)
     text = update_or_add_field(text, "SuburbsBobbingHighScore", suburbsbobbing)
@@ -193,23 +206,28 @@ def update_save_data(
     text = update_or_add_field(text, "CountryBobbingHighScore", countrybobbing)
     return text
 
+
 def extract_save_data(text):
     total = extract_int(r"TotalCandyAmount=(\d+);", text)
     candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
     candy = int(candy_matches[-1].group(1)) if candy_matches else 0
     costume_match = re.search(r"EquippedCostumes=\[([^\]]*)\];", text)
-    costumes = [c.strip() for c in costume_match.group(1).split(",") if c.strip()] if costume_match else []
+    costumes = [c.strip() for c in costume_match.group(
+        1).split(",") if c.strip()] if costume_match else []
     xp = extract_int(r"ExperiencePoints\s*=\s*(\d+);", text)
     robot_jumps = extract_int(r"RobotRampJumos=(\d+)", text)
     monster_bashes = extract_int(r"MonsterPailBashes=(\d+)", text)
     suburbsbobbing = extract_int(r"SuburbsBobbingHighScore=(\d+)", text)
     mallbobbing = extract_int(r"MallBobbingHighScore=(\d+)", text)
     countrybobbing = extract_int(r"CountryBobbingHighScore=(\d+)", text)
-    player_position = extract_vector3(r"PlayerPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
-    camera_position = extract_vector3(r"CameraPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
+    player_position = extract_vector3(
+        r"PlayerPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
+    camera_position = extract_vector3(
+        r"CameraPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
 
     match = re.search(r"Level=([^;]+);", text)
-    world = next((k for k, v in WORLD_PATHS.items() if v in match.group(1)), "Suburbs") if match else "Suburbs"
+    world = next((k for k, v in WORLD_PATHS.items()
+                 if v in match.group(1)), "Suburbs") if match else "Suburbs"
     return (
         total, candy, costumes, xp,
         robot_jumps, monster_bashes,
@@ -218,10 +236,13 @@ def extract_save_data(text):
     )
 
 # ---------------- file operations (UI calls these) ----------------
+
+
 def open_save_dialog():
     """Open file dialog, read file, parse and populate AppState variables.
        Returns True on success, False otherwise."""
-    path = filedialog.askopenfilename(title="Open Costume Quest Save File", filetypes=[("All Files", "*.*")])
+    path = filedialog.askopenfilename(
+        title="Open Costume Quest Save File", filetypes=[("All Files", "*.*")])
     if not path:
         return False
     try:
@@ -232,7 +253,8 @@ def open_save_dialog():
         # try to find {Level=...} section for path detection
         start = raw.find(b"{Level=")
         end = raw.find(b"}", start)
-        section = raw[start:end + 1].decode(errors="ignore") if start != -1 and end != -1 else ""
+        section = raw[start:end +
+                      1].decode(errors="ignore") if start != -1 and end != -1 else ""
         # decode whole raw text
         raw_text = raw.decode(errors="ignore")
 
@@ -271,6 +293,7 @@ def open_save_dialog():
     AppState.save_text_data = raw_text
     AppState.loading_save = False
     return True
+
 
 def populate_entries_from_state(cards_entries, battle_entries):
     """Given UI entry widget maps, fill them from AppState.save_text_data."""
@@ -316,6 +339,7 @@ def populate_entries_from_state(cards_entries, battle_entries):
     except Exception:
         pass  # fail silently if UI not yet ready
 
+
 def _replace_card_values_in_text(text, cards_entries):
     updated = text
     for card_num, entry in cards_entries.items():
@@ -328,17 +352,20 @@ def _replace_card_values_in_text(text, cards_entries):
         updated = pattern.sub(rf'\g<1>{val}\g<3>', updated, count=1)
     return updated
 
+
 def _replace_battle_values_in_text(text, battle_entries):
     updated = text
     for item_key, entry in battle_entries.items():
         val = entry.get().strip()
         if not val.isdigit():
-            raise ValueError(f"{BATTLE_ITEM_NAMES.get(item_key, item_key)} has invalid amount '{val}'")
+            raise ValueError(
+                f"{BATTLE_ITEM_NAMES.get(item_key, item_key)} has invalid amount '{val}'")
         pattern = re.compile(
             rf'(BattleItem_{item_key}=InventoryItem\{{[^}}]*?CurrentAmount=)(\d+)(;[^}}]*\}})'
         )
         updated = pattern.sub(rf'\g<1>{val}\g<3>', updated, count=1)
     return updated
+
 
 def save_changes(cards_entries, battle_entries):
     """Write changes back to loaded save file path."""
@@ -351,7 +378,8 @@ def save_changes(cards_entries, battle_entries):
         new_total = int(AppState.total_candy_var.get())
         AppState.original_candy_value = new_candy
         AppState.last_total_candy = new_total
-        selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
+        selected_costumes = [var.get().strip()
+                             for var in AppState.costume_vars if var.get().strip()]
         xp = int(AppState.xp_var.get())
         new_level = int(AppState.level_var.get())
         robotjumps = int(AppState.robotjumps_var.get())
@@ -365,8 +393,10 @@ def save_changes(cards_entries, battle_entries):
         updated_text = AppState.save_text_data
 
         # --- Update card values and battle items ---
-        updated_text = _replace_card_values_in_text(updated_text, cards_entries)
-        updated_text = _replace_battle_values_in_text(updated_text, battle_entries)
+        updated_text = _replace_card_values_in_text(
+            updated_text, cards_entries)
+        updated_text = _replace_battle_values_in_text(
+            updated_text, battle_entries)
 
         # --- Update core fields ---
         updated_text = update_save_data(
@@ -409,7 +439,8 @@ def save_as(cards_entries, battle_entries):
     path = filedialog.asksaveasfilename(
         title="Save As",
         defaultextension=".",
-        filetypes=[("JSON File", "*.json"), ("Text File", "*.txt"), ("All Files", "*.*")]
+        filetypes=[("JSON File", "*.json"),
+                   ("Text File", "*.txt"), ("All Files", "*.*")]
     )
     if not path:
         return False
@@ -417,12 +448,15 @@ def save_as(cards_entries, battle_entries):
     try:
         # --- Build updated_text from UI ---
         updated_text = AppState.save_text_data
-        updated_text = _replace_card_values_in_text(updated_text, cards_entries)
-        updated_text = _replace_battle_values_in_text(updated_text, battle_entries)
+        updated_text = _replace_card_values_in_text(
+            updated_text, cards_entries)
+        updated_text = _replace_battle_values_in_text(
+            updated_text, battle_entries)
 
         new_candy = int(AppState.candy_var.get())
         new_total = int(AppState.total_candy_var.get())
-        selected_costumes = [var.get().strip() for var in AppState.costume_vars if var.get().strip()]
+        selected_costumes = [var.get().strip()
+                             for var in AppState.costume_vars if var.get().strip()]
         xp = int(AppState.xp_var.get())
         new_level = int(AppState.level_var.get())
         robotjumps = int(AppState.robotjumps_var.get())
@@ -500,6 +534,7 @@ def save_as(cards_entries, battle_entries):
     except Exception as e:
         messagebox.showerror("Error", f"Failed to save: {e}")
         return False
+
 
 def backup_save():
     path = AppState.save_path.get()

@@ -1,4 +1,7 @@
 # ui.py
+from constants import THEMES, NAMES, COSTUME_OPTIONS, CARD_NAMES, BATTLE_ITEM_NAMES, WORLD_PATHS, DEBUG_TELEPORTS
+from PIL import Image, ImageTk
+from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkthemes import ThemedTk
@@ -6,15 +9,14 @@ import saveio
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
-from saveio import AppState
-from PIL import Image, ImageTk
-from constants import THEMES, NAMES, COSTUME_OPTIONS, CARD_NAMES, BATTLE_ITEM_NAMES, WORLD_PATHS, DEBUG_TELEPORTS
 
 # keep a module-level theme name
 _current_theme_name = "light"
 
+
 def current_theme():
     return THEMES[_current_theme_name]
+
 
 def apply_theme(root, theme_name):
     global _current_theme_name
@@ -23,7 +25,8 @@ def apply_theme(root, theme_name):
     style = ttk.Style()
     style.theme_use(theme["style_theme"])
 
-    style.configure("TNotebook", background=theme.get("notebook_bg", theme["bg"]), borderwidth=0)
+    style.configure("TNotebook", background=theme.get(
+        "notebook_bg", theme["bg"]), borderwidth=0)
     style.configure("TNotebook.Tab",
                     background=theme["tab_bg"],
                     foreground=theme["tab_fg"],
@@ -40,10 +43,13 @@ def apply_theme(root, theme_name):
     root.configure(bg=theme["bg"])
     root.set_theme(theme["root_theme"])
 
+
 def toggle_theme(root):
     apply_theme(root, "dark" if _current_theme_name == "light" else "light")
 
 # ---------- small widgets ----------
+
+
 class ToolTip:
     def __init__(self, widget, text):
         self.widget = widget
@@ -75,17 +81,22 @@ class ToolTip:
             self.tipwindow.destroy()
             self.tipwindow = None
 
+
 def create_vector_editor(parent, label_text, variables, state="normal"):
     frame = ttk.Frame(parent)
     frame.columnconfigure(1, weight=1)
     ttk.Label(frame, text=label_text).grid(row=0, column=0, sticky="w")
     for i, (axis, var) in enumerate(zip(["X", "Y", "Z"], variables)):
-        ttk.Label(frame, text=f"{axis}:").grid(row=i + 1, column=1, padx=10, pady=2)
+        ttk.Label(frame, text=f"{axis}:").grid(
+            row=i + 1, column=1, padx=10, pady=2)
         if state == "readonly":  # use label instead of entry
-            ttk.Label(frame, textvariable=var).grid(row=i + 1, column=2, padx=10, pady=2, sticky="w")
+            ttk.Label(frame, textvariable=var).grid(
+                row=i + 1, column=2, padx=10, pady=2, sticky="w")
         else:  # normal editable entry
-            ttk.Entry(frame, textvariable=var, state=state).grid(row=i + 1, column=2, padx=10, pady=2, sticky="w")
+            ttk.Entry(frame, textvariable=var, state=state).grid(
+                row=i + 1, column=2, padx=10, pady=2, sticky="w")
     return frame
+
 
 def create_card_gallery(parent, card_names, collected_dict, images_path="images/cards", thumb_size=(64, 64)):
     """
@@ -105,8 +116,10 @@ def create_card_gallery(parent, card_names, collected_dict, images_path="images/
     canvas_width = (thumb_size[0] + 21) * VISIBLE_COLUMNS
     canvas_height = (thumb_size[1] + 45) * NUM_ROWS
 
-    canvas = tk.Canvas(parent, width=canvas_width, height=canvas_height, highlightthickness=0)
-    h_scrollbar = ttk.Scrollbar(parent, orient="horizontal", command=canvas.xview)
+    canvas = tk.Canvas(parent, width=canvas_width,
+                       height=canvas_height, highlightthickness=0)
+    h_scrollbar = ttk.Scrollbar(
+        parent, orient="horizontal", command=canvas.xview)
     scroll_frame = ttk.Frame(canvas)
 
     scroll_frame.bind(
@@ -127,7 +140,8 @@ def create_card_gallery(parent, card_names, collected_dict, images_path="images/
     parent.progress_var = tk.DoubleVar()
     progress_label = ttk.Label(parent, text="Collected: 0 / 0 (0%)")
     progress_label.grid(row=2, column=0, sticky="w", padx=10, pady=5)
-    progress = ttk.Progressbar(parent, variable=parent.progress_var, maximum=100, length=300)
+    progress = ttk.Progressbar(
+        parent, variable=parent.progress_var, maximum=100, length=300)
     progress.grid(row=3, column=0, sticky="w", padx=10, pady=5)
 
     def update_progress():
@@ -135,7 +149,8 @@ def create_card_gallery(parent, card_names, collected_dict, images_path="images/
         collected = sum(var.get() for var in collected_dict.values())
         percent = (collected / total * 100) if total else 0
         parent.progress_var.set(percent)
-        progress_label.config(text=f"Collected: {collected} / {total} ({percent:.0f}%)")
+        progress_label.config(
+            text=f"Collected: {collected} / {total} ({percent:.0f}%)")
 
         # Update card images
         for card_num, lbl in parent._labels.items():
@@ -181,7 +196,8 @@ def create_card_gallery(parent, card_names, collected_dict, images_path="images/
                 x = event.x_root + 20
                 y = event.y_root + 20
                 top.geometry(f"+{x}+{y}")
-                big = img.resize((img.width, img.height), Image.Resampling.LANCZOS)
+                big = img.resize((img.width, img.height),
+                                 Image.Resampling.LANCZOS)
                 big_tk = ImageTk.PhotoImage(big)
                 parent._images.append(big_tk)
                 tk.Label(top, image=big_tk, text=name, compound="top").pack()
@@ -196,33 +212,42 @@ def create_card_gallery(parent, card_names, collected_dict, images_path="images/
             lbl.bind("<Leave>", hide_popup)
 
         else:
-            ttk.Label(scroll_frame, text=f"{card_name}\n(Missing)").grid(row=i % NUM_ROWS, column=i // NUM_ROWS, padx=8, pady=8)
+            ttk.Label(scroll_frame, text=f"{card_name}\n(Missing)").grid(
+                row=i % NUM_ROWS, column=i // NUM_ROWS, padx=8, pady=8)
 
     update_progress()
     parent.update_progress = update_progress
     return parent.progress_var
 
+
 def build_tracker_tab(parent):
     row = 0
-    ttk.Label(parent, text="Battle Stamps").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    ttk.Label(parent, text="Battle Stamps").grid(
+        row=row, column=0, sticky="w", padx=10, pady=5)
     row += 1
-    ttk.Label(parent, text="Costumes").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    ttk.Label(parent, text="Costumes").grid(
+        row=row, column=0, sticky="w", padx=10, pady=5)
     row += 1
 
     # Creepy Treats Tracker
-    ttk.Label(parent, text="Creepy Treat Cards").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    ttk.Label(parent, text="Creepy Treat Cards").grid(
+        row=row, column=0, sticky="w", padx=10, pady=5)
     row += 1
     parent.cards_frame = ttk.Frame(parent)
-    parent.cards_frame.grid(row=row, column=0, columnspan=4, sticky="nsew", padx=20, pady=10)
+    parent.cards_frame.grid(row=row, column=0, columnspan=4,
+                            sticky="nsew", padx=20, pady=10)
     row += 1
-    parent.card_progress = create_card_gallery(parent.cards_frame, CARD_NAMES, AppState.card_vars, images_path=CARDS_DIR)
+    parent.card_progress = create_card_gallery(
+        parent.cards_frame, CARD_NAMES, AppState.card_vars, images_path=CARDS_DIR)
 
     # Level Tracker (placeholder label kept)
-    ttk.Label(parent, text="Level").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    ttk.Label(parent, text="Level").grid(
+        row=row, column=0, sticky="w", padx=10, pady=5)
     row += 1
 
     # Quests / Apple Bobbing
-    ttk.Label(parent, text="Quests").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    ttk.Label(parent, text="Quests").grid(
+        row=row, column=0, sticky="w", padx=10, pady=5)
     row += 1
     bobbing_label = ttk.Label(parent, text="Apple Bobbing:")
     bobbing_label.grid(row=row, column=0, sticky="w", padx=25, pady=5)
@@ -244,9 +269,12 @@ def build_tracker_tab(parent):
     parent.applebobbing_entries = {}
     parent.progress_var = tk.DoubleVar()
     applebobbingprogress = ttk.Label(parent, text="Completed: 0 / 0 (0%)")
-    applebobbingprogress.grid(row=row, column=0, columnspan=4, padx=40, pady=10, sticky="w")
-    applebobbingprogressbar = ttk.Progressbar(parent, variable=parent.progress_var, maximum=100, length=200)
-    applebobbingprogressbar.grid(row=row, column=1, columnspan=2, padx=40, pady=10, sticky="w")
+    applebobbingprogress.grid(
+        row=row, column=0, columnspan=4, padx=40, pady=10, sticky="w")
+    applebobbingprogressbar = ttk.Progressbar(
+        parent, variable=parent.progress_var, maximum=100, length=200)
+    applebobbingprogressbar.grid(
+        row=row, column=1, columnspan=2, padx=40, pady=10, sticky="w")
     row += 1
 
     def update_applebobbing_progress():
@@ -255,15 +283,18 @@ def build_tracker_tab(parent):
                         if int(var.get() or 0) >= threshold)
         percentage = (collected / total) * 100 if total > 0 else 0
         parent.progress_var.set(percentage)
-        applebobbingprogress.config(text=f"Completed: {collected} / {total} ({percentage:.0f}%)")
+        applebobbingprogress.config(
+            text=f"Completed: {collected} / {total} ({percentage:.0f}%)")
 
     r = 14
     for label_text, var in misc_stats1:
         display_label = label_text.replace(" High Score:", "")
-        ttk.Label(parent, text=display_label).grid(row=r, column=0, sticky="w", padx=40, pady=5)
+        ttk.Label(parent, text=display_label).grid(
+            row=r, column=0, sticky="w", padx=40, pady=5)
 
         def make_status_var(v=var, threshold=bobbing_thresholds[label_text]):
             s = tk.StringVar()
+
             def update_status(*_):
                 score = int(v.get() or 0)
                 s.set("✅ Completed" if score >= threshold else "❌ Incomplete")
@@ -273,8 +304,10 @@ def build_tracker_tab(parent):
             return s
 
         status_var = make_status_var()
-        ttk.Label(parent, textvariable=status_var).grid(row=r, column=2, sticky="w", padx=10, pady=5)
-        parent.applebobbing_entries[label_text] = (var, bobbing_thresholds[label_text])
+        ttk.Label(parent, textvariable=status_var).grid(
+            row=r, column=2, sticky="w", padx=10, pady=5)
+        parent.applebobbing_entries[label_text] = (
+            var, bobbing_thresholds[label_text])
         r += 1
 
     # expose the updater for callers
@@ -282,6 +315,7 @@ def build_tracker_tab(parent):
     # initial update
     update_applebobbing_progress()
     return parent
+
 
 def toggle_tracker_window(root):
     # If the tracker window exists and is still open → close it
@@ -298,7 +332,8 @@ def toggle_tracker_window(root):
     root._tracker_win = tracker_win  # keep reference on root
 
     # ---- set the icon (.ico only for Windows)
-    import constants, os
+    import constants
+    import os
     try:
         icon_path = os.path.join(constants.BASE_DIR, "icon.ico")
         if os.path.exists(icon_path):
@@ -324,6 +359,8 @@ def toggle_tracker_window(root):
     tracker_win.protocol("WM_DELETE_WINDOW", on_close)
 
 # ---------- UI builder ----------
+
+
 def create_menu(root, frames_refs):
     theme = THEMES[_current_theme_name]
 
@@ -338,20 +375,25 @@ def create_menu(root, frames_refs):
     menu_bar = make_menu(root)
 
     file_menu = make_menu(menu_bar)
-    file_menu.add_command(label="Open", command=lambda: _open_and_fill(root, frames_refs))
-    file_menu.add_command(label="Save", command=lambda: saveio.save_changes(frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
-    file_menu.add_command(label="Save As...", command=lambda: saveio.save_as(frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
+    file_menu.add_command(
+        label="Open", command=lambda: _open_and_fill(root, frames_refs))
+    file_menu.add_command(label="Save", command=lambda: saveio.save_changes(
+        frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
+    file_menu.add_command(label="Save As...", command=lambda: saveio.save_as(
+        frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
     file_menu.add_command(label="Backup Save File", command=saveio.backup_save)
     file_menu.add_separator()
     file_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="File", menu=file_menu)
 
     options_menu = make_menu(menu_bar)
-    options_menu.add_command(label="Toggle Light/Dark Mode", command=lambda: toggle_theme(root))
+    options_menu.add_command(
+        label="Toggle Light/Dark Mode", command=lambda: toggle_theme(root))
     menu_bar.add_cascade(label="Options", menu=options_menu)
 
     view_menu = make_menu(menu_bar)
-    view_menu.add_command(label="Show/Hide 100% Tracker", command=lambda: toggle_tracker_window(root))
+    view_menu.add_command(label="Show/Hide 100% Tracker",
+                          command=lambda: toggle_tracker_window(root))
     menu_bar.add_cascade(label="View", menu=view_menu)
 
     help_menu = make_menu(menu_bar)
@@ -378,28 +420,31 @@ def create_menu(root, frames_refs):
         )
     )
     help_menu.add_command(
-    label="About",
-    command=lambda: messagebox.showinfo(
-        "About",
-        "Costume Quest PC Save Editor - Alpha Version\n"
-        "Made by: DeathMaster001\n\n"
-        "This program allows you to view and edit Costume Quest PC save files. Use responsibly!"
+        label="About",
+        command=lambda: messagebox.showinfo(
+            "About",
+            "Costume Quest PC Save Editor - Alpha Version\n"
+            "Made by: DeathMaster001\n\n"
+            "This program allows you to view and edit Costume Quest PC save files. Use responsibly!"
         )
     )
     menu_bar.add_cascade(label="Help", menu=help_menu)
 
     root.config(menu=menu_bar)
 
+
 def _open_and_fill(root, frames_refs):
     ok = saveio.open_save_dialog()
     if not ok:
         return
-    saveio.populate_entries_from_state(frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries)
+    saveio.populate_entries_from_state(
+        frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries)
     if hasattr(frames_refs["Battle Stamps"], "update_progress"):
         frames_refs["Battle Stamps"].update_progress()
     if hasattr(root, "_tracker_win") and root._tracker_win and root._tracker_win.winfo_exists():
         if hasattr(root._tracker_win, "update_applebobbing_progress"):
             root._tracker_win.update_applebobbing_progress()
+
 
 def create_tabs(root):
     notebook = ttk.Notebook(root)
@@ -417,27 +462,37 @@ def create_tabs(root):
     # ---------- Summary Frame ----------
     summary_frame = frames["Summary"]
     row = 0
-    ttk.Label(summary_frame, text="Main Stats").grid(row=row, column=0, sticky="w", padx=10, pady=5)
-    ttk.Label(summary_frame, text="Misc. Stats").grid(row=row, column=2, sticky="w", padx=10, pady=5)
+    ttk.Label(summary_frame, text="Main Stats").grid(
+        row=row, column=0, sticky="w", padx=10, pady=5)
+    ttk.Label(summary_frame, text="Misc. Stats").grid(
+        row=row, column=2, sticky="w", padx=10, pady=5)
     row += 1
 
-    #Summary Level
-    ttk.Label(summary_frame, text="Level:").grid(row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.level_var, width=33).grid(row=row, column=1, padx=25)
+    # Summary Level
+    ttk.Label(summary_frame, text="Level:").grid(
+        row=row, column=0, sticky="w", padx=25)
+    ttk.Label(summary_frame, textvariable=saveio.AppState.level_var,
+              width=33).grid(row=row, column=1, padx=25)
     row += 1
 
     # Summary XP
-    ttk.Label(summary_frame, text="Experience Points (XP):").grid(row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.xp_var, width=33).grid(row=row, column=1, padx=25)
+    ttk.Label(summary_frame, text="Experience Points (XP):").grid(
+        row=row, column=0, sticky="w", padx=25)
+    ttk.Label(summary_frame, textvariable=saveio.AppState.xp_var,
+              width=33).grid(row=row, column=1, padx=25)
     row += 1
 
     # Summary CurrentCandy
-    ttk.Label(summary_frame, text="Current Candy:").grid(row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.candy_var, width=33).grid(row=row, column=1, padx=25)
+    ttk.Label(summary_frame, text="Current Candy:").grid(
+        row=row, column=0, sticky="w", padx=25)
+    ttk.Label(summary_frame, textvariable=saveio.AppState.candy_var,
+              width=33).grid(row=row, column=1, padx=25)
     row += 1
 
-    ttk.Label(summary_frame, text="Total Candy:").grid(row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.total_candy_var, width=33).grid(row=row, column=1, padx=25)
+    ttk.Label(summary_frame, text="Total Candy:").grid(
+        row=row, column=0, sticky="w", padx=25)
+    ttk.Label(summary_frame, textvariable=saveio.AppState.total_candy_var,
+              width=33).grid(row=row, column=1, padx=25)
     row += 1
 
     # Summary Misc. Stats
@@ -450,31 +505,42 @@ def create_tabs(root):
     ]
     row = 1
     for label_text, var in misc_stats:
-        ttk.Label(summary_frame, text=label_text).grid(row=row, column=2, sticky="w", padx=25, pady=5)
-        ttk.Label(summary_frame, textvariable=var, width=33, anchor="w").grid(row=row, column=3, sticky="w", padx=25, pady=5)
+        ttk.Label(summary_frame, text=label_text).grid(
+            row=row, column=2, sticky="w", padx=25, pady=5)
+        ttk.Label(summary_frame, textvariable=var, width=33, anchor="w").grid(
+            row=row, column=3, sticky="w", padx=25, pady=5)
         row += 1
 
-    ttk.Label(summary_frame, text="World:").grid(row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.selected_world, width=33).grid(row=row, column=1, padx=25)
+    ttk.Label(summary_frame, text="World:").grid(
+        row=row, column=0, sticky="w", padx=25)
+    ttk.Label(summary_frame, textvariable=saveio.AppState.selected_world,
+              width=33).grid(row=row, column=1, padx=25)
     row += 1
 
-    player_position_frame = create_vector_editor(summary_frame, "Player Position:", saveio.AppState.player_position_vars, state="readonly")
-    player_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+    player_position_frame = create_vector_editor(
+        summary_frame, "Player Position:", saveio.AppState.player_position_vars, state="readonly")
+    player_position_frame.grid(
+        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 2
 
-    camera_position_frame = create_vector_editor(summary_frame, "Camera Position:", saveio.AppState.camera_position_vars, state="readonly")
-    camera_position_frame.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+    camera_position_frame = create_vector_editor(
+        summary_frame, "Camera Position:", saveio.AppState.camera_position_vars, state="readonly")
+    camera_position_frame.grid(
+        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 1
 
-    ttk.Label(summary_frame, text="Costumes:").grid(row=row, column=0, sticky="w", padx=25, pady=5)
+    ttk.Label(summary_frame, text="Costumes:").grid(
+        row=row, column=0, sticky="w", padx=25, pady=5)
     row += 1
-    ttk.Label(summary_frame, text="Equipped Costumes:").grid(row=row, column=0, padx=35, pady=5)
+    ttk.Label(summary_frame, text="Equipped Costumes:").grid(
+        row=row, column=0, padx=35, pady=5)
 
     saveio.AppState.costume_display_vars = [tk.StringVar() for _ in NAMES]
     for i, name in enumerate(NAMES):
         if not saveio.AppState.costume_vars[i].get():
             saveio.AppState.costume_vars[i].set(COSTUME_OPTIONS[i])
-        saveio.AppState.costume_display_vars[i].set(f"{name}: {saveio.AppState.costume_vars[i].get()}")
+        saveio.AppState.costume_display_vars[i].set(
+            f"{name}: {saveio.AppState.costume_vars[i].get()}")
         ttk.Label(summary_frame, textvariable=saveio.AppState.costume_display_vars[i]).grid(
             row=row, column=1, padx=10, pady=5, sticky="w"
         )
@@ -488,10 +554,12 @@ def create_tabs(root):
 
     # ---------- Stats & World Frame ----------
     stats_frame = frames["Stats & World"]
-    ttk.Label(stats_frame, text="Stats").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+    ttk.Label(stats_frame, text="Stats").grid(
+        row=row, column=0, sticky="w", padx=10, pady=5)
     row += 1
 
-    ttk.Label(stats_frame, text="Level:").grid(row=row, column=0, sticky="w", padx=25, pady=5)
+    ttk.Label(stats_frame, text="Level:").grid(
+        row=row, column=0, sticky="w", padx=25, pady=5)
     level_dropdown = ttk.Combobox(
         stats_frame,
         textvariable=saveio.AppState.level_var,
@@ -504,25 +572,34 @@ def create_tabs(root):
         level_dropdown.bind(event, saveio.update_xp_from_level)
     row += 1
 
-    ttk.Label(stats_frame, text="Experience Points (XP):").grid(row=row, column=0, sticky="w", padx=25, pady=5)
-    ttk.Entry(stats_frame, textvariable=saveio.AppState.xp_var, width=33).grid(row=row, column=1, padx=25, pady=5, sticky="w")
+    ttk.Label(stats_frame, text="Experience Points (XP):").grid(
+        row=row, column=0, sticky="w", padx=25, pady=5)
+    ttk.Entry(stats_frame, textvariable=saveio.AppState.xp_var, width=33).grid(
+        row=row, column=1, padx=25, pady=5, sticky="w")
     row += 1
 
-    ttk.Label(stats_frame, text="Current Candy:").grid(row=row, column=0, sticky="w", padx=25, pady=5)
-    ttk.Entry(stats_frame, textvariable=saveio.AppState.candy_var, width=33).grid(row=row, column=1, padx=25, pady=5, sticky="w")
+    ttk.Label(stats_frame, text="Current Candy:").grid(
+        row=row, column=0, sticky="w", padx=25, pady=5)
+    ttk.Entry(stats_frame, textvariable=saveio.AppState.candy_var, width=33).grid(
+        row=row, column=1, padx=25, pady=5, sticky="w")
     row += 2
 
-    ttk.Label(stats_frame, text="World and Position").grid(row=row, column=0, padx=10, pady=5, sticky="w")
+    ttk.Label(stats_frame, text="World and Position").grid(
+        row=row, column=0, padx=10, pady=5, sticky="w")
     row += 1
-    ttk.Label(stats_frame, text="World:").grid(row=row, column=0, padx=25, pady=5, sticky="w")
-    ttk.Combobox(stats_frame, textvariable=saveio.AppState.selected_world, values=list(WORLD_PATHS.keys()), width=31, state="readonly").grid(row=row, column=1, padx=25, pady=5, sticky="w")
+    ttk.Label(stats_frame, text="World:").grid(
+        row=row, column=0, padx=25, pady=5, sticky="w")
+    ttk.Combobox(stats_frame, textvariable=saveio.AppState.selected_world, values=list(
+        WORLD_PATHS.keys()), width=31, state="readonly").grid(row=row, column=1, padx=25, pady=5, sticky="w")
     row += 1
 
     # Location dropdown variable
     location_var = tk.StringVar(value="")  # initially empty
 
-    ttk.Label(stats_frame, text="Location:").grid(row=row, column=0, padx=25, pady=5, sticky="w")
-    location_cb = ttk.Combobox(stats_frame, textvariable=location_var, values=[], width=31, state="readonly")
+    ttk.Label(stats_frame, text="Location:").grid(
+        row=row, column=0, padx=25, pady=5, sticky="w")
+    location_cb = ttk.Combobox(
+        stats_frame, textvariable=location_var, values=[], width=31, state="readonly")
     location_cb.grid(row=row, column=1, padx=25, pady=5, sticky="w")
     row += 1
 
@@ -549,19 +626,26 @@ def create_tabs(root):
 
     location_var.trace_add("write", teleport_to_location)
 
-    player_position_frame2 = create_vector_editor(stats_frame, "Player Position:", saveio.AppState.player_position_vars)
-    player_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+    player_position_frame2 = create_vector_editor(
+        stats_frame, "Player Position:", saveio.AppState.player_position_vars)
+    player_position_frame2.grid(
+        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 1
 
-    camera_position_frame2 = create_vector_editor(stats_frame, "Camera Position:", saveio.AppState.camera_position_vars)
-    camera_position_frame2.grid(row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+    camera_position_frame2 = create_vector_editor(
+        stats_frame, "Camera Position:", saveio.AppState.camera_position_vars)
+    camera_position_frame2.grid(
+        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
 
     # ---------- Costumes Frame ----------
     costumes_frame = frames["Costumes"]
-    ttk.Label(costumes_frame, text="Equipped Costumes:").grid(row=0, column=0, padx=10, pady=5)
+    ttk.Label(costumes_frame, text="Equipped Costumes:").grid(
+        row=0, column=0, padx=10, pady=5)
     for i, name in enumerate(NAMES):
-        ttk.Label(costumes_frame, text=name).grid(row=i, column=1, padx=10, pady=5)
-        ttk.Combobox(costumes_frame, textvariable=saveio.AppState.costume_vars[i], values=COSTUME_OPTIONS, width=30).grid(row=i, column=2, sticky="w", padx=10, pady=5)
+        ttk.Label(costumes_frame, text=name).grid(
+            row=i, column=1, padx=10, pady=5)
+        ttk.Combobox(costumes_frame, textvariable=saveio.AppState.costume_vars[i], values=COSTUME_OPTIONS, width=30).grid(
+            row=i, column=2, sticky="w", padx=10, pady=5)
 
     # ---------- Cards frame ----------
     cards_frame = frames["Cards"]
@@ -571,14 +655,15 @@ def create_tabs(root):
     cards_frame.progress_var = tk.DoubleVar()
     cards_frame.toggle_all_var = tk.IntVar()
 
-
     def update_cards_progress():
         total = len(cards_frame.entries)
-        collected = sum(1 for e in cards_frame.entries.values() if e.get().strip().isdigit() and int(e.get().strip()) > 0)
+        collected = sum(1 for e in cards_frame.entries.values(
+        ) if e.get().strip().isdigit() and int(e.get().strip()) > 0)
         percentage = (collected / total) * 100 if total > 0 else 0
         cards_frame.progress_var.set(percentage)
         if hasattr(cards_frame, "progress_label"):
-            cards_frame.progress_label.config(text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
+            cards_frame.progress_label.config(
+                text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
 
     def toggle_all_cards():
         val = "1" if cards_frame.toggle_all_var.get() else "0"
@@ -587,7 +672,8 @@ def create_tabs(root):
             entry.insert(0, val)
         update_cards_progress()
 
-    ttk.Checkbutton(cards_frame, text="Toggle All", variable=cards_frame.toggle_all_var, command=toggle_all_cards).grid(row=0, column=0, columnspan=4, pady=10)
+    ttk.Checkbutton(cards_frame, text="Toggle All", variable=cards_frame.toggle_all_var,
+                    command=toggle_all_cards).grid(row=0, column=0, columnspan=4, pady=10)
 
     for i in range(54):
         card_num = i + 1
@@ -608,11 +694,13 @@ def create_tabs(root):
 
     def update_battle_item_progress():
         total = len(battle_frame.entries)
-        collected = sum(1 for e in battle_frame.entries.values() if e.get().strip().isdigit() and int(e.get().strip()) > 0)
+        collected = sum(1 for e in battle_frame.entries.values(
+        ) if e.get().strip().isdigit() and int(e.get().strip()) > 0)
         percentage = (collected / total) * 100 if total > 0 else 0
         battle_frame.progress_var.set(percentage)
         if hasattr(battle_frame, "progress_label"):
-            battle_frame.progress_label.config(text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
+            battle_frame.progress_label.config(
+                text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
 
     def toggle_all_battle_items():
         val = "1" if battle_frame.toggle_all_var.get() else "0"
@@ -621,26 +709,33 @@ def create_tabs(root):
             entry.insert(0, val)
         update_battle_item_progress()
 
-    ttk.Checkbutton(battle_frame, text="Toggle All", variable=battle_frame.toggle_all_var, command=toggle_all_battle_items).grid(row=0, column=0, columnspan=4, pady=10)
+    ttk.Checkbutton(battle_frame, text="Toggle All", variable=battle_frame.toggle_all_var,
+                    command=toggle_all_battle_items).grid(row=0, column=0, columnspan=4, pady=10)
 
     items_per_col = 9
     for i, (key, name) in enumerate(BATTLE_ITEM_NAMES.items()):
         col = (i // items_per_col) * 2
         row = (i % items_per_col) + 1
-        ttk.Label(battle_frame, text=name).grid(row=row, column=col, sticky='e', padx=5, pady=2)
+        ttk.Label(battle_frame, text=name).grid(
+            row=row, column=col, sticky='e', padx=5, pady=2)
         entry = tk.Entry(battle_frame, width=8)
         entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
         entry.bind("<KeyRelease>", lambda e: update_battle_item_progress())
         battle_frame.entries[key] = entry
 
-    battle_frame.progress_label = ttk.Label(battle_frame, text="Collected: 0 / 0 (0%)")
-    battle_frame.progress_label.grid(row=21, column=2, columnspan=4, sticky="w")
-    battle_frame.progress = ttk.Progressbar(battle_frame, variable=battle_frame.progress_var, maximum=100, length=200)
-    battle_frame.progress.grid(row=21, column=0, columnspan=2, padx=10, pady=10, sticky="w")
+    battle_frame.progress_label = ttk.Label(
+        battle_frame, text="Collected: 0 / 0 (0%)")
+    battle_frame.progress_label.grid(
+        row=21, column=2, columnspan=4, sticky="w")
+    battle_frame.progress = ttk.Progressbar(
+        battle_frame, variable=battle_frame.progress_var, maximum=100, length=200)
+    battle_frame.progress.grid(
+        row=21, column=0, columnspan=2, padx=10, pady=10, sticky="w")
     battle_frame.update_progress = update_battle_item_progress
 
     # Quests tab placeholder
-    ttk.Label(frames["Quests"], text="Not implemented yet.", anchor="center", justify="center").pack(expand=True, fill='both')
+    ttk.Label(frames["Quests"], text="Not implemented yet.",
+              anchor="center", justify="center").pack(expand=True, fill='both')
 
     # return the notebook and a map of frames so main can keep references
     frames["Battle Stamps"] = battle_frame
