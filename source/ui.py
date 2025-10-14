@@ -220,144 +220,6 @@ def create_card_gallery(parent, card_names, collected_dict, images_path="images/
     return parent.progress_var
 
 
-def build_tracker_tab(parent):
-    row = 0
-    ttk.Label(parent, text="Battle Stamps").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 1
-    ttk.Label(parent, text="Costumes").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 1
-
-    # Creepy Treats Tracker
-    ttk.Label(parent, text="Creepy Treat Cards").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 1
-    parent.cards_frame = ttk.Frame(parent)
-    parent.cards_frame.grid(row=row, column=0, columnspan=4,
-                            sticky="nsew", padx=20, pady=10)
-    row += 1
-    parent.card_progress = create_card_gallery(
-        parent.cards_frame, CARD_NAMES, AppState.card_vars, images_path=CARDS_DIR)
-
-    # Level Tracker (placeholder label kept)
-    ttk.Label(parent, text="Level").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 1
-
-    # Quests / Apple Bobbing
-    ttk.Label(parent, text="Quests").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 1
-    bobbing_label = ttk.Label(parent, text="Apple Bobbing:")
-    bobbing_label.grid(row=row, column=0, sticky="w", padx=25, pady=5)
-    ToolTip(bobbing_label, "Complete 3 rounds of Apple Bobbing at each location, doing so will complete these quests!\nFirst 2 rounds give Candy, 3rd gives a Creepy Treat Card.")
-    row += 1
-
-    misc_stats1 = [
-        ("Suburbs High Score:", saveio.AppState.suburbsbobbing_var),
-        ("Autumn Haven Mall High Score:", saveio.AppState.mallbobbing_var),
-        ("Fall Valley High Score:", saveio.AppState.countrybobbing_var),
-    ]
-
-    bobbing_thresholds = {
-        "Suburbs High Score:": 30,
-        "Autumn Haven Mall High Score:": 35,
-        "Fall Valley High Score:": 40,
-    }
-
-    parent.applebobbing_entries = {}
-    parent.progress_var = tk.DoubleVar()
-    applebobbingprogress = ttk.Label(parent, text="Completed: 0 / 0 (0%)")
-    applebobbingprogress.grid(
-        row=row, column=0, columnspan=4, padx=40, pady=10, sticky="w")
-    applebobbingprogressbar = ttk.Progressbar(
-        parent, variable=parent.progress_var, maximum=100, length=200)
-    applebobbingprogressbar.grid(
-        row=row, column=1, columnspan=2, padx=40, pady=10, sticky="w")
-    row += 1
-
-    def update_applebobbing_progress():
-        total = len(parent.applebobbing_entries)
-        collected = sum(1 for var, threshold in parent.applebobbing_entries.values()
-                        if int(var.get() or 0) >= threshold)
-        percentage = (collected / total) * 100 if total > 0 else 0
-        parent.progress_var.set(percentage)
-        applebobbingprogress.config(
-            text=f"Completed: {collected} / {total} ({percentage:.0f}%)")
-
-    r = 14
-    for label_text, var in misc_stats1:
-        display_label = label_text.replace(" High Score:", "")
-        ttk.Label(parent, text=display_label).grid(
-            row=r, column=0, sticky="w", padx=40, pady=5)
-
-        def make_status_var(v=var, threshold=bobbing_thresholds[label_text]):
-            s = tk.StringVar()
-
-            def update_status(*_):
-                score = int(v.get() or 0)
-                s.set("✅ Completed" if score >= threshold else "❌ Incomplete")
-                update_applebobbing_progress()
-            v.trace_add("write", update_status)
-            update_status()
-            return s
-
-        status_var = make_status_var()
-        ttk.Label(parent, textvariable=status_var).grid(
-            row=r, column=2, sticky="w", padx=10, pady=5)
-        parent.applebobbing_entries[label_text] = (
-            var, bobbing_thresholds[label_text])
-        r += 1
-
-    # expose the updater for callers
-    parent.update_applebobbing_progress = update_applebobbing_progress
-    # initial update
-    update_applebobbing_progress()
-    return parent
-
-
-def toggle_tracker_window(root):
-    # If the tracker window exists and is still open → close it
-    if hasattr(root, "_tracker_win") and root._tracker_win and root._tracker_win.winfo_exists():
-        root._tracker_win.destroy()
-        root._tracker_win = None
-        return
-
-    # Otherwise → create it
-    tracker_win = tk.Toplevel(root)
-    tracker_win.title("Costume Quest 100% Tracker")
-    tracker_win.geometry("800x900")
-    tracker_win.minsize(800, 900)
-    root._tracker_win = tracker_win  # keep reference on root
-
-    # ---- set the icon (.ico only for Windows)
-    import constants
-    import os
-    try:
-        icon_path = os.path.join(constants.BASE_DIR, "icon.ico")
-        if os.path.exists(icon_path):
-            tracker_win.iconbitmap(icon_path)
-    except Exception:
-        pass
-
-    tracker_frame = ttk.Frame(tracker_win)
-    tracker_frame.pack(expand=True, fill="both")
-
-    # build tracker UI inside this frame
-    build_tracker_tab(tracker_frame)
-
-    # forward the update function to the window object for easier calls
-    if hasattr(tracker_frame, "update_applebobbing_progress"):
-        tracker_win.update_applebobbing_progress = tracker_frame.update_applebobbing_progress
-
-    # clear root._tracker_win when closed manually
-    def on_close():
-        root._tracker_win = None
-        tracker_win.destroy()
-
-    tracker_win.protocol("WM_DELETE_WINDOW", on_close)
-
 # ---------- UI builder ----------
 
 
@@ -391,11 +253,6 @@ def create_menu(root, frames_refs):
         label="Toggle Light/Dark Mode", command=lambda: toggle_theme(root))
     menu_bar.add_cascade(label="Options", menu=options_menu)
 
-    view_menu = make_menu(menu_bar)
-    view_menu.add_command(label="Show/Hide 100% Tracker",
-                          command=lambda: toggle_tracker_window(root))
-    menu_bar.add_cascade(label="View", menu=view_menu)
-
     help_menu = make_menu(menu_bar)
     help_menu.add_command(
         label="How to Use",
@@ -410,8 +267,6 @@ def create_menu(root, frames_refs):
             " - Save: Save changes to the current file.\n"
             " - Save As...: Save to a new file location (.json or .txt allowed).\n"
             " - Backup Save File: Make a backup of your current save.\n\n"
-            "View Menu:\n"
-            " - Show/Hide 100% Tracker: Opens a separate window to track completion.\n\n"
             "Options Menu:\n"
             " - Toggle Light/Dark Mode: Switches editor themes.\n\n"
             "Tips:\n"
@@ -697,6 +552,21 @@ def create_tabs(root):
         entry.bind("<KeyRelease>", lambda e: update_cards_progress())
         cards_frame.entries[card_num] = entry
 
+    # --- Add Creepy Treat Card Gallery (visual progress) ---
+    ttk.Separator(cards_frame, orient="horizontal").grid(
+        row=row + 2, column=0, columnspan=4, sticky="ew", pady=10
+    )
+    ttk.Label(cards_frame, text="Creepy Treat Cards Gallery:").grid(
+        row=row + 3, column=0, padx=10, pady=5, sticky="w"
+    )
+
+    gallery_frame = ttk.Frame(cards_frame)
+    gallery_frame.grid(row=row + 4, column=0, columnspan=4,
+                       sticky="nsew", padx=10, pady=10)
+    cards_frame.gallery_progress = create_card_gallery(
+        gallery_frame, CARD_NAMES, saveio.AppState.card_vars, images_path=CARDS_DIR
+    )
+
     cards_frame.update_progress = update_cards_progress
 
     # ---------- Battle Stamps ----------
@@ -749,10 +619,62 @@ def create_tabs(root):
 
     battle_frame.update_progress = update_battle_item_progress
 
-    # Quests tab placeholder
-    ttk.Label(frames["Quests"], text="Not implemented yet.",
-              anchor="center", justify="center").pack(expand=True, fill='both')
+    # ---------- Quests ----------
+    quests_frame = frames["Quests"]
+    ttk.Label(quests_frame, text="Quests").grid(
+        row=0, column=0, sticky="w", padx=10, pady=5
+    )
+    ttk.Label(quests_frame, text="Apple Bobbing Quests").grid(
+        row=1, column=0, sticky="w", padx=25, pady=5
+    )
+    bobbing_label = ttk.Label(
+        quests_frame, text="Complete 3 rounds per area to finish each quest.")
+    bobbing_label.grid(row=2, column=0, columnspan=2,
+                       sticky="w", padx=40, pady=5)
+    ToolTip(bobbing_label, "Complete 3 rounds of Apple Bobbing at each location.\nFirst 2 rounds give Candy, 3rd gives a Creepy Treat Card.")
 
-    # return the notebook and a map of frames so main can keep references
-    frames["Battle Stamps"] = battle_frame
+    bobbing_data = [
+        ("Suburbs High Score:", saveio.AppState.suburbsbobbing_var, 30),
+        ("Autumn Haven Mall High Score:", saveio.AppState.mallbobbing_var, 35),
+        ("Fall Valley High Score:", saveio.AppState.countrybobbing_var, 40),
+    ]
+
+    quests_frame.progress_var = tk.DoubleVar()
+    progress_label = ttk.Label(quests_frame, text="Completed: 0 / 0 (0%)")
+    progress_label.grid(row=3, column=0, sticky="w", padx=40, pady=5)
+    progress_bar = ttk.Progressbar(
+        quests_frame, variable=quests_frame.progress_var, maximum=100, length=200)
+    progress_bar.grid(row=3, column=1, sticky="w", padx=40, pady=5)
+
+    def update_quest_progress():
+        total = len(bobbing_data)
+        completed = 0
+        for label_text, var, threshold in bobbing_data:
+            score = int(var.get() or 0)
+            if score >= threshold:
+                completed += 1
+        percent = (completed / total) * 100 if total > 0 else 0
+        quests_frame.progress_var.set(percent)
+        progress_label.config(
+            text=f"Completed: {completed} / {total} ({percent:.0f}%)")
+
+    r = 4
+    for name, var, threshold in bobbing_data:
+        ttk.Label(quests_frame, text=name.replace(" High Score:", "")).grid(
+            row=r, column=0, sticky="w", padx=40, pady=5)
+        status = tk.StringVar()
+
+        def make_updater(v=var, s=status, t=threshold):
+            def inner(*_):
+                score = int(v.get() or 0)
+                s.set("✅ Completed" if score >= t else "❌ Incomplete")
+                update_quest_progress()
+            v.trace_add("write", inner)
+            inner()
+        make_updater()
+
+        ttk.Label(quests_frame, textvariable=status).grid(
+            row=r, column=1, sticky="w", padx=10, pady=5)
+        r += 1
+
     return notebook, frames
