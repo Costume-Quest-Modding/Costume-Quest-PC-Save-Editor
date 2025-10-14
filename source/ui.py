@@ -584,7 +584,7 @@ def create_tabs(root):
         row=row, column=1, padx=25, pady=5, sticky="w")
     row += 2
 
-    ttk.Label(stats_frame, text="World and Position").grid(
+    ttk.Label(stats_frame, text="World, Location and Position").grid(
         row=row, column=0, padx=10, pady=5, sticky="w")
     row += 1
     ttk.Label(stats_frame, text="World:").grid(
@@ -639,7 +639,7 @@ def create_tabs(root):
 
     # ---------- Costumes Frame ----------
     costumes_frame = frames["Costumes"]
-    ttk.Label(costumes_frame, text="Equipped Costumes:").grid(
+    ttk.Label(costumes_frame, text="Equipped Costumes").grid(
         row=0, column=0, padx=10, pady=5)
     for i, name in enumerate(NAMES):
         ttk.Label(costumes_frame, text=name).grid(
@@ -650,8 +650,6 @@ def create_tabs(root):
     # ---------- Cards frame ----------
     cards_frame = frames["Cards"]
     cards_frame.entries = {}
-    cards_per_col = 18
-
     cards_frame.progress_var = tk.DoubleVar()
     cards_frame.toggle_all_var = tk.IntVar()
 
@@ -661,9 +659,8 @@ def create_tabs(root):
         ) if e.get().strip().isdigit() and int(e.get().strip()) > 0)
         percentage = (collected / total) * 100 if total > 0 else 0
         cards_frame.progress_var.set(percentage)
-        if hasattr(cards_frame, "progress_label"):
-            cards_frame.progress_label.config(
-                text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
+        cards_frame.progress_label.config(
+            text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
 
     def toggle_all_cards():
         val = "1" if cards_frame.toggle_all_var.get() else "0"
@@ -672,19 +669,35 @@ def create_tabs(root):
             entry.insert(0, val)
         update_cards_progress()
 
+    # --- Header row ---
+    ttk.Label(cards_frame, text="Creepy Treat Cards:").grid(
+        row=0, column=0, padx=10, pady=5, sticky="w")
     ttk.Checkbutton(cards_frame, text="Toggle All", variable=cards_frame.toggle_all_var,
-                    command=toggle_all_cards).grid(row=0, column=0, columnspan=4, pady=10)
+                    command=toggle_all_cards).grid(row=0, column=1, padx=10, pady=5)
+    cards_frame.progress_label = ttk.Label(
+        cards_frame, text="Collected: 0 / 0 (0%)")
+    cards_frame.progress_label.grid(
+        row=0, column=2, padx=10, pady=5, sticky="w")
+    cards_frame.progress = ttk.Progressbar(
+        cards_frame, variable=cards_frame.progress_var, maximum=100, length=150)
+    cards_frame.progress.grid(row=0, column=3, padx=10, pady=5, sticky="w")
 
+    # --- Card entries below ---
+    cards_per_col = 18
+    start_row = 1
     for i in range(54):
         card_num = i + 1
-        col = i // cards_per_col * 2
-        row = (i % cards_per_col) + 1
+        col = (i // cards_per_col) * 2
+        row = start_row + (i % cards_per_col)
         card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
-        label = ttk.Label(cards_frame, text=f"{card_name}")
-        label.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+        ttk.Label(cards_frame, text=card_name).grid(
+            row=row, column=col, sticky='e', padx=5, pady=2)
         entry = tk.Entry(cards_frame, width=8)
         entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
+        entry.bind("<KeyRelease>", lambda e: update_cards_progress())
         cards_frame.entries[card_num] = entry
+
+    cards_frame.update_progress = update_cards_progress
 
     # ---------- Battle Stamps ----------
     battle_frame = frames["Battle Stamps"]
@@ -698,9 +711,8 @@ def create_tabs(root):
         ) if e.get().strip().isdigit() and int(e.get().strip()) > 0)
         percentage = (collected / total) * 100 if total > 0 else 0
         battle_frame.progress_var.set(percentage)
-        if hasattr(battle_frame, "progress_label"):
-            battle_frame.progress_label.config(
-                text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
+        battle_frame.progress_label.config(
+            text=f"Collected: {collected} / {total} ({percentage:.0f}%)")
 
     def toggle_all_battle_items():
         val = "1" if battle_frame.toggle_all_var.get() else "0"
@@ -709,13 +721,25 @@ def create_tabs(root):
             entry.insert(0, val)
         update_battle_item_progress()
 
+    # --- Header row ---
+    ttk.Label(battle_frame, text="Battle Stamps:").grid(
+        row=0, column=0, padx=10, pady=5, sticky="w")
     ttk.Checkbutton(battle_frame, text="Toggle All", variable=battle_frame.toggle_all_var,
-                    command=toggle_all_battle_items).grid(row=0, column=0, columnspan=4, pady=10)
+                    command=toggle_all_battle_items).grid(row=0, column=1, padx=10, pady=5)
+    battle_frame.progress_label = ttk.Label(
+        battle_frame, text="Collected: 0 / 0 (0%)")
+    battle_frame.progress_label.grid(
+        row=0, column=2, padx=10, pady=5, sticky="w")
+    battle_frame.progress = ttk.Progressbar(
+        battle_frame, variable=battle_frame.progress_var, maximum=100, length=150)
+    battle_frame.progress.grid(row=0, column=3, padx=10, pady=5, sticky="w")
 
+    # --- Battle stamp entries below ---
     items_per_col = 9
+    start_row = 1  # entries start below header
     for i, (key, name) in enumerate(BATTLE_ITEM_NAMES.items()):
+        row = start_row + (i % items_per_col)
         col = (i // items_per_col) * 2
-        row = (i % items_per_col) + 1
         ttk.Label(battle_frame, text=name).grid(
             row=row, column=col, sticky='e', padx=5, pady=2)
         entry = tk.Entry(battle_frame, width=8)
@@ -723,14 +747,6 @@ def create_tabs(root):
         entry.bind("<KeyRelease>", lambda e: update_battle_item_progress())
         battle_frame.entries[key] = entry
 
-    battle_frame.progress_label = ttk.Label(
-        battle_frame, text="Collected: 0 / 0 (0%)")
-    battle_frame.progress_label.grid(
-        row=21, column=2, columnspan=4, sticky="w")
-    battle_frame.progress = ttk.Progressbar(
-        battle_frame, variable=battle_frame.progress_var, maximum=100, length=200)
-    battle_frame.progress.grid(
-        row=21, column=0, columnspan=2, padx=10, pady=10, sticky="w")
     battle_frame.update_progress = update_battle_item_progress
 
     # Quests tab placeholder
