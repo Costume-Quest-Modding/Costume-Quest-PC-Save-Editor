@@ -296,11 +296,10 @@ def open_save_dialog():
 
 
 def populate_entries_from_state(cards_entries, battle_entries):
-    """Given UI entry widget maps, fill them from AppState.save_text_data."""
     if not AppState.save_text_data:
         return
 
-    AppState.loading_save = True  # Prevent traces from firing prematurely
+    AppState.loading_save = True  # prevent trace updates
 
     # --- Update battle items ---
     for match in BATTLE_ITEM_PATTERN.finditer(AppState.save_text_data):
@@ -311,7 +310,8 @@ def populate_entries_from_state(cards_entries, battle_entries):
             entry.delete(0, tk.END)
             entry.insert(0, current_amount)
 
-    # --- Update creepy treat cards ---
+    # --- Update cards ---
+    cards_frame_ref = None
     for match in CARD_PATTERN.finditer(AppState.save_text_data):
         card_num = int(match.group(2))
         current_amount = int(match.group(3))
@@ -319,25 +319,22 @@ def populate_entries_from_state(cards_entries, battle_entries):
             entry = cards_entries[card_num]
             entry.delete(0, tk.END)
             entry.insert(0, str(current_amount))
+            # store a reference to the parent frame
+            if not cards_frame_ref:
+                cards_frame_ref = entry.master
 
-        # Update card_vars to reflect collected status
         if card_num in AppState.card_vars:
             AppState.card_vars[card_num].set(1 if current_amount > 0 else 0)
 
-    # --- Force a refresh of card gallery ---
-    # This ensures labels update immediately after loading
-    for card_num, var in AppState.card_vars.items():
-        var.set(var.get())  # triggers trace_add to update image
+    # trigger variable traces
+    for var in AppState.card_vars.values():
+        var.set(var.get())
 
     AppState.loading_save = False
 
-    # --- Optional: update 100% tracker progress bar if exists ---
-    try:
-        from ui import tracker_frame  # adjust if your frame is named differently
-        if hasattr(tracker_frame, "update_progress"):
-            tracker_frame.update_progress()
-    except Exception:
-        pass  # fail silently if UI not yet ready
+    # --- update the progress bar directly ---
+    if cards_frame_ref and hasattr(cards_frame_ref, "update_progress"):
+        cards_frame_ref.update_progress()
 
 
 def _replace_card_values_in_text(text, cards_entries):
