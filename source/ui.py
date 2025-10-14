@@ -261,7 +261,12 @@ def create_tabs(root):
     camera_position_frame.grid(
         row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
     row += 1
-
+    ttk.Label(summary_frame, text="Battle Stamps:").grid(
+        row=row, column=0, sticky="w", padx=25, pady=5)
+    row += 1
+    ttk.Label(summary_frame, text="Creepy Treat Cards:").grid(
+        row=row, column=0, sticky="w", padx=25, pady=5)
+    row += 1
     ttk.Label(summary_frame, text="Costumes:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5)
     row += 1
