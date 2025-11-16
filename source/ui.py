@@ -250,10 +250,12 @@ def create_tabs(root):
     row = 0
     ttk.Label(summary_frame, text="Player Info").grid(
         row=row, column=0, sticky="w", padx=10, pady=5)
-    ttk.Label(summary_frame, text="Misc. Stats").grid(
+    ttk.Label(summary_frame, text="World & Position").grid(
         row=row, column=2, sticky="w", padx=10, pady=5)
     ttk.Label(summary_frame, text="Apple Bobbing High Scores").grid(
-        row=3, column=2, sticky="w", padx=10, pady=5)
+        row=8, column=2, sticky="w", padx=10, pady=5)
+    ttk.Label(summary_frame, text="Misc. Stats").grid(
+        row=12, column=2, sticky="w", padx=10, pady=5)
     row += 1
     # ---------------------------------------------------------
     #  SECTION 1 — Player Info
@@ -262,25 +264,25 @@ def create_tabs(root):
     ttk.Label(summary_frame, text="Player Level:").grid(
         row=row, column=0, sticky="w", padx=25)
     ttk.Label(summary_frame, textvariable=saveio.AppState.level_var,
-              width=33).grid(row=row, column=1, padx=25)
+              width=33).grid(row=row, column=1, padx=25, pady=5)
     row += 1
 
     ttk.Label(summary_frame, text="XP:").grid(
-        row=row, column=0, sticky="w", padx=25)
+        row=row, column=0, sticky="w", padx=25, pady=5)
     ttk.Label(summary_frame, textvariable=saveio.AppState.xp_var,
-              width=33).grid(row=row, column=1, padx=25)
+              width=33).grid(row=row, column=1, padx=25, pady=5)
     row += 1
 
     ttk.Label(summary_frame, text="Candy:").grid(
         row=row, column=0, sticky="w", padx=25)
     ttk.Label(summary_frame, textvariable=saveio.AppState.candy_var,
-              width=33).grid(row=row, column=1, padx=25)
+              width=33).grid(row=row, column=1, padx=25, pady=5)
     row += 1
 
     ttk.Label(summary_frame, text="Total Candy:").grid(
         row=row, column=0, sticky="w", padx=25)
     ttk.Label(summary_frame, textvariable=saveio.AppState.total_candy_var,
-              width=33).grid(row=row, column=1, padx=25)
+              width=33).grid(row=row, column=1, padx=25, pady=5)
     row += 1
 
     # ---------------------------------------------------------
@@ -339,50 +341,53 @@ def create_tabs(root):
     # ---------------------------------------------------------
     #  SECTION 3 — WORLD & POSITION
     # ---------------------------------------------------------
-    ttk.Label(summary_frame, text="World & Position").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 1
-
+    row = 1
     ttk.Label(summary_frame, text="Current Map:").grid(
-        row=row, column=0, sticky="w", padx=25)
+        row=row, column=2, sticky="w", padx=25)
     ttk.Label(summary_frame, textvariable=saveio.AppState.selected_world,
-              width=33).grid(row=row, column=1, padx=25)
+              width=33).grid(row=row, column=3, padx=25)
     row += 1
 
-    player_position_frame = create_vector_editor(
-        summary_frame, "Player Position:", saveio.AppState.player_position_vars, state="readonly")
-    player_position_frame.grid(
-        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
-    row += 2
+    positions = [
+        ("Player Position:", saveio.AppState.player_position_vars),
+        ("Camera Position:", saveio.AppState.camera_position_vars)
+    ]
 
-    camera_position_frame = create_vector_editor(
-        summary_frame, "Camera Position:", saveio.AppState.camera_position_vars, state="readonly")
-    camera_position_frame.grid(
-        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
-    row += 1
+    for label_text, vars_list in positions:
+        ttk.Label(summary_frame, text=label_text).grid(
+            row=row, column=2, sticky="w", padx=25, pady=5
+        )
+        for i, axis in enumerate(["X", "Y", "Z"]):
+            ttk.Label(summary_frame, text=f"{axis}:").grid(
+                row=row + i, column=3, sticky="w", padx=25, pady=5
+            )
+            ttk.Label(summary_frame, textvariable=vars_list[i], width=15).grid(
+                row=row + i, column=3, sticky="w", padx=40, pady=5
+            )
+        row += 3  # move row counter past this block
 
     # ---------------------------------------------------------
     #  SECTION 4 — MISC. STATS
     # ---------------------------------------------------------
-    misc_stats = [
-        ("Robot Ramp Jumps:", saveio.AppState.robotjumps_var),
-        ("Monster Pail Bashes:", saveio.AppState.monsterbashes_var),
+    bobbing_stats = [
+        ("Suburbs:", saveio.AppState.suburbsbobbing_var),
+        ("Autumn Haven Mall:", saveio.AppState.mallbobbing_var),
+        ("Fall Valley:", saveio.AppState.countrybobbing_var)
     ]
-    row = 1
-    for label_text, var in misc_stats:
+    row = 9
+    for label_text, var in bobbing_stats:
         ttk.Label(summary_frame, text=label_text).grid(
             row=row, column=2, sticky="w", padx=25, pady=5)
         ttk.Label(summary_frame, textvariable=var, width=33, anchor="w").grid(
             row=row, column=3, sticky="w", padx=25, pady=5)
         row += 1
 
-    bobbing_stats = [
-        ("Suburbs:", saveio.AppState.suburbsbobbing_var),
-        ("Autumn Haven Mall:", saveio.AppState.mallbobbing_var),
-        ("Fall Valley:", saveio.AppState.countrybobbing_var)
+    misc_stats = [
+        ("Robot Ramp Jumps:", saveio.AppState.robotjumps_var),
+        ("Monster Pail Bashes:", saveio.AppState.monsterbashes_var),
     ]
-    row = 4
-    for label_text, var in bobbing_stats:
+    row = 13
+    for label_text, var in misc_stats:
         ttk.Label(summary_frame, text=label_text).grid(
             row=row, column=2, sticky="w", padx=25, pady=5)
         ttk.Label(summary_frame, textvariable=var, width=33, anchor="w").grid(
