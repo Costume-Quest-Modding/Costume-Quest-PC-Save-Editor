@@ -3,6 +3,10 @@ import re
 import os
 import sys
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
+STAMP_DIR = os.path.join(BASE_DIR, "images", "battle_stamps")
+
 XP_THRESHOLDS = {
     1: 0, 2: 2500, 3: 6000, 4: 12000, 5: 20000,
     6: 31000, 7: 45000, 8: 62000, 9: 82000, 10: 105000,
@@ -124,6 +128,49 @@ CARD_NAMES = {
     54: "Gloop"
 }
 
+CARD_IMAGES = {
+    num: os.path.join(CARDS_DIR, f"trickcard_{num:03}.png")
+    for num in CARD_NAMES.keys()
+}
+
+BATTLE_ITEM_PATTERN = re.compile(
+    r'(BattleItem_(\w+)=InventoryItem\{[^}]*?CurrentAmount=)(\d+)(;[^}]*\})'
+)
+
+BATTLE_ITEM_NAMES = {
+    "FangOfTheWolf": "Fang of the Wolf",
+    "BlackCat": "Black Cat",
+    "MovingTombstone": "Moving Tombstone",
+    "Egg": "Egg",
+    "DisembodiedHand": "Disembodied Hand",
+    "PumpkinGuts": "Pumpkin Guts",
+    "ScreamingSpider": "Screaming Spider",
+    "BloodshotEyeballs": "Bloodshot Eyeballs",
+    "ToiletPaper": "Toilet Paper",
+    "OneEyedVampireBat": "One-Eyed Vampire Bat",
+    "WitchesBrew": "Witch's Brew",
+    "JawboneOfTheWolf": "Jawbone of the Wolf",
+    "AlbinoBlackCat": "Albino Black Cat",
+    "Banshee": "Banshee",
+    "FlyingTombstone": "Flying Tombstone",
+    "RottenEgg": "Rotten Egg",
+    "SixFingeredHand": "Disembodied Six Fingered Hand",
+    "MoldyPumpkinGuts": "Moldy Pumpkin Guts",
+    "YodelingWidow": "Yodeling Black Widow",
+    "TwoPlyToiletPaper": "2-Ply Toilet Paper",
+    "HeadlessBanshee": "Headless Banshee",
+    "VegetarianBrew": "Vegetarian Witch's Brew",
+    "NoEyedVampireBat": "No-Eyed Vampire Bat",
+    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs"
+}
+
+
+BATTLE_STAMP_IMAGES = {
+    key: os.path.join(STAMP_DIR, f"stamp_{i+1:03}.png")
+    for i, key in enumerate(BATTLE_ITEM_NAMES.keys())
+}
+
+
 THEMES = {
     "dark": {
         "root_theme": "black",
@@ -159,37 +206,6 @@ THEMES = {
         "tab_selected_bg": "#90CAF9",
         "tab_selected_fg": "#0D47A1",
     }
-}
-
-BATTLE_ITEM_PATTERN = re.compile(
-    r'(BattleItem_(\w+)=InventoryItem\{[^}]*?CurrentAmount=)(\d+)(;[^}]*\})'
-)
-
-BATTLE_ITEM_NAMES = {
-    "FangOfTheWolf": "Fang of the Wolf",
-    "BlackCat": "Black Cat",
-    "MovingTombstone": "Moving Tombstone",
-    "Egg": "Egg",
-    "DisembodiedHand": "Disembodied Hand",
-    "PumpkinGuts": "Pumpkin Guts",
-    "ScreamingSpider": "Screaming Spider",
-    "BloodshotEyeballs": "Bloodshot Eyeballs",
-    "ToiletPaper": "Toilet Paper",
-    "OneEyedVampireBat": "One-Eyed Vampire Bat",
-    "WitchesBrew": "Witch's Brew",
-    "JawboneOfTheWolf": "Jawbone of the Wolf",
-    "AlbinoBlackCat": "Albino Black Cat",
-    "Banshee": "Banshee",
-    "FlyingTombstone": "Flying Tombstone",
-    "RottenEgg": "Rotten Egg",
-    "SixFingeredHand": "Disembodied Six Fingered Hand",
-    "MoldyPumpkinGuts": "Moldy Pumpkin Guts",
-    "YodelingWidow": "Yodeling Black Widow",
-    "TwoPlyToiletPaper": "2-Ply Toilet Paper",
-    "HeadlessBanshee": "Headless Banshee",
-    "VegetarianBrew": "Vegetarian Witch's Brew",
-    "NoEyedVampireBat": "No-Eyed Vampire Bat",
-    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs"
 }
 
 # Helper for icon path if needed when packaged

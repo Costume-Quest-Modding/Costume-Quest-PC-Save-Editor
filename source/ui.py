@@ -1,5 +1,5 @@
 # ui.py
-from constants import THEMES, NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, BATTLE_ITEM_NAMES, WORLD_PATHS, DEBUG_TELEPORTS
+from constants import THEMES, NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS
 from PIL import Image, ImageTk
 from saveio import AppState
 import tkinter as tk
@@ -80,6 +80,59 @@ class ToolTip:
         if self.tipwindow:
             self.tipwindow.destroy()
             self.tipwindow = None
+
+
+class ImageTooltip:
+    """
+    Tooltip for showing images (cards or battle stamps) on hover.
+    Automatically scales 64x64 stamps to 128x128 for better visibility.
+    Keeps pixel art crisp using Image.NEAREST.
+    """
+
+    def __init__(self, widget, img_path, scale_stamps=True):
+        self.widget = widget
+        self.img_path = img_path
+        self.scale_stamps = False  # set to "scale_stamps" to upscale 64x64 image
+        self.tip_window = None
+        self.photo = None
+
+        widget.bind("<Enter>", self._show_tooltip)
+        widget.bind("<Leave>", self._hide_tooltip)
+
+    def _show_tooltip(self, event=None):
+        if self.tip_window:
+            return
+
+        if not self.img_path or not os.path.isfile(self.img_path):
+            return
+
+        # Load image
+        img = Image.open(self.img_path)
+        w, h = img.size
+
+        # If it's a small stamp and scaling is enabled, double it
+        if self.scale_stamps and (w, h) == (64, 64):
+            img = img.resize((w * 2, h * 2), Image.NEAREST)
+        # Otherwise, keep original size (e.g., 128x128 cards)
+
+        self.photo = ImageTk.PhotoImage(img)
+
+        # Create tooltip window
+        self.tip_window = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)
+        x = self.widget.winfo_pointerx() + 10
+        y = self.widget.winfo_pointery() + 10
+        tw.wm_geometry(f"+{x}+{y}")
+
+        # Display image
+        lbl = tk.Label(tw, image=self.photo,
+                       borderwidth=0, highlightthickness=0)
+        lbl.pack()
+
+    def _hide_tooltip(self, event=None):
+        if self.tip_window:
+            self.tip_window.destroy()
+            self.tip_window = None
 
 
 def create_vector_editor(parent, label_text, variables, state="normal"):
@@ -475,8 +528,16 @@ def create_tabs(root):
         col = (i // cards_per_col) * 2
         row = start_row + (i % cards_per_col)
         card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
-        ttk.Label(cards_frame, text=card_name).grid(
-            row=row, column=col, sticky='e', padx=5, pady=2)
+
+        lbl = ttk.Label(cards_frame, text=card_name)
+        lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+
+        # Attach image tooltip (if image exists)
+        img_path = CARD_IMAGES.get(card_num)
+        if os.path.isfile(img_path):
+            ImageTooltip(lbl, img_path)
+
+        # create entry
         entry = tk.Entry(cards_frame, width=8)
         entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
         entry.bind("<KeyRelease>", lambda e: update_cards_progress())
@@ -490,22 +551,22 @@ def create_tabs(root):
     battle_frame.entries = {}
     battle_frame.progress_var = tk.DoubleVar()
     battle_frame.toggle_all_var = tk.IntVar()
-    battle_frame.progress_text = battle_progress_text
+    battle_frame.progress_text = battle_progress_text  # link to Summary tab
 
     def update_battle_item_progress():
         total = len(battle_frame.entries)
         collected = sum(1 for e in battle_frame.entries.values(
         ) if e.get().strip().isdigit() and int(e.get().strip()) > 0)
-        percentage = (collected / total) * 100 if total > 0 else 0
+        percentage = (collected / total) * 100 if total else 0
         battle_frame.progress_var.set(percentage)
         battle_frame.progress_text.set(
             f"Collected: {collected} / {total} ({percentage:.0f}%)")
 
     def toggle_all_battle_items():
         val = "1" if battle_frame.toggle_all_var.get() else "0"
-        for entry in battle_frame.entries.values():
-            entry.delete(0, tk.END)
-            entry.insert(0, val)
+        for e in battle_frame.entries.values():
+            e.delete(0, tk.END)
+            e.insert(0, val)
         update_battle_item_progress()
 
     # --- Header row ---
@@ -521,16 +582,24 @@ def create_tabs(root):
         battle_frame, variable=battle_frame.progress_var, maximum=100, length=150)
     battle_frame.progress.grid(row=0, column=3, padx=10, pady=5, sticky="w")
 
-    # --- Battle stamp entries below ---
+    # --- Battle stamp entries ---
     items_per_col = 9
-    start_row = 1  # entries start below header
+    start_row = 1
     for i, (key, name) in enumerate(BATTLE_ITEM_NAMES.items()):
         row = start_row + (i % items_per_col)
         col = (i // items_per_col) * 2
-        ttk.Label(battle_frame, text=name).grid(
-            row=row, column=col, sticky='e', padx=5, pady=2)
+
+        lbl = ttk.Label(battle_frame, text=name)
+        lbl.grid(row=row, column=col, sticky="e", padx=5, pady=2)
+
+        # Attach image tooltip (if image exists)
+        img_path = BATTLE_STAMP_IMAGES.get(key)
+        if img_path and os.path.isfile(img_path):
+            ImageTooltip(lbl, img_path)
+
+        # create entry
         entry = tk.Entry(battle_frame, width=8)
-        entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
+        entry.grid(row=row, column=col+1, sticky="w", padx=5, pady=2)
         entry.bind("<KeyRelease>", lambda e: update_battle_item_progress())
         battle_frame.entries[key] = entry
 
@@ -542,14 +611,9 @@ def create_tabs(root):
     ttk.Label(quests_frame, text="Quests").grid(
         row=0, column=0, sticky="w", padx=10, pady=5
     )
-    ttk.Label(quests_frame, text="Apple Bobbing Quests").grid(
-        row=1, column=0, sticky="w", padx=25, pady=5
-    )
-    bobbing_label = ttk.Label(
-        quests_frame, text="Complete 3 rounds per area to finish each quest.")
-    bobbing_label.grid(row=2, column=0, columnspan=2,
-                       sticky="w", padx=40, pady=5)
-    ToolTip(bobbing_label, "Complete 3 rounds of Apple Bobbing at each location.\nFirst 2 rounds give Candy, 3rd gives a Creepy Treat Card.")
+    quest_label = ttk.Label(quests_frame, text="Apple Bobbing Quests")
+    quest_label.grid(row=1, column=0, sticky="w", padx=25, pady=5)
+    ToolTip(quest_label, "Complete 3 rounds per location of Apple Bobbing to finish the quest.\nFirst 2 rounds give Candy, 3rd gives a Creepy Treat Card.")
 
     bobbing_data = [
         ("Suburbs High Score:", saveio.AppState.suburbsbobbing_var, 30),
