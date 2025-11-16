@@ -49,6 +49,20 @@ COSTUME_OPTIONS = [
     "Costume_BlackCat", "Costume_Grubbin"
 ]
 
+COSTUME_DISPLAY_NAMES = {
+    "Costume_Robot": "Robot",
+    "Costume_Knight": "Knight",
+    "Costume_StatueOfLiberty": "Statue of Liberty",
+    "Costume_SpaceWarrior": "Space Warrior",
+    "Costume_Ninja": "Ninja",
+    "Costume_Unicorn": "Unicorn",
+    "Costume_Pumpkin": "Pumpkin",
+    "Costume_Vampire": "Vampire",
+    "Costume_FrenchFries": "French Fries",
+    "Costume_BlackCat": "Black Cat",
+    "Costume_Grubbin": "Grubbin"
+}
+
 CARD_PATTERN = re.compile(
     r'(TrickyTreatCard_(\d+)=InventoryItem\{[^}]*CurrentAmount=)(\d+)(;[^}]*\})'
 )

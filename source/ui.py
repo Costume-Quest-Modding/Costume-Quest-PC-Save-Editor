@@ -1,5 +1,5 @@
 # ui.py
-from constants import THEMES, NAMES, COSTUME_OPTIONS, CARD_NAMES, BATTLE_ITEM_NAMES, WORLD_PATHS, DEBUG_TELEPORTS
+from constants import THEMES, NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, BATTLE_ITEM_NAMES, WORLD_PATHS, DEBUG_TELEPORTS
 from PIL import Image, ImageTk
 from saveio import AppState
 import tkinter as tk
@@ -268,15 +268,17 @@ def create_tabs(root):
     for i, name in enumerate(NAMES):
         if not saveio.AppState.costume_vars[i].get():
             saveio.AppState.costume_vars[i].set(COSTUME_OPTIONS[i])
-        saveio.AppState.costume_display_vars[i].set(
-            f"{name}: {saveio.AppState.costume_vars[i].get()}")
+        display_name = COSTUME_DISPLAY_NAMES.get(
+            saveio.AppState.costume_vars[i].get(),
+            saveio.AppState.costume_vars[i].get())  # fallback to internal name
+        saveio.AppState.costume_display_vars[i].set(f"{name}: {display_name}")
         ttk.Label(summary_frame, textvariable=saveio.AppState.costume_display_vars[i]).grid(
             row=row, column=1, padx=25, pady=5, sticky="w"
         )
         saveio.AppState.costume_vars[i].trace_add(
             "write",
             lambda *args, idx=i, nm=name: saveio.AppState.costume_display_vars[idx].set(
-                f"{nm}: {saveio.AppState.costume_vars[idx].get()}"
+                f"{nm}: {COSTUME_DISPLAY_NAMES.get(saveio.AppState.costume_vars[idx].get(), saveio.AppState.costume_vars[idx].get())}"
             ),
         )
         row += 1
