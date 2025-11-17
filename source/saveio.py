@@ -302,13 +302,24 @@ def populate_entries_from_state(cards_entries, battle_entries):
     AppState.loading_save = True  # prevent trace updates
 
     # --- Update battle items ---
+    battle_frame_ref = None
     for match in BATTLE_ITEM_PATTERN.finditer(AppState.save_text_data):
-        item_key = match.group(2)
+        stamp_num = match.group(2)
         current_amount = match.group(3)
-        if item_key in battle_entries:
-            entry = battle_entries[item_key]
+        if stamp_num in battle_entries:
+            entry = battle_entries[stamp_num]
             entry.delete(0, tk.END)
             entry.insert(0, current_amount)
+            if not battle_frame_ref:
+                battle_frame_ref = entry.master  # assign the parent frame
+
+    # --- update the progress bar directly ---
+    if battle_frame_ref and hasattr(battle_frame_ref, "update_progress"):
+        battle_frame_ref.update_progress()
+
+    # force update missing battle stamps after loading
+    if battle_frame_ref and hasattr(battle_frame_ref, "update_missing_stamps"):
+        battle_frame_ref.update_missing_stamps()
 
     # --- Update cards ---
     cards_frame_ref = None
@@ -335,6 +346,10 @@ def populate_entries_from_state(cards_entries, battle_entries):
     # --- update the progress bar directly ---
     if cards_frame_ref and hasattr(cards_frame_ref, "update_progress"):
         cards_frame_ref.update_progress()
+
+    # force update missing cards after loading
+    if cards_frame_ref and hasattr(cards_frame_ref, "update_missing_cards"):
+        cards_frame_ref.update_missing_cards()
 
 
 def _replace_card_values_in_text(text, cards_entries):
