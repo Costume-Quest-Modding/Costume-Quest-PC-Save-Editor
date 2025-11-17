@@ -135,6 +135,107 @@ class ImageTooltip:
             self.tip_window = None
 
 
+class CardsTab(ttk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.entries = {}
+        self.progress_var = tk.DoubleVar()
+        self.toggle_all_var = tk.IntVar()
+        self.progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
+        self.missing_cards_var = tk.StringVar(value="All")
+
+        self._build_ui()
+        self.update_progress()
+        self.update_missing_cards()
+
+    def _build_ui(self):
+        # Header row
+        ttk.Label(self, text="Creepy Treat Cards:").grid(
+            row=0, column=0, padx=10, pady=5, sticky="w")
+        ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var,
+                        command=self.toggle_all_cards).grid(row=0, column=1, padx=10, pady=5)
+        ttk.Label(self, textvariable=self.progress_text).grid(
+            row=0, column=2, padx=10, pady=5, sticky="w")
+        ttk.Progressbar(self, variable=self.progress_var, maximum=100, length=150).grid(
+            row=0, column=3, padx=10, pady=5, sticky="w")
+
+        # Card entries grid
+        cards_per_col = 18
+        start_row = 1
+        for i in range(54):
+            card_num = i + 1
+            col = (i // cards_per_col) * 2
+            row = start_row + (i % cards_per_col)
+            card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
+
+            lbl = ttk.Label(self, text=card_name)
+            lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+
+            # Image tooltip
+            img_path = CARD_IMAGES.get(card_num)
+            if img_path and os.path.isfile(img_path):
+                self._attach_image_tooltip(lbl, img_path)
+
+            entry = tk.Entry(self, width=8)
+            entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
+            entry.bind("<KeyRelease>", lambda e: [
+                       self.update_progress(), self.update_missing_cards()])
+            self.entries[card_num] = entry
+
+        # Missing cards section
+        last_row = start_row + cards_per_col * \
+            ((54 + cards_per_col - 1) // cards_per_col)
+        missing_frame = ttk.Frame(self)
+        missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
+        missing_frame.columnconfigure(1, weight=1)
+
+        ttk.Label(missing_frame, text="Missing Cards:").grid(
+            row=0, column=0, padx=10, pady=5, sticky="w")
+        ttk.Label(missing_frame, textvariable=self.missing_cards_var, anchor="w", wraplength=400).grid(
+            row=0, column=1, sticky="ew", padx=10, pady=5
+        )
+
+        # Auto-wrap
+        self.bind("<Configure>", self._update_wrap)
+
+    def _attach_image_tooltip(self, widget, img_path):
+        """Attach an image tooltip (like your ImageTooltip)"""
+        ImageTooltip(widget, img_path)
+
+    def _update_wrap(self, event=None):
+        width = self.winfo_width()
+        if width > 150:
+            self.children.get('!frame').children.get(
+                '!label2').config(wraplength=width - 150)
+
+    def update_progress(self):
+        total = len(self.entries)
+        collected = sum(1 for e in self.entries.values() if e.get(
+        ).strip().isdigit() and int(e.get().strip()) > 0)
+        percent = (collected / total) * 100 if total > 0 else 0
+        self.progress_var.set(percent)
+        self.progress_text.set(
+            f"Collected: {collected} / {total} ({percent:.0f}%)")
+
+    def update_missing_cards(self):
+        missing = [CARD_NAMES.get(num, f"Card {num}") for num, e in self.entries.items(
+        ) if not e.get().strip() or e.get().strip() == "0"]
+        if all(not e.get().strip() or e.get().strip() == "0" for e in self.entries.values()):
+            self.missing_cards_var.set("All")
+        elif all(e.get().strip() and int(e.get().strip()) > 0 for e in self.entries.values()):
+            self.missing_cards_var.set("None")
+        else:
+            self.missing_cards_var.set(", ".join(missing))
+
+    def toggle_all_cards(self):
+        val = "1" if self.toggle_all_var.get() else "0"
+        for e in self.entries.values():
+            e.delete(0, tk.END)
+            e.insert(0, val)
+        self.update_progress()
+        self.update_missing_cards()
+
+
 def create_vector_editor(parent, label_text, variables, state="normal"):
     frame = ttk.Frame(parent)
     frame.columnconfigure(1, weight=1)
@@ -238,12 +339,21 @@ def create_tabs(root):
         "Summary": ttk.Frame(notebook),
         "Stats & World": ttk.Frame(notebook),
         "Battle Stamps": ttk.Frame(notebook),
-        "Cards": ttk.Frame(notebook),
         "Costumes": ttk.Frame(notebook),
         "Quests": ttk.Frame(notebook),
     }
-    for name, frame in frames.items():
-        notebook.add(frame, text=name)
+
+    # Create CardsTab instance
+    cards_frame = CardsTab(notebook)
+    frames["Cards"] = cards_frame
+
+    # Add tabs in the desired order
+    notebook.add(frames["Summary"], text="Summary")
+    notebook.add(frames["Stats & World"], text="Stats & World")
+    notebook.add(frames["Battle Stamps"], text="Battle Stamps")
+    notebook.add(frames["Cards"], text="Cards")
+    notebook.add(frames["Costumes"], text="Costumes")
+    notebook.add(frames["Quests"], text="Quests")
 
     # ---------- Summary Frame ----------
     summary_frame = frames["Summary"]
@@ -488,126 +598,6 @@ def create_tabs(root):
             row=i, column=1, padx=10, pady=5)
         ttk.Combobox(costumes_frame, textvariable=saveio.AppState.costume_vars[i], values=COSTUME_OPTIONS, width=30).grid(
             row=i, column=2, sticky="w", padx=10, pady=5)
-
-    # ---------- Cards frame ----------
-    cards_frame = frames["Cards"]
-    cards_frame.entries = {}
-    cards_frame.progress_var = tk.DoubleVar()
-    cards_frame.toggle_all_var = tk.IntVar()
-    cards_frame.progress_text = cards_progress_text  # link to Summary tab
-
-    def update_cards_progress():
-        total = len(cards_frame.entries)
-        collected = sum(1 for e in cards_frame.entries.values(
-        ) if e.get().strip().isdigit() and int(e.get().strip()) > 0)
-        percentage = (collected / total) * 100 if total > 0 else 0
-        cards_frame.progress_var.set(percentage)
-        cards_frame.progress_text.set(
-            f"Collected: {collected} / {total} ({percentage:.0f}%)")
-
-    def update_missing_cards():
-        missing = []
-        for card_num, entry in cards_frame.entries.items():
-            val = entry.get().strip()
-            if not val or val == "0":  # card not collected
-                missing.append(CARD_NAMES.get(card_num, f"Card {card_num}"))
-
-        # logic for All / None / list...
-        if all(not entry.get().strip() or entry.get().strip() == "0"
-               for entry in cards_frame.entries.values()):
-            cards_frame.missing_cards_var.set("All")
-        elif all(entry.get().strip() and int(entry.get().strip()) > 0
-                 for entry in cards_frame.entries.values()):
-            cards_frame.missing_cards_var.set("None")
-        else:
-            cards_frame.missing_cards_var.set(", ".join(missing))
-
-    # REGISTER BOTH FUNCTIONS
-    cards_frame.update_progress = update_cards_progress
-    cards_frame.update_missing_cards = update_missing_cards
-
-    def toggle_all_cards():
-        val = "1" if cards_frame.toggle_all_var.get() else "0"
-        for entry in cards_frame.entries.values():
-            entry.delete(0, tk.END)
-            entry.insert(0, val)
-        update_cards_progress()
-        update_missing_cards()
-
-    # --- Header row ---
-    ttk.Label(cards_frame, text="Creepy Treat Cards:").grid(
-        row=0, column=0, padx=10, pady=5, sticky="w")
-    ttk.Checkbutton(cards_frame, text="Toggle All", variable=cards_frame.toggle_all_var,
-                    command=toggle_all_cards).grid(row=0, column=1, padx=10, pady=5)
-    cards_frame.progress_label = ttk.Label(
-        cards_frame, textvariable=cards_frame.progress_text)
-    cards_frame.progress_label.grid(
-        row=0, column=2, padx=10, pady=5, sticky="w")
-    cards_frame.progress = ttk.Progressbar(
-        cards_frame, variable=cards_frame.progress_var, maximum=100, length=150)
-    cards_frame.progress.grid(row=0, column=3, padx=10, pady=5, sticky="w")
-
-    # --- Card entries below ---
-    cards_per_col = 18
-    start_row = 1
-    for i in range(54):
-        card_num = i + 1
-        col = (i // cards_per_col) * 2
-        row = start_row + (i % cards_per_col)
-        card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
-
-        lbl = ttk.Label(cards_frame, text=card_name)
-        lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
-
-        # Attach image tooltip (if image exists)
-        img_path = CARD_IMAGES.get(card_num)
-        if os.path.isfile(img_path):
-            ImageTooltip(lbl, img_path)
-
-        entry = tk.Entry(cards_frame, width=8)
-        entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
-
-        # Bind with default arguments to capture correct references
-        entry.bind("<KeyRelease>", lambda e, en=entry, cn=card_num: [
-                   update_cards_progress(), update_missing_cards()])
-        cards_frame.entries[card_num] = entry
-
-    # ---------- Missing Cards Section ----------
-    last_row = start_row + cards_per_col * \
-        ((54 + cards_per_col - 1) // cards_per_col)
-
-    missing_frame = ttk.Frame(cards_frame)
-    missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
-    missing_frame.columnconfigure(1, weight=1)
-
-    ttk.Label(missing_frame, text="Missing Cards:").grid(
-        row=0, column=0, padx=10, pady=5, sticky="w"
-    )
-
-    cards_frame.missing_cards_var = tk.StringVar(value="All")
-
-    cards_frame.missing_cards_label = ttk.Label(
-        missing_frame,
-        textvariable=cards_frame.missing_cards_var,
-        anchor="w",
-        wraplength=400  # temporary; will auto-adjust
-    )
-    cards_frame.missing_cards_label.grid(
-        row=0, column=1, sticky="ew", padx=10, pady=5
-    )
-
-    # --- Auto-wrap so text never pushes the grid ---
-
-    def update_wrap(*args):
-        width = cards_frame.winfo_width()
-        if width > 150:
-            cards_frame.missing_cards_label.config(wraplength=width - 150)
-
-    cards_frame.bind("<Configure>", update_wrap)
-
-    cards_frame.update_progress = update_cards_progress
-    cards_frame.update_progress()
-    update_missing_cards()
 
     # ---------- Battle Stamps ----------
     battle_frame = frames["Battle Stamps"]
