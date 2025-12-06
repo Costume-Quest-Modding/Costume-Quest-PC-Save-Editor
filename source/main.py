@@ -2,14 +2,19 @@
 import os
 import saveio
 import ui
-from ttkthemes import ThemedTk
+import tkinter as tk
+from tkinter import ttk
 
 
 def main():
-    root = ThemedTk(theme="winxpblue")
+    # Create main window with a default ttk theme
+    root = tk.Tk()
     root.title("Costume Quest PC Save Editor")
     root.geometry("800x600")
     root.minsize(800, 600)
+
+    style = ttk.Style()
+    style.theme_use('clam')
 
     # initialize Tk variables inside AppState
     saveio.AppState.init_vars(root)
@@ -20,9 +25,6 @@ def main():
 
     # menu needs access to frames map so save/load can use their entries
     ui.create_menu(root, frames_map)
-
-    # apply default theme
-    ui.apply_theme(root, "light")
 
     # set icon if available
     import constants

@@ -1,51 +1,15 @@
 # ui.py
-from constants import THEMES, NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS
+from tkinter import ttk
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS
 from PIL import Image, ImageTk
 from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
-from ttkthemes import ThemedTk
 import saveio
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
-# keep a module-level theme name
-_current_theme_name = "light"
-
-
-def current_theme():
-    return THEMES[_current_theme_name]
-
-
-def apply_theme(root, theme_name):
-    global _current_theme_name
-    _current_theme_name = theme_name
-    theme = THEMES[theme_name]
-    style = ttk.Style()
-    style.theme_use(theme["style_theme"])
-
-    style.configure("TNotebook", background=theme.get(
-        "notebook_bg", theme["bg"]), borderwidth=0)
-    style.configure("TNotebook.Tab",
-                    background=theme["tab_bg"],
-                    foreground=theme["tab_fg"],
-                    padding=6)
-    style.map("TNotebook.Tab",
-              background=[("selected", theme["tab_selected_bg"])],
-              foreground=[("selected", theme["tab_selected_fg"])])
-    style.configure("TFrame", background=theme["bg"])
-    style.configure("TLabel", background=theme["bg"], foreground=theme["fg"])
-    style.configure("TEntry",
-                    fieldbackground=theme["entry_bg"],
-                    foreground=theme["entry_fg"],
-                    background=theme["entry_bg"])
-    root.configure(bg=theme["bg"])
-    root.set_theme(theme["root_theme"])
-
-
-def toggle_theme(root):
-    apply_theme(root, "dark" if _current_theme_name == "light" else "light")
 
 # ---------- small widgets ----------
 
@@ -363,15 +327,8 @@ def create_vector_editor(parent, label_text, variables, state="normal"):
 
 
 def create_menu(root, frames_refs):
-    theme = THEMES[_current_theme_name]
-
     def make_menu(parent):
-        return tk.Menu(parent,
-                       background=theme["menu_bg"],
-                       foreground=theme["menu_fg"],
-                       activebackground=theme["menu_active_bg"],
-                       activeforeground=theme["menu_active_fg"],
-                       tearoff=0)
+        return tk.Menu(parent, tearoff=0)
 
     menu_bar = make_menu(root)
 
@@ -387,11 +344,6 @@ def create_menu(root, frames_refs):
     file_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="File", menu=file_menu)
 
-    options_menu = make_menu(menu_bar)
-    options_menu.add_command(
-        label="Toggle Light/Dark Mode", command=lambda: toggle_theme(root))
-    menu_bar.add_cascade(label="Options", menu=options_menu)
-
     help_menu = make_menu(menu_bar)
     help_menu.add_command(
         label="How to Use",
@@ -406,8 +358,6 @@ def create_menu(root, frames_refs):
             " - Save: Save changes to the current file.\n"
             " - Save As...: Save to a new file location (.json or .txt allowed).\n"
             " - Backup Save File: Make a backup of your current save.\n\n"
-            "Options Menu:\n"
-            " - Toggle Light/Dark Mode: Switches editor themes.\n\n"
             "Tips:\n"
             " - Hover over labels for more info (tooltips).\n"
             " - Ensure you save changes before closing the editor."
