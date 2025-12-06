@@ -135,6 +135,113 @@ class ImageTooltip:
             self.tip_window = None
 
 
+class BattleStampsTab(ttk.Frame):
+    def __init__(self, parent, progress_text_var=None):
+        super().__init__(parent)
+        self.entries = {}
+        self.progress_var = tk.DoubleVar()
+        self.toggle_all_var = tk.IntVar()
+        self.progress_text = progress_text_var
+        self.missing_stamps_var = tk.StringVar(value="All")
+
+        self._build_ui()
+        self.update_progress()
+        self.update_missing_stamps()
+
+    def _build_ui(self):
+        # Header row
+        ttk.Label(self, text="Battle Stamps:").grid(
+            row=0, column=0, padx=10, pady=5, sticky="w"
+        )
+        ttk.Checkbutton(
+            self, text="Toggle All", variable=self.toggle_all_var,
+            command=self.toggle_all_stamps
+        ).grid(row=0, column=1, padx=10, pady=5)
+
+        ttk.Label(self, textvariable=self.progress_text).grid(
+            row=0, column=2, padx=10, pady=5, sticky="w"
+        )
+        ttk.Progressbar(self, variable=self.progress_var, maximum=100, length=150).grid(
+            row=0, column=3, padx=10, pady=5, sticky="w"
+        )
+
+        # Stamp entries grid
+        items_per_col = 9
+        start_row = 1
+        for i, (stamp_num, name) in enumerate(BATTLE_ITEM_NAMES.items()):
+            row = start_row + (i % items_per_col)
+            col = (i // items_per_col) * 2
+
+            lbl = ttk.Label(self, text=name)
+            lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+
+            # Image tooltip
+            img_path = BATTLE_STAMP_IMAGES.get(stamp_num)
+            if img_path and os.path.isfile(img_path):
+                ImageTooltip(lbl, img_path)
+
+            entry = tk.Entry(self, width=8)
+            entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
+            entry.bind("<KeyRelease>", lambda e: [
+                       self.update_progress(), self.update_missing_stamps()])
+            self.entries[stamp_num] = entry
+
+        # Missing stamps section
+        last_row = start_row + (len(BATTLE_ITEM_NAMES) //
+                                items_per_col + 1) * items_per_col
+        missing_frame = ttk.Frame(self)
+        missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
+        missing_frame.columnconfigure(1, weight=1)
+
+        ttk.Label(missing_frame, text="Missing Stamps:").grid(
+            row=0, column=0, padx=10, pady=5, sticky="w"
+        )
+        ttk.Label(missing_frame, textvariable=self.missing_stamps_var, anchor="w", wraplength=400).grid(
+            row=0, column=1, sticky="ew", padx=10, pady=5
+        )
+
+        # Auto-wrap
+        self.bind("<Configure>", self._update_wrap)
+
+    def _update_wrap(self, event=None):
+        width = self.winfo_width()
+        if width > 150:
+            # Only one missing stamps label exists
+            self.children.get(list(self.children.keys())[-1]).children.get(list(self.children.get(
+                list(self.children.keys())[-1]).children.keys())[1]).config(wraplength=width - 150)
+
+    def update_progress(self):
+        total = len(self.entries)
+        collected = sum(
+            1 for e in self.entries.values() if e.get().strip().isdigit() and int(e.get().strip()) > 0
+        )
+        percent = (collected / total) * 100 if total > 0 else 0
+        self.progress_var.set(percent)
+        if self.progress_text:
+            self.progress_text.set(
+                f"Collected: {collected} / {total} ({percent:.0f}%)")
+
+    def update_missing_stamps(self):
+        missing = [
+            BATTLE_ITEM_NAMES.get(num, f"Stamp {num}") for num, e in self.entries.items()
+            if not e.get().strip() or e.get().strip() == "0"
+        ]
+        if all(not e.get().strip() or e.get().strip() == "0" for e in self.entries.values()):
+            self.missing_stamps_var.set("All")
+        elif all(e.get().strip() and int(e.get().strip()) > 0 for e in self.entries.values()):
+            self.missing_stamps_var.set("None")
+        else:
+            self.missing_stamps_var.set(", ".join(missing))
+
+    def toggle_all_stamps(self):
+        val = "1" if self.toggle_all_var.get() else "0"
+        for e in self.entries.values():
+            e.delete(0, tk.END)
+            e.insert(0, val)
+        self.update_progress()
+        self.update_missing_stamps()
+
+
 class CardsTab(ttk.Frame):
     def __init__(self, parent, progress_text_var=None):
         super().__init__(parent)
@@ -348,6 +455,11 @@ def create_tabs(root):
     cards_frame = CardsTab(notebook, progress_text_var=cards_progress_text)
     frames["Cards"] = cards_frame
 
+    battle_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
+    battlestamps_frame = BattleStampsTab(
+        notebook, progress_text_var=battle_progress_text)
+    frames["Battle Stamps"] = battlestamps_frame
+
     # Add tabs in the desired order
     notebook.add(frames["Summary"], text="Summary")
     notebook.add(frames["Stats & World"], text="Stats & World")
@@ -405,7 +517,6 @@ def create_tabs(root):
     row += 1
 
     # Battle Stamps
-    battle_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
     ttk.Label(summary_frame, text="Battle Stamps:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5
     )
@@ -598,143 +709,6 @@ def create_tabs(root):
             row=i, column=1, padx=10, pady=5)
         ttk.Combobox(costumes_frame, textvariable=saveio.AppState.costume_vars[i], values=COSTUME_OPTIONS, width=30).grid(
             row=i, column=2, sticky="w", padx=10, pady=5)
-
-    # ---------- Battle Stamps ----------
-    battle_frame = frames["Battle Stamps"]
-    battle_frame.entries = {}
-    battle_frame.progress_var = tk.DoubleVar()
-    battle_frame.toggle_all_var = tk.IntVar()
-    battle_frame.progress_text = battle_progress_text  # link to Summary tab
-
-    # --- Progress Update ---
-    def update_battle_item_progress():
-        total = len(battle_frame.entries)
-        collected = sum(
-            1 for e in battle_frame.entries.values()
-            if e.get().strip().isdigit() and int(e.get().strip()) > 0
-        )
-        percentage = (collected / total) * 100 if total > 0 else 0
-        battle_frame.progress_var.set(percentage)
-        battle_frame.progress_text.set(
-            f"Collected: {collected} / {total} ({percentage:.0f}%)"
-        )
-
-    # --- Missing Stamps Logic ---
-    def update_missing_stamps():
-        missing = []
-        all_empty = True
-        all_collected = True
-
-        for stamp_num, entry in battle_frame.entries.items():
-            val = entry.get().strip()
-            if not val or val == "0":
-                missing.append(BATTLE_ITEM_NAMES.get(
-                    stamp_num, f"Stamp {stamp_num}"))
-                all_collected = False
-            else:
-                all_empty = False
-
-        if all_empty:
-            battle_frame.missing_stamps_var.set("All")
-        elif all_collected:
-            battle_frame.missing_stamps_var.set("None")
-        else:
-            battle_frame.missing_stamps_var.set(", ".join(missing))
-
-    # --- Toggle All ---
-    def toggle_all_battle_items():
-        val = "1" if battle_frame.toggle_all_var.get() else "0"
-        for entry in battle_frame.entries.values():
-            entry.delete(0, tk.END)
-            entry.insert(0, val)
-        update_battle_item_progress()
-        update_missing_stamps()
-
-    # --- Header Row ---
-    ttk.Label(battle_frame, text="Battle Stamps:").grid(
-        row=0, column=0, padx=10, pady=5, sticky="w"
-    )
-    ttk.Checkbutton(
-        battle_frame,
-        text="Toggle All",
-        variable=battle_frame.toggle_all_var,
-        command=toggle_all_battle_items
-    ).grid(row=0, column=1, padx=10, pady=5)
-    battle_frame.progress_label = ttk.Label(
-        battle_frame, textvariable=battle_frame.progress_text
-    )
-    battle_frame.progress_label.grid(
-        row=0, column=2, padx=10, pady=5, sticky="w")
-    battle_frame.progress = ttk.Progressbar(
-        battle_frame, variable=battle_frame.progress_var, maximum=100, length=150
-    )
-    battle_frame.progress.grid(row=0, column=3, padx=10, pady=5, sticky="w")
-
-    # --- Battle Stamp Entries ---
-    items_per_col = 9
-    start_row = 1
-    for i, (key, name) in enumerate(BATTLE_ITEM_NAMES.items()):
-        row = start_row + (i % items_per_col)
-        col = (i // items_per_col) * 2
-
-        # Label
-        lbl = ttk.Label(battle_frame, text=name)
-        lbl.grid(row=row, column=col, sticky="e", padx=5, pady=2)
-
-        # Image tooltip
-        img_path = BATTLE_STAMP_IMAGES.get(key)
-        if img_path and os.path.isfile(img_path):
-            ImageTooltip(lbl, img_path)
-
-        # Entry
-        entry = tk.Entry(battle_frame, width=8)
-        entry.grid(row=row, column=col + 1, sticky="w", padx=5, pady=2)
-
-        # Bind updates (both progress & missing list)
-        entry.bind(
-            "<KeyRelease>",
-            lambda e, en=entry: [
-                update_battle_item_progress(), update_missing_stamps()]
-        )
-
-        battle_frame.entries[key] = entry
-
-    # ---------- Missing Stamps Section ----------
-    last_row = max(entry.grid_info()['row']
-                   for entry in battle_frame.entries.values()) + 1
-
-    missing_frame = ttk.Frame(battle_frame)
-    missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
-    missing_frame.columnconfigure(1, weight=1)
-
-    ttk.Label(missing_frame, text="Missing Stamps:").grid(
-        row=0, column=0, padx=10, pady=5, sticky="w"
-    )
-
-    battle_frame.missing_stamps_var = tk.StringVar(value="All")
-    battle_frame.missing_stamps_label = ttk.Label(
-        missing_frame,
-        textvariable=battle_frame.missing_stamps_var,
-        anchor="w",
-        wraplength=400
-    )
-    battle_frame.missing_stamps_label.grid(
-        row=0, column=1, sticky="ew", padx=10, pady=5
-    )
-
-    # --- Auto-wrap so text never pushes the grid ---
-    def update_stamps_wrap(*args):
-        width = battle_frame.winfo_width()
-        if width > 150:
-            battle_frame.missing_stamps_label.config(wraplength=width - 150)
-
-    battle_frame.bind("<Configure>", update_stamps_wrap)
-
-    # ---------- Initial State ----------
-    battle_frame.update_progress = update_battle_item_progress
-    battle_frame.update_missing_stamps = update_missing_stamps
-    battle_frame.update_progress()
-    battle_frame.update_missing_stamps()
 
     # ---------- Quests ----------
     quests_frame = frames["Quests"]
