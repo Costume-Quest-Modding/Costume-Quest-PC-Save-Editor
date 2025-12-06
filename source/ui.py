@@ -136,12 +136,12 @@ class ImageTooltip:
 
 
 class CardsTab(ttk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, progress_text_var=None):
         super().__init__(parent)
         self.entries = {}
         self.progress_var = tk.DoubleVar()
         self.toggle_all_var = tk.IntVar()
-        self.progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
+        self.progress_text = progress_text_var
         self.missing_cards_var = tk.StringVar(value="All")
 
         self._build_ui()
@@ -344,7 +344,8 @@ def create_tabs(root):
     }
 
     # Create CardsTab instance
-    cards_frame = CardsTab(notebook)
+    cards_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
+    cards_frame = CardsTab(notebook, progress_text_var=cards_progress_text)
     frames["Cards"] = cards_frame
 
     # Add tabs in the desired order
@@ -414,7 +415,6 @@ def create_tabs(root):
     row += 1
 
     # Cards
-    cards_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
     ttk.Label(summary_frame, text="Cards:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5)
 
