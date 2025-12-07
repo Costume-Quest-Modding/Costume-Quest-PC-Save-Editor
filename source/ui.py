@@ -1,12 +1,12 @@
 # ui.py
-from tkinter import ttk
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS
-from PIL import Image, ImageTk
+import os
+import saveio
 from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
-import saveio
-import os
+from PIL import Image, ImageTk
+from map_editor import MapEditor
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_HOUSES, MAP_IMAGES
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
@@ -307,6 +307,9 @@ class CardsTab(ttk.Frame):
         self.update_missing_cards()
 
 
+# ---------- Vector editor ----------
+
+
 def create_vector_editor(parent, label_text, variables, state="normal"):
     frame = ttk.Frame(parent)
     frame.columnconfigure(1, weight=1)
@@ -397,6 +400,7 @@ def create_tabs(root):
         "Stats & World": ttk.Frame(notebook),
         "Battle Stamps": ttk.Frame(notebook),
         "Costumes": ttk.Frame(notebook),
+        "Map": ttk.Frame(notebook),
         "Quests": ttk.Frame(notebook),
     }
 
@@ -416,6 +420,7 @@ def create_tabs(root):
     notebook.add(frames["Battle Stamps"], text="Battle Stamps")
     notebook.add(frames["Cards"], text="Cards")
     notebook.add(frames["Costumes"], text="Costumes")
+    notebook.add(frames["Map"], text="Map")
     notebook.add(frames["Quests"], text="Quests")
 
     # ---------- Summary Frame ----------
@@ -712,5 +717,23 @@ def create_tabs(root):
         ttk.Label(quests_frame, textvariable=status).grid(
             row=r, column=1, sticky="w", padx=10, pady=5)
         r += 1
+
+    # ---------- Map Tab ----------
+    map_frame = frames["Map"]
+
+    # Pick the default world and map path
+    default_world = "Suburbs"
+    map_path = MAP_IMAGES.get(default_world)
+
+    # Create the MapEditor inside the Map tab
+    map_editor = MapEditor(
+        map_frame,
+        initial_world="Suburbs",
+        max_size=(800, 575)
+    )
+    map_editor.pack(fill="both", expand=True)
+
+    # Keep a reference in frames dict if needed
+    frames["MapEditor"] = map_editor
 
     return notebook, frames

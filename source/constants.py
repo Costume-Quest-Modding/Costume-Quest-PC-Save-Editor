@@ -15,6 +15,32 @@ XP_THRESHOLDS = {
 
 NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
+MAP_IMAGES = {
+    "Suburbs": os.path.join(BASE_DIR, "images", "maps", "suburbs.png"),
+    "Autumn Haven Mall": os.path.join(BASE_DIR, "images", "maps", "mall.png"),
+    "Fall Valley": os.path.join(BASE_DIR, "images", "maps", "fall_valley.png")
+}
+
+MAP_HOUSES = {
+    "Suburbs": {
+        # Example coordinates — you will replace these with real ones later
+        "House_01": (120, 180, 170, 230),
+        "House_02": (240, 160, 290, 210),
+        "House_03": (350, 200, 400, 250),
+        "House_04": (480, 190, 530, 240)
+    },
+    "Autumn Haven Mall": {
+        "Kiosk_01": (150, 150, 200, 200),
+        "Store_01": (260, 140, 330, 210),
+        "Store_02": (390, 100, 460, 170)
+    },
+    "Fall Valley": {
+        "Tent_01": (80, 220, 140, 280),
+        "Festival_Stand": (200, 160, 250, 210),
+        "House_01": (420, 120, 470, 170)
+    }
+}
+
 DEBUG_TELEPORTS = {
     "Suburbs": {
         "Reynold & Wren's House": (-25.5, 3.3, 33.3),
