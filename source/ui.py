@@ -439,7 +439,7 @@ def create_tabs(root):
     #  SECTION 1 — Player Info
     # ---------------------------------------------------------
 
-    ttk.Label(summary_frame, text="Player Level:").grid(
+    ttk.Label(summary_frame, text="Level:").grid(
         row=row, column=0, sticky="w", padx=25)
     ttk.Label(summary_frame, textvariable=saveio.AppState.level_var,
               width=33).grid(row=row, column=1, padx=25, pady=5)
@@ -590,13 +590,13 @@ def create_tabs(root):
         level_dropdown.bind(event, saveio.update_xp_from_level)
     row += 1
 
-    ttk.Label(stats_frame, text="Experience Points (XP):").grid(
+    ttk.Label(stats_frame, text="XP:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5)
     ttk.Entry(stats_frame, textvariable=saveio.AppState.xp_var, width=33).grid(
         row=row, column=1, padx=25, pady=5, sticky="w")
     row += 1
 
-    ttk.Label(stats_frame, text="Current Candy:").grid(
+    ttk.Label(stats_frame, text="Candy:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5)
     ttk.Entry(stats_frame, textvariable=saveio.AppState.candy_var, width=33).grid(
         row=row, column=1, padx=25, pady=5, sticky="w")
