@@ -1,0 +1,163 @@
+Name: House01
+Category: House
+Subtype: Candy
+Position: 
+Description: 
+InternalName: FriendlySuburbDoor15
+Reward: 50 Candy
+-
+Name: House02
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor18
+Description: 
+Reward: 50 Candy
+-
+Name: House03
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: House04
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: House05
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: House06
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: House07
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: House08
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: House09
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: House10
+Category: House
+Subtype: Candy
+Position: 
+InternalName: FriendlySuburbDoor
+Description: 
+Reward: 50 Candy
+-
+Name: MonsterHouse01
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 25 Candy
+InternalName: MonsterSuburbDoor1
+-
+Name: MonsterHouse02
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 25 Candy
+InternalName: MonsterSuburbDoor2
+-
+Name: MonsterHouse03
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 25 Candy
+InternalName: MonsterSuburbDoor3
+-
+Name: MonsterHouse04
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 25 Candy
+InternalName: MonsterSuburbDoor4
+-
+Name: MonsterHouse05
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 25 Candy
+InternalName: MonsterSuburbDoor5
+-
+Name: MonsterHouse06
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 50 Candy
+InternalName: MonsterSuburbDoor6
+-
+Name: MonsterHouse07
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 50 Candy
+InternalName: MonsterSuburbDoor7
+-
+Name: MonsterHouse08
+Category: House
+Subtype: Monster
+Position: 
+Description: 
+Reward: 25 Candy
+InternalName: MonsterSuburbDoor8
+-
+Name: StartHouse01
+Category: House
+Subtype: Cutscene
+Position: 
+Description: Player's House
+-
+Name: StartHouse02
+Category: House
+Subtype: Candy
+Position: 
+Description: 
+Reward: 100 Candy
+-
+Name: StartHouse03
+Category: House
+Subtype: Cutscene
+Position: 
+Description: Player's Sibling Kidnapped
+-
