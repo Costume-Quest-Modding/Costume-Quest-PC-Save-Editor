@@ -8,9 +8,10 @@ from constants import MAP_HOUSES, MAP_IMAGES
 class MapEditor(ttk.Frame):
     def __init__(self, parent, initial_world="Suburbs", max_size=(800, 575)):
         super().__init__(parent)
+        self.root = self.winfo_toplevel()
         self.max_width, self.max_height = max_size
 
-        # --- Top controls frame ---
+        # --- Top controls ---
         top_frame = ttk.Frame(self)
         top_frame.pack(side="top", fill="x", padx=5, pady=5)
 
@@ -21,7 +22,7 @@ class MapEditor(ttk.Frame):
         )
         self.world_menu.pack(side="left")
 
-        # Zoom controls frame
+        # Zoom controls
         zoom_frame = ttk.Frame(top_frame)
         zoom_frame.pack(side="left", padx=10)
 
@@ -39,14 +40,42 @@ class MapEditor(ttk.Frame):
             zoom_frame, text="+", width=3, command=lambda: self._change_zoom(1))
         self.zoom_plus.pack(side="left")
 
-        # --- Canvas ---
-        self.canvas = tk.Canvas(self, bg="black", highlightthickness=0)
-        self.canvas.pack(fill="both", expand=True)
+        # --- Content frame ---
+        self.content_frame = ttk.Frame(self)
+        self.content_frame.pack(fill="both", expand=True)
 
-        # Coord label
+        self.canvas = tk.Canvas(
+            self.content_frame, bg="black", highlightthickness=0)
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        # --- Side info panel ---
+        self.side_panel = ttk.Frame(
+            self.content_frame, width=260, relief="ridge")
+        self.side_panel.pack_propagate(False)
+        self.side_panel_visible = False
+
+        header = ttk.Frame(self.side_panel)
+        header.pack(fill="x", padx=6, pady=6)
+
+        self.side_title = ttk.Label(
+            header, text="Details", font=("Segoe UI", 11, "bold"))
+        self.side_title.pack(side="left")
+
+        close_btn = ttk.Button(header, text="X", width=3,
+                               command=self._close_side_panel)
+        close_btn.pack(side="right")
+
+        self.side_body = ttk.Frame(self.side_panel)
+        self.side_body.pack(fill="both", expand=True, padx=10, pady=10)
+
+        self.info_var = tk.StringVar(value="Click a house")
+        self.info_label = ttk.Label(
+            self.side_body, textvariable=self.info_var, justify="left")
+        self.info_label.pack(anchor="nw")
+
         self.coord_var = tk.StringVar(value="X: 0, Y: 0")
-        self.coord_label = tk.Label(self.canvas, textvariable=self.coord_var,
-                                    bg="black", fg="white")
+        self.coord_label = tk.Label(
+            self.canvas, textvariable=self.coord_var, bg="black", fg="white")
         self.coord_window = self.canvas.create_window(
             0, 0, anchor="ne", window=self.coord_label)
 
@@ -89,23 +118,25 @@ class MapEditor(ttk.Frame):
         self.orig_img = Image.open(map_path)
         self.orig_w, self.orig_h = self.orig_img.size
 
-        # Reset zoom
         self.current_zoom = 0.75
         self._user_moved = False
+        self._close_side_panel()
 
-        # Clear old canvas items
+        # Clear canvas
         self.canvas.delete("all")
         self.house_rects.clear()
 
-        # Load houses from constants once
-        self.houses = MAP_HOUSES.get(world_name, {})
-
-        # Create the canvas image placeholder
-        self.canvas_image = self.canvas.create_image(0, 0, anchor="nw")
-
-        # Create windows for coord label
+        # Re-create the coord label window
+        self.coord_label = tk.Label(
+            self.canvas, textvariable=self.coord_var, bg="black", fg="white")
         self.coord_window = self.canvas.create_window(
             0, 0, anchor="ne", window=self.coord_label)
+
+        # Load houses for this world
+        self.houses = MAP_HOUSES.get(world_name, {})
+
+        # Create the map image placeholder
+        self.canvas_image = self.canvas.create_image(0, 0, anchor="nw")
 
         # Apply zoom (draws image and houses)
         self._set_zoom(self.current_zoom)
@@ -114,7 +145,6 @@ class MapEditor(ttk.Frame):
         self._load_world(value)
 
     def _change_zoom(self, direction):
-        """direction: +1 to zoom in, -1 to zoom out"""
         try:
             idx = self.zoom_levels.index(self.current_zoom)
         except ValueError:
@@ -129,7 +159,6 @@ class MapEditor(ttk.Frame):
 
         self._set_zoom(next_zoom)
 
-    # --- zoom with scroll wheel ---
     def _zoom(self, event):
         if hasattr(event, "delta") and event.delta != 0:
             direction = 1 if event.delta > 0 else -1
@@ -139,58 +168,42 @@ class MapEditor(ttk.Frame):
             direction = 0
         self._change_zoom(direction)
 
-    # --- the missing _set_zoom method ---
     def _set_zoom(self, zoom):
-        prev_zoom = self.current_zoom
         self.current_zoom = zoom
         new_size = (int(self.orig_w * zoom), int(self.orig_h * zoom))
         self.map_img = self.orig_img.resize(new_size, Image.NEAREST)
         self.tk_map = ImageTk.PhotoImage(self.map_img)
-
-        # Update canvas image
         self.canvas.itemconfig(self.canvas_image, image=self.tk_map)
 
-        # Center map if user hasn't moved
         if not self._user_moved:
             self.offset_x = (self.max_width - new_size[0]) // 2
             self.offset_y = (self.max_height - new_size[1]) // 2
 
         self.canvas.coords(self.canvas_image, self.offset_x, self.offset_y)
 
-        # Clear old house rectangles
+        # Clear old rectangles
         for rect in self.house_rects.values():
             self.canvas.delete(rect)
         self.house_rects.clear()
 
-        # Draw new house rectangles using existing self.houses
-        for hid, (x1, y1, x2, y2) in self.houses.items():
+        # Draw houses
+        for hid, house in self.houses.items():
+            x1, y1, x2, y2 = house["coords"]
             rect = self.canvas.create_rectangle(
                 x1 * zoom + self.offset_x,
                 y1 * zoom + self.offset_y,
                 x2 * zoom + self.offset_x,
                 y2 * zoom + self.offset_y,
-                outline="red", width=2, tags=hid
+                outline="red",
+                width=2,
+                fill="black",
+                tags=hid
             )
-            self.canvas.tag_bind(hid, "<Button-1>", lambda e,
-                                 h=hid: self.toggle_house(h))
+            self.canvas.tag_bind(rect, "<ButtonRelease-1>",
+                                 lambda e, h=hid: self.show_house_info(h))
             self.house_rects[hid] = rect
 
-        # Update zoom label
         self.zoom_label.config(text=f"{self.current_zoom}x")
-
-    # --- image resizing ---
-
-    def _resize_image_to_max(self, img):
-        w, h = img.size
-        max_w, max_h = self.max_width, self.max_height
-        if w > max_w or h > max_h:
-            ratio = min(max_w / w, max_h / h)
-            return img.resize((int(w * ratio), int(h * ratio)), Image.NEAREST)
-        return img
-
-    # --- house click ---
-    def toggle_house(self, hid):
-        print(f"Clicked: {hid}")
 
     # --- coords ---
     def _update_coords(self, event):
@@ -203,11 +216,16 @@ class MapEditor(ttk.Frame):
         self.coord_var.set(f"X: {int(rel_x)}, Y: {int(rel_y)}")
 
     def _update_coord_position(self):
+        if not self.coord_window:
+            return
         canvas_width = self.canvas.winfo_width()
         self.canvas.coords(self.coord_window, canvas_width - 10, 10)
 
     # --- drag & pan ---
     def _start_drag(self, event):
+        item = self.canvas.find_withtag("current")
+        if item and item[0] in self.house_rects.values():
+            return
         self.drag_start = (event.x, event.y)
 
     def _drag(self, event):
@@ -224,7 +242,7 @@ class MapEditor(ttk.Frame):
         scale_x = self.map_img.width / self.orig_w
         scale_y = self.map_img.height / self.orig_h
         for hid, rect in self.house_rects.items():
-            x1, y1, x2, y2 = self.houses[hid]
+            x1, y1, x2, y2 = self.houses[hid]["coords"]
             self.canvas.coords(rect,
                                x1 * scale_x + self.offset_x,
                                y1 * scale_y + self.offset_y,
@@ -234,3 +252,37 @@ class MapEditor(ttk.Frame):
 
     def _end_drag(self, event):
         self.drag_start = None
+
+    # --- side panel ---
+    def _open_side_panel(self):
+        if not self.side_panel_visible:
+            self.side_panel.pack(side="right", fill="y")
+            self.root.update_idletasks()
+            self.root.geometry(
+                f"{self.root.winfo_width() + 260}x{self.root.winfo_height()}")
+            self.side_panel_visible = True
+
+    def _close_side_panel(self):
+        if self.side_panel_visible:
+            self.side_panel.pack_forget()
+            self.root.update_idletasks()
+            self.root.geometry(
+                f"{self.root.winfo_width() - 260}x{self.root.winfo_height()}")
+            self.side_panel_visible = False
+
+    # --- house info ---
+    def show_house_info(self, hid):
+        house = self.houses[hid]
+        x1, y1, x2, y2 = house["coords"]
+        self.info_var.set(
+            f"Name: {hid}\n"
+            f"Description: {house['description']}\n"
+            f"Category: {house['category']}\n"
+            f"Subtype: {house['subtype']}\n"
+            f"Reward: {house.get('reward', '')}\n\n"
+            f"World: {self.world_name}\n"
+            f"Internal Name: {house.get('internal_name', '')}\n"
+            f"Bounds:\n  X1: {x1}\n  Y1: {y1}\n  X2: {x2}\n  Y2: {y2}"
+        )
+        if not self.side_panel_visible:
+            self._open_side_panel()
