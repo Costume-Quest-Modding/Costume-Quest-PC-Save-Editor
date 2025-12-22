@@ -1,41 +1,67 @@
 # Costume-Quest-PC-Save-Editor
-A Python GUI save editor/viewer for the Costume Quest PC Steam release. Must use an existing save file otherwise saving is disabled.
 
-_Note: Currently, DLC save files are not supported. This will most likely be supported in the future._
+A Python GUI save editor/viewer for the Costume Quest PC (Steam) release — view and edit save data safely, with save backups and a simple UI.
 
-## Current Features
-- Save As... to a .json, .txt or a regular binary file.
-- Save Backups.
-- Light/Dark Mode toggle.
+> ⚠️ **Note:** DLC save files are not supported yet.
 
-Can edit:
-- Player Level
-- Experience Points
-- Current Candy
-- World
-- Player Position
-- Camera Position
-- Equipped Costumes (for each character)
-- Cards
-- Battle Stamps
-  - Toggle for setting all battle stamp amounts to "0" or "1".
-  - Percentage bar. (keeps track of stamps left to collect/purchase)
+---
 
-Can view:
-  - Total Candy
-  - Robot Ramp Jumps
-  - Monster Pail Bashes
-  - Suburbs Apple Bobbing High Score
-  - Autumn Haven Mall Apple Bobbing High Score
-  - Fall Valley Apple Bobbing High Score
+## 🚀 Features
+- **Edit:** Player Level, Experience, Current Candy, World, Player / Camera Position, Equipped Costumes, Cards, Battle Stamps.  
+- **Summary:** View all important save info in one convenient tab.  
+- **UI:** Interactive Map (WIP), Save/Save As (.json, .txt, or binary), Manual backups (recommended before editing).  
+- **Safety:** Existing save file required for writing; editor avoids overwriting by default.
 
-## Planned Features
-- Costume Pieces
-- Quests
+---
 
-## Future Planned Features
-- Locations Select.
-- World Progression %
-- Presets for speedrunners.
-- Add Tooltips.
+## 🧰 Prerequisites
+- **Python 3.11+** (tested on Windows)
+- Pillow (PIL) — for image handling
+- tkinter (usually bundled with OS Python; on Linux you may need `python3-tk`)
 
+---
+
+## 🛠️ Installation (local dev)
+1. Clone project:
+   ```bash
+   git clone https://github.com/<your-user>/Costume-Quest-PC-Save-Editor.git
+   cd Costume-Quest-PC-Save-Editor
+   ```
+2. Create & activate venv:
+   - Windows (PowerShell):
+     ```powershell
+     python -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     ```
+   - macOS/Linux:
+     ```bash
+     python -m venv .venv
+     source .venv/bin/activate
+     ```
+3. Install deps:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+## ▶️ Run the app
+
+```bash
+python -m source.main
+```
+
+(or `python source/main.py` if you prefer direct execution)
+
+---
+
+## 🧭 Quick usage
+1. Open an existing Costume Quest save file.  
+2. Edit fields in the main UI (levels, candy, world, positions, costumes).  
+3. Use **Save** to save changes or **Save As...** to export to `.json`, `.txt`, or binary. Backups are manual; use the Backup option before editing (recommended).
+
+---
+
+## ⚠️ Known limitations
+- DLC saves are not supported currently (tracked for future work).  
+- On Linux, tkinter may not be installed by default — install the distribution package (e.g., `sudo apt install python3-tk`).

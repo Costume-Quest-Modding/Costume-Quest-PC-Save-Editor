@@ -1,3 +1,4 @@
 ttkthemes
 datetime
 pyinstaller
+Pillow

@@ -89,6 +89,10 @@ class MapEditor(ttk.Frame):
         self.houses = {}
         self.house_rects = {}
 
+        # Per-world view state (zoom, offsets, cursor)
+        self._world_views = {}
+        self._last_rel = (0, 0)
+
         # Bindings
         self.canvas.bind("<Motion>", self._update_coords)
         self.canvas.bind("<MouseWheel>", self._zoom)
@@ -141,7 +145,38 @@ class MapEditor(ttk.Frame):
         # Apply zoom (draws image and houses)
         self._set_zoom(self.current_zoom)
 
+        # Restore saved view for this world (if available)
+        state = self._world_views.get(world_name)
+        if state:
+            # restore zoom if different
+            if state.get("zoom") is not None and state.get("zoom") != self.current_zoom:
+                self._set_zoom(state["zoom"])
+            # restore offsets
+            self.offset_x = state.get("offset_x", self.offset_x)
+            self.offset_y = state.get("offset_y", self.offset_y)
+            self.canvas.coords(self.canvas_image, self.offset_x, self.offset_y)
+            # reposition house rects using current scale
+            scale_x = self.map_img.width / self.orig_w
+            scale_y = self.map_img.height / self.orig_h
+            for hid, rect in self.house_rects.items():
+                x1, y1, x2, y2 = self.houses[hid]["coords"]
+                self.canvas.coords(rect,
+                                   x1 * scale_x + self.offset_x,
+                                   y1 * scale_y + self.offset_y,
+                                   x2 * scale_x + self.offset_x,
+                                   y2 * scale_y + self.offset_y)
+            # restore cursor display
+            cur = state.get("cursor")
+            if cur:
+                self._last_rel = cur
+                self.coord_var.set(f"X: {int(cur[0])}, Y: {int(cur[1])}")
+        else:
+            # nothing saved; ensure coord window position is updated
+            self._update_coord_position()
+
     def _change_world(self, value):
+        # persist current world's view before switching
+        self._save_view_state()
         self._load_world(value)
 
     def _change_zoom(self, direction):
@@ -204,6 +239,8 @@ class MapEditor(ttk.Frame):
             self.house_rects[hid] = rect
 
         self.zoom_label.config(text=f"{self.current_zoom}x")
+        # ensure coord window remains on top
+        self._raise_coord_window()
 
     # --- coords ---
     def _update_coords(self, event):
@@ -213,6 +250,8 @@ class MapEditor(ttk.Frame):
                  self.offset_y) / self.current_zoom
         rel_x = max(0, min(rel_x, self.orig_w))
         rel_y = max(0, min(rel_y, self.orig_h))
+        # store last relative map coords for persistence
+        self._last_rel = (rel_x, rel_y)
         self.coord_var.set(f"X: {int(rel_x)}, Y: {int(rel_y)}")
 
     def _update_coord_position(self):
@@ -286,3 +325,22 @@ class MapEditor(ttk.Frame):
         )
         if not self.side_panel_visible:
             self._open_side_panel()
+
+    def _save_view_state(self):
+        """Persist the current view state (zoom, offsets, cursor) for the active world."""
+        if not hasattr(self, "world_name"):
+            return
+        self._world_views[self.world_name] = {
+            "zoom": self.current_zoom,
+            "offset_x": self.offset_x,
+            "offset_y": self.offset_y,
+            "cursor": getattr(self, "_last_rel", None),
+        }
+
+    def _raise_coord_window(self):
+        """Ensure the coord window is on top of the canvas stacking order."""
+        try:
+            if self.coord_window:
+                self.canvas.tag_raise(self.coord_window)
+        except tk.TclError:
+            pass
