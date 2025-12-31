@@ -52,7 +52,7 @@ MAP_HOUSES = {
             "reward": "N/A"
         },
         "House01": {
-            "coords": (50, 100, 75, 125),
+            "coords": (310, 315, 325, 330),
             "name": "House01",
             "category": "House",
             "subtype": "Candy",
@@ -61,7 +61,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House02": {
-            "coords": (200, 80, 225, 105),
+            "coords": (320, 210, 335, 225),
             "name": "House02",
             "category": "House",
             "subtype": "Candy",
@@ -70,7 +70,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House03": {
-            "coords": (300, 200, 325, 225),
+            "coords": (405, 155, 420, 170),
             "name": "House03",
             "category": "House",
             "subtype": "Candy",
@@ -79,7 +79,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House04": {
-            "coords": (400, 180, 425, 205),
+            "coords": (405, 360, 420, 375),
             "name": "House04",
             "category": "House",
             "subtype": "Candy",
@@ -88,7 +88,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House05": {
-            "coords": (500, 150, 525, 175),
+            "coords": (450, 300, 465, 315),
             "name": "House05",
             "category": "House",
             "subtype": "Candy",
@@ -97,7 +97,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House06": {
-            "coords": (50, 300, 75, 325),
+            "coords": (508, 358, 523, 373),
             "name": "House06",
             "category": "House",
             "subtype": "Candy",
@@ -106,7 +106,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House07": {
-            "coords": (150, 350, 175, 375),
+            "coords": (630, 400, 645, 415),
             "name": "House07",
             "category": "House",
             "subtype": "Candy",
@@ -115,7 +115,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House08": {
-            "coords": (250, 400, 275, 425),
+            "coords": (680, 250, 695, 265),
             "name": "House08",
             "category": "House",
             "subtype": "Candy",
@@ -124,7 +124,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House09": {
-            "coords": (350, 450, 375, 475),
+            "coords": (585, 115, 600, 130),
             "name": "House09",
             "category": "House",
             "subtype": "Candy",
@@ -133,7 +133,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "House10": {
-            "coords": (450, 500, 475, 525),
+            "coords": (480, 135, 495, 150),
             "name": "House10",
             "category": "House",
             "subtype": "Candy",
@@ -142,7 +142,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "MonsterHouse01": {
-            "coords": (600, 100, 625, 125),
+            "coords": (255, 270, 270, 285),
             "name": "MonsterHouse01",
             "category": "House",
             "subtype": "Monster",
@@ -151,7 +151,7 @@ MAP_HOUSES = {
             "reward": "25 Candy"
         },
         "MonsterHouse02": {
-            "coords": (650, 150, 675, 175),
+            "coords": (370, 260, 385, 275),
             "name": "MonsterHouse02",
             "category": "House",
             "subtype": "Monster",
@@ -160,7 +160,7 @@ MAP_HOUSES = {
             "reward": "25 Candy"
         },
         "MonsterHouse03": {
-            "coords": (700, 200, 725, 225),
+            "coords": (580, 365, 595, 380),
             "name": "MonsterHouse03",
             "category": "House",
             "subtype": "Monster",
@@ -169,7 +169,7 @@ MAP_HOUSES = {
             "reward": "25 Candy"
         },
         "MonsterHouse04": {
-            "coords": (750, 250, 775, 275),
+            "coords": (475, 200, 490, 215),
             "name": "MonsterHouse04",
             "category": "House",
             "subtype": "Monster",
@@ -178,7 +178,7 @@ MAP_HOUSES = {
             "reward": "25 Candy"
         },
         "MonsterHouse05": {
-            "coords": (50, 50, 75, 75),
+            "coords": (685, 350, 700, 365),
             "name": "MonsterHouse05",
             "category": "House",
             "subtype": "Monster",
@@ -187,7 +187,7 @@ MAP_HOUSES = {
             "reward": "25 Candy"
         },
         "MonsterHouse06": {
-            "coords": (100, 200, 125, 225),
+            "coords": (520, 70, 535, 85),
             "name": "MonsterHouse06",
             "category": "House",
             "subtype": "Monster",
@@ -196,7 +196,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "MonsterHouse07": {
-            "coords": (200, 300, 225, 325),
+            "coords": (650, 160, 665, 175),
             "name": "MonsterHouse07",
             "category": "House",
             "subtype": "Monster",
@@ -205,7 +205,7 @@ MAP_HOUSES = {
             "reward": "50 Candy"
         },
         "MonsterHouse08": {
-            "coords": (300, 400, 325, 425),
+            "coords": (458, 423, 473, 438),
             "name": "MonsterHouse08",
             "category": "House",
             "subtype": "Monster",
