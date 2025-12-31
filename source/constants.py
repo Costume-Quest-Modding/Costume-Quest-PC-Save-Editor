@@ -429,43 +429,5 @@ BATTLE_STAMP_IMAGES = {
     for i, key in enumerate(BATTLE_ITEM_NAMES.keys())
 }
 
-
-THEMES = {
-    "dark": {
-        "root_theme": "black",
-        "style_theme": "xpnative",
-        "bg": "#1e1e1e",
-        "fg": "#e0e0e0",
-        "notebook_bg": "#2a2a2a",
-        "menu_bg": "#2a2a2a",
-        "menu_fg": "#dddddd",
-        "menu_active_bg": "#444444",
-        "menu_active_fg": "#80c0ff",
-        "entry_bg": "#2a2a2a",
-        "entry_fg": "#e0e0e0",
-        "tab_bg": "#2a2a2a",
-        "tab_fg": "#cccccc",
-        "tab_selected_bg": "#444444",
-        "tab_selected_fg": "#ffffff"
-    },
-    "light": {
-        "bg": "#E3F2FD",
-        "fg": "#0D47A1",
-        "root_theme": "winxpblue",
-        "style_theme": "xpnative",
-        "notebook_bg": "#BBDEFB",
-        "menu_bg": "#BBDEFB",
-        "menu_fg": "#0D47A1",
-        "menu_active_bg": "#90CAF9",
-        "menu_active_fg": "#0D47A1",
-        "entry_bg": "#FFFFFF",
-        "entry_fg": "#0D47A1",
-        "tab_bg": "#BBDEFB",
-        "tab_fg": "#0D47A1",
-        "tab_selected_bg": "#90CAF9",
-        "tab_selected_fg": "#0D47A1",
-    }
-}
-
 # Helper for icon path if needed when packaged
 BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
