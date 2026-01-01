@@ -53,6 +53,9 @@ class AppState:
         cls.player_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
         cls.camera_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
         cls.card_vars = {i + 1: tk.IntVar(value=0) for i in range(54)}
+        # Quest tracking
+        cls.quest_flags = []  # e.g., QuestAccomplishments
+        cls.quest_flags_var = tk.StringVar()  # triggers UI update
 
 # ---------------- utility / parsing ----------------
 
@@ -132,6 +135,18 @@ def extract_vector3(pattern, text):
     if match:
         return tuple(float(match.group(i)) for i in range(1, 4))
     return (0.0, 0.0, 0.0)
+
+
+def extract_quests(text):
+    """
+    Returns a list of completed quest IDs from the QuestAccomplishments=[...] list.
+    """
+    match = re.search(r"QuestAccomplishments=\[([A-Za-z0-9_,]+)\];", text)
+    if match:
+        quests_str = match.group(1)
+        # Split by comma and remove empty strings
+        return [q.strip() for q in quests_str.split(",") if q.strip()]
+    return []
 
 
 def update_or_add_field(text, field_name, new_value):
@@ -281,11 +296,16 @@ def open_save_dialog():
     AppState.suburbsbobbing_var.set(str(suburbsbobbing))
     AppState.mallbobbing_var.set(str(mallbobbing))
     AppState.countrybobbing_var.set(str(countrybobbing))
+    # --- QUESTS ---
+    AppState.quest_flags = extract_quests(raw_text)
+    AppState.quest_flags_var.set(",".join(AppState.quest_flags))
 
     for i in range(3):
         AppState.costume_vars[i].set(costumes[i] if i < len(costumes) else "")
         AppState.player_position_vars[i].set(player_pos[i])
         AppState.camera_position_vars[i].set(camera_pos[i])
+
+    print("Loaded Quest Flags:", AppState.quest_flags)
 
     AppState.selected_world.set(world)
     AppState.save_path.set(path)
@@ -379,6 +399,31 @@ def _replace_battle_values_in_text(text, battle_entries):
     return updated
 
 
+def _replace_quest_flags_in_text(text, quest_flags):
+    """
+    Updates the QuestAccomplishments list in the save text.
+    Saves them in the correct array format the game expects:
+    QuestAccomplishments=[quest1,quest2,...];
+    """
+    quest_str = ",".join(quest_flags)  # e.g., DoorNSkeleton_SecondDoor,...
+    # Replace existing QuestAccomplishments line if it exists
+    if re.search(r"QuestAccomplishments=\[.*?\];", text):
+        text = re.sub(
+            r"QuestAccomplishments=\[.*?\];",
+            f"QuestAccomplishments=[{quest_str}];",
+            text,
+        )
+    else:
+        # Insert before EquippedCostumes if exists, else append at end
+        insert_point = text.find("EquippedCostumes=")
+        insert_text = f"QuestAccomplishments=[{quest_str}];\n"
+        if insert_point != -1:
+            text = text[:insert_point] + insert_text + text[insert_point:]
+        else:
+            text = text.strip() + "\n" + insert_text
+    return text
+
+
 def save_changes(cards_entries, battle_entries):
     """Write changes back to loaded save file path."""
     path = AppState.save_path.get()
@@ -409,6 +454,10 @@ def save_changes(cards_entries, battle_entries):
             updated_text, cards_entries)
         updated_text = _replace_battle_values_in_text(
             updated_text, battle_entries)
+
+        # --- Update quests ---
+        updated_text = _replace_quest_flags_in_text(
+            updated_text, AppState.quest_flags)
 
         # --- Update core fields ---
         updated_text = update_save_data(
@@ -478,6 +527,10 @@ def save_as(cards_entries, battle_entries):
         countrybobbing = int(AppState.countrybobbing_var.get())
         player_pos = tuple(var.get() for var in AppState.player_position_vars)
         camera_pos = tuple(var.get() for var in AppState.camera_position_vars)
+
+        # --- Update quests ---
+        updated_text = _replace_quest_flags_in_text(
+            updated_text, AppState.quest_flags)
 
         # --- Update core fields ---
         updated_text = update_save_data(
