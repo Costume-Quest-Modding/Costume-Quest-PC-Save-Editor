@@ -21,6 +21,202 @@ MAP_IMAGES = {
     "Fall Valley": os.path.join(BASE_DIR, "images", "maps", "fall_valley.png")
 }
 
+QUESTS = {
+    "Suburbs": {
+        "Robot Repair": {
+            "questtype": "Main",  # e.g., Quest Type: "Main" or "Side"
+            "description": "Dorsilla ruined my costume! I need to rebuild it!",
+            "how_to_complete": "\nOpen all 3 treasure coffins in the alley to rebuild the Robot costume.",
+            "reward": "300 XP",
+            "completed": False
+        },
+        "Programmed for Protection": {
+            "questtype": "Main",
+            "description": "Bullies are oppressing the weak in Auburn Pines! They must be stopped!",
+            "how_to_complete": "\nTalk to Travis twice to get the quest."
+            "\nRun away from him using the Robot's Boost ability.",
+            "reward": "300 XP",
+            "completed": False
+        },
+        "Pie for the Putterpam": {
+            "questtype": "Main",
+            "description": "Mrs. Putterpam is in need of a pie ingredient.",
+            "how_to_complete": "\nTalk to Mrs. Putterpam to get the quest."
+            "\nFind her the missing ingredient (Cherries). (Must complete \"The Patriot's Party\" first.)"
+            "\nReturn to her with the ingredient.",
+            "reward": "300 XP",
+            "completed": False
+        },
+        "The Patriot's Party": {
+            "questtype": "Main",
+            "description": "Russell won't let us into his awesome party.",
+            "how_to_complete": "\nTalk to Russell to get the quest."
+            "\nTalk to 4 NPC's to build the Liberty Costume. (One has a Costume Pattern and 3 have Costume Pieces)"
+            "\nTalk again to Russell (as the Liberty Costume) to enter the party.",
+            "reward": "300 XP",
+            "completed": False
+        },
+        "These Tombstones Aren't Styrofoam": {
+            "questtype": "Main",
+            "description": "Get through the cemetery and find Monster HQ!",
+            "how_to_complete": "\nEnter the cemetery to start the quest."
+            "\nTrigger the cutscene at the end of the cemetery to finish the quest.",
+            "reward": "300 XP",
+            "completed": False
+        },
+        "Suburbs Bobbing for Apples": {
+            "questtype": "Side",
+            "description": "Bob for Apples!",
+            "how_to_complete": "\nComplete 3 rounds of Apple Bobbing to finish the quest.",
+            "reward": "\n20 Candy (Round 1)"
+            "\n50 Candy (Round 2)"
+            "\nSweet Tooth Creepy Treat Card (Round 3)",
+            "completed": False
+        },
+        "Auburn Pines Hide 'n' Seek": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "This Card Is So Rare": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Suburbs Collect 'em All": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        }
+    },
+    "Autumn Haven Mall": {
+        "Tickets for Treats": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Earn Your Monster Slayer Badge": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "The Mall-O-Rail is Broken": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "The Dark Side of the Mall": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Extreme Costume Challenge!": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "This Card Is Rarer": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Mall Collect 'em All": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Mall Bobbing for Apples": {
+            "questtype": "Side",
+            "description": "Bob for Apples!",
+            "how_to_complete": "\nComplete 3 rounds of Apple Bobbing to finish the quest.",
+            "reward": "\n20 Candy (Round 1)"
+            "\n50 Candy (Round 2)"
+            "\nPizza Sundae Creepy Treat Card (Round 3)",
+            "completed": False
+        },
+        "Mall Hide 'n' Seek": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        }
+    },
+    "Fall Valley": {
+        "The Original Costume Quest": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "All's Fair That Ends Fare": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Children of the High Fructose Corn Syrup": {
+            "questtype": "Main",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Fall Valley Hide 'n' Seek": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Fall Valley Bobbing for Apples": {
+            "questtype": "Side",
+            "description": "Bob for Apples!",
+            "how_to_complete": "\nComplete 3 rounds of Apple Bobbing to finish the quest.",
+            "reward": "\n20 Candy (Round 1)"
+            "\n50 Candy (Round 2)"
+            "\nSugar Bucket Creepy Treat Card (Round 3)",
+            "completed": False
+        },
+        "This Card Is The Rarest": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        },
+        "Fall Valley Collect 'em All": {
+            "questtype": "Side",
+            "description": "",
+            "how_to_complete": "",
+            "reward": "",
+            "completed": False
+        }
+    }
+}
+
 MAP_HOUSES = {
     # Houses are 15x15.
     "Suburbs": {

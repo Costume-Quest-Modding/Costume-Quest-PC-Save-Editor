@@ -6,44 +6,18 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from map_editor import MapEditor
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_HOUSES, MAP_IMAGES
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_HOUSES, MAP_IMAGES, QUESTS
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
 
 # ---------- small widgets ----------
 
-
-class ToolTip:
-    def __init__(self, widget, text):
-        self.widget = widget
-        self.text = text
-        self.tipwindow = None
-        widget.bind("<Enter>", self.show_tip)
-        widget.bind("<Leave>", self.hide_tip)
-
-    def show_tip(self, event=None):
-        if self.tipwindow or not self.text:
-            return
-        try:
-            x, y, cx, cy = self.widget.bbox("insert")
-            x += self.widget.winfo_rootx() + 20
-            y += self.widget.winfo_rooty() + 10
-        except Exception:
-            x = self.widget.winfo_rootx() + 20
-            y = self.widget.winfo_rooty() + 10
-        self.tipwindow = tw = tk.Toplevel(self.widget)
-        tw.wm_overrideredirect(True)
-        tw.wm_geometry(f"+{x}+{y}")
-        label = tk.Label(tw, text=self.text, justify='left',
-                         background="#ffffe0", relief='solid', borderwidth=1,
-                         font=("tahoma", "8", "normal"))
-        label.pack(ipadx=1)
-
-    def hide_tip(self, event=None):
-        if self.tipwindow:
-            self.tipwindow.destroy()
-            self.tipwindow = None
+def toggle_frame(frame):
+    if frame.winfo_viewable():
+        frame.grid_remove()
+    else:
+        frame.grid()
 
 
 class ImageTooltip:
@@ -667,56 +641,161 @@ def create_tabs(root):
 
     # ---------- Quests ----------
     quests_frame = frames["Quests"]
+
     ttk.Label(quests_frame, text="Quests").grid(
         row=0, column=0, sticky="w", padx=10, pady=5
     )
-    quest_label = ttk.Label(quests_frame, text="Apple Bobbing Quests")
-    quest_label.grid(row=1, column=0, sticky="w", padx=25, pady=5)
-    ToolTip(quest_label, "Complete 3 rounds per location of Apple Bobbing to finish the quest.\nFirst 2 rounds give Candy, 3rd gives a Creepy Treat Card.")
 
-    bobbing_data = [
-        ("Suburbs High Score:", saveio.AppState.suburbsbobbing_var, 30),
-        ("Autumn Haven Mall High Score:", saveio.AppState.mallbobbing_var, 35),
-        ("Fall Valley High Score:", saveio.AppState.countrybobbing_var, 40),
-    ]
+    # === Scrollable Canvas ===
+    canvas = tk.Canvas(quests_frame, highlightthickness=0)
+    scrollbar = ttk.Scrollbar(
+        quests_frame, orient="vertical", command=canvas.yview
+    )
 
-    quests_frame.progress_var = tk.DoubleVar()
-    progress_label = ttk.Label(quests_frame, text="Completed: 0 / 0 (0%)")
-    progress_label.grid(row=3, column=0, sticky="w", padx=40, pady=5)
-    progress_bar = ttk.Progressbar(
-        quests_frame, variable=quests_frame.progress_var, maximum=100, length=200)
-    progress_bar.grid(row=3, column=1, sticky="w", padx=40, pady=5)
+    scrollable = ttk.Frame(canvas)
 
-    def update_quest_progress():
-        total = len(bobbing_data)
-        completed = 0
-        for label_text, var, threshold in bobbing_data:
-            score = int(var.get() or 0)
-            if score >= threshold:
-                completed += 1
-        percent = (completed / total) * 100 if total > 0 else 0
-        quests_frame.progress_var.set(percent)
-        progress_label.config(
-            text=f"Completed: {completed} / {total} ({percent:.0f}%)")
+    scrollable.bind(
+        "<Configure>",
+        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
 
-    r = 4
-    for name, var, threshold in bobbing_data:
-        ttk.Label(quests_frame, text=name.replace(" High Score:", "")).grid(
-            row=r, column=0, sticky="w", padx=40, pady=5)
-        status = tk.StringVar()
+    canvas.create_window((0, 0), window=scrollable, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
 
-        def make_updater(v=var, s=status, t=threshold):
-            def inner(*_):
-                score = int(v.get() or 0)
-                s.set("✅ Completed" if score >= t else "❌ Incomplete")
-                update_quest_progress()
-            v.trace_add("write", inner)
-            inner()
-        make_updater()
+    canvas.grid(row=1, column=0, sticky="nsew")
+    scrollbar.grid(row=1, column=1, sticky="ns")
 
-        ttk.Label(quests_frame, textvariable=status).grid(
-            row=r, column=1, sticky="w", padx=10, pady=5)
-        r += 1
+    quests_frame.rowconfigure(1, weight=1)
+    quests_frame.columnconfigure(0, weight=1)
+
+    # === Mouse wheel support ===
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    # === Toggle helper ===
+    def toggle_frame(frame, label=None, title=None):
+        if frame.winfo_viewable():
+            frame.grid_remove()
+            if label and title:
+                label.config(text=f"▶ {title}")
+        else:
+            frame.grid()
+            if label and title:
+                label.config(text=f"▼ {title}")
+
+    # === Build Quest Log ===
+    row = 0
+
+    # Bobbing for apples mapping
+    bobbing_map = {
+        "Suburbs Bobbing for Apples": (saveio.AppState.suburbsbobbing_var, 30),
+        "Mall Bobbing for Apples": (saveio.AppState.mallbobbing_var, 35),
+        "Fall Valley Bobbing for Apples": (saveio.AppState.countrybobbing_var, 40),
+    }
+
+    for world, quests in QUESTS.items():
+        # ----- World header -----
+        world_lbl = ttk.Label(
+            scrollable,
+            text=f"▶ {world}",
+            cursor="hand2",
+            font=("Segoe UI", 10, "bold")
+        )
+        world_lbl.grid(row=row, column=0, sticky="w", padx=15, pady=4)
+        row += 1
+
+        world_frame = ttk.Frame(scrollable)
+        world_frame.grid(row=row, column=0, sticky="w", padx=30)
+        world_frame.grid_remove()  # collapsed by default
+
+        world_lbl.bind(
+            "<Button-1>",
+            lambda e, f=world_frame, l=world_lbl, t=world: toggle_frame(
+                f, l, t)
+        )
+
+        row += 1
+        qrow = 0
+
+        for quest_name, data in quests.items():
+            # ----- Quest header -----
+            status_var = tk.StringVar(value="")
+            if quest_name in bobbing_map:
+                bobbing_var, threshold = bobbing_map[quest_name]
+
+                def make_bobbing_updater(v=bobbing_var, s=status_var, t=threshold):
+                    def inner(*_):
+                        score = int(v.get() or 0)
+                        s.set("✅ Completed" if score >= t else "❌ Incomplete")
+                    v.trace_add("write", inner)
+                    inner()
+                make_bobbing_updater()
+
+            quest_lbl = ttk.Label(
+                world_frame,
+                text=f"▶ {quest_name}",
+                cursor="hand2",
+                font=("Segoe UI", 9, "bold")
+            )
+            quest_lbl.grid(row=qrow, column=0, sticky="w", pady=2)
+            if quest_name in bobbing_map:
+                ttk.Label(world_frame, textvariable=status_var).grid(
+                    row=qrow, column=1, sticky="w", padx=10
+                )
+            qrow += 1
+
+            # ----- Collapsible frame -----
+            quest_frame = ttk.Frame(world_frame)
+            quest_frame.grid(row=qrow, column=0, sticky="w", padx=15)
+            quest_frame.grid_remove()  # collapsed by default
+            qrow += 1
+
+            quest_lbl.bind(
+                "<Button-1>",
+                lambda e, f=quest_frame, l=quest_lbl, t=quest_name: toggle_frame(
+                    f, l, t)
+            )
+
+            # ----- Description -----
+            ttk.Label(
+                quest_frame,
+                text=f"Description: {data.get('description') or 'N/A'}",
+                wraplength=550
+            ).grid(row=0, column=0, sticky="w")
+
+            # ----- How to complete -----
+            ttk.Label(
+                quest_frame,
+                text=f"How to complete: {data.get('how_to_complete') or 'N/A'}",
+                wraplength=550
+            ).grid(row=1, column=0, sticky="w", pady=(2, 2))
+
+            # ----- Reward -----
+            ttk.Label(
+                quest_frame,
+                text=f"Reward: {data.get('reward') or 'N/A'}",
+                wraplength=550
+            ).grid(row=2, column=0, sticky="w", pady=(2, 2))
+
+            # ----- Keep normal completed checkbox for non-bobbing quests -----
+            if quest_name not in bobbing_map:
+                completed_var = tk.BooleanVar(
+                    value=data.get("completed", False))
+
+                completed_var.trace_add(
+                    "write",
+                    lambda *_,
+                    q=data,
+                    v=completed_var: q.update({"completed": v.get()})
+                )
+
+                ttk.Checkbutton(
+                    quest_frame,
+                    text="Completed",
+                    variable=completed_var
+                ).grid(row=3, column=0, sticky="w", pady=(0, 8))
 
     # ---------- Map Tab ----------
     map_frame = frames["Map"]
