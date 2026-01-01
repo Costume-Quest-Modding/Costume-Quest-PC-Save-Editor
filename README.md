@@ -1,6 +1,6 @@
 # Costume-Quest-PC-Save-Editor
 
-A Python GUI save editor/viewer for the Costume Quest PC (Steam) release — view and edit save data safely, with save backups and a simple UI.
+A Python GUI Save Editor/Viewer for the Costume Quest PC (Steam) release — View and edit save data safely, with save backups and a simple UI.
 
 > ⚠️ **Note:** DLC save files are not supported yet.
 >
@@ -9,7 +9,8 @@ A Python GUI save editor/viewer for the Costume Quest PC (Steam) release — vie
 ---
 
 ## 🚀 Features
-- **Edit:** Player Level, Experience, Current Candy, World, Player / Camera Position, Equipped Costumes, Cards, Battle Stamps.  
+- **Edit:** Player Level, Experience, Candy, World/Location, Player Position, Equipped Costumes, Cards and Stamps.
+- **View:** Interactive Map (WIP) and Quests (WIP).
 - **Summary:** View all important save info in one convenient tab.  
 - **UI:** Interactive Map (WIP), Save/Save As (.json, .txt, or binary), Manual backups (recommended before editing).  
 - **Safety:** Existing save file required for writing; editor avoids overwriting by default.
