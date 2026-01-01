@@ -779,24 +779,6 @@ def create_tabs(root):
                 wraplength=550
             ).grid(row=2, column=0, sticky="w", pady=(2, 2))
 
-            # ----- Keep normal completed checkbox for non-bobbing quests -----
-            if quest_name not in bobbing_map:
-                completed_var = tk.BooleanVar(
-                    value=data.get("completed", False))
-
-                completed_var.trace_add(
-                    "write",
-                    lambda *_,
-                    q=data,
-                    v=completed_var: q.update({"completed": v.get()})
-                )
-
-                ttk.Checkbutton(
-                    quest_frame,
-                    text="Completed",
-                    variable=completed_var
-                ).grid(row=3, column=0, sticky="w", pady=(0, 8))
-
     # ---------- Map Tab ----------
     map_frame = frames["Map"]
 
