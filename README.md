@@ -3,6 +3,8 @@
 A Python GUI save editor/viewer for the Costume Quest PC (Steam) release — view and edit save data safely, with save backups and a simple UI.
 
 > ⚠️ **Note:** DLC save files are not supported yet.
+>
+![CQ PC Save Editor Summary](https://i.imgur.com/cGIhqpY.png)
 
 ---
 
