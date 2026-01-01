@@ -344,7 +344,7 @@ def create_menu(root, frames_refs):
         label="About",
         command=lambda: messagebox.showinfo(
             "About",
-            "Costume Quest PC Save Editor - Alpha Version\n"
+            "Costume Quest PC Save Editor - Alpha Version 1.1\n"
             "Made by: DeathMaster001\n\n"
             "This program allows you to view and edit Costume Quest PC save files. Use responsibly!"
         )
@@ -705,7 +705,8 @@ def create_tabs(root):
 
         world_frame = ttk.Frame(scrollable)
         world_frame.grid(row=row, column=0, sticky="w", padx=30)
-        world_frame.grid()  # collapsed by default # world_frame.grid_remove() to collapse
+        # collapsed by default # world_frame.grid_remove() to collapse
+        world_frame.grid_remove()
         world_lbl.bind(
             "<Button-1>",
             lambda e, f=world_frame, l=world_lbl, t=world: toggle_frame(
@@ -726,7 +727,8 @@ def create_tabs(root):
 
             quest_frame = ttk.Frame(world_frame)
             quest_frame.grid(row=qrow+1, column=0, sticky="w", padx=20)
-            quest_frame.grid()  # collapsed by default  # quest_frame.grid_remove() to collapse
+            # collapsed by default  # quest_frame.grid_remove() to collapse
+            quest_frame.grid_remove()
             quest_lbl.bind(
                 "<Button-1>",
                 lambda e, f=quest_frame, l=quest_lbl, t=quest_name: toggle_frame(
