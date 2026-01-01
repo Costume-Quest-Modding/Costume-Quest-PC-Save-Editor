@@ -21,6 +21,39 @@ MAP_IMAGES = {
     "Fall Valley": os.path.join(BASE_DIR, "images", "maps", "fall_valley.png")
 }
 
+QUEST_FLAG_MAP = {
+    # Individual component quests
+    "Door N Skeleton - First Door": ["DoorNSkeleton_FirstDoor"],
+    "Door N Skeleton - Second Door": ["DoorNSkeleton_SecondDoor"],
+    "Suburbs MQ1 - Car Wreck": ["Burbs_MQ1_CarWreck"],
+    "L_010 - No Costume Started": ["L_010_NoCostumeStarted"],
+
+    # Parent quests
+    # Robot Repair
+    "Robot Repair": {
+        "started": [
+            "DoorNSkeleton_FirstDoor",
+            "DoorNSkeleton_SecondDoor",
+            "Burbs_MQ1_CarWreck",
+            "L_010_NoCostumeStarted"
+        ],
+        "completed": [
+            "DoorNSkeleton_FirstDoor",
+            "DoorNSkeleton_SecondDoor",
+            "Burbs_MQ1_CarWreck",
+            "L_010_NoCostumeStarted",
+            "L_010_BashTutorialDone",
+            "RobotPiece_TreasureChest1",
+            "RobotPiece_TreasureChest2",
+            "RobotPiece_TreasureChest3",
+            "L_010_TreasureTutorialDone",
+            "Burbs_MQ1_Ramp",
+            "RobotRamp"
+        ]
+    }
+}
+
+
 QUESTS = {
     "Suburbs": {
         "Robot Repair": {
