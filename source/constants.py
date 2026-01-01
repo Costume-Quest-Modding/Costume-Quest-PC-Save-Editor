@@ -24,19 +24,17 @@ MAP_IMAGES = {
 QUESTS = {
     "Suburbs": {
         "Robot Repair": {
-            "questtype": "Main",  # e.g., Quest Type: "Main" or "Side"
+            "questtype": "Main",
             "description": "Dorsilla ruined my costume! I need to rebuild it!",
             "how_to_complete": "\nOpen all 3 treasure coffins in the alley to rebuild the Robot costume.",
-            "reward": "300 XP",
-            "completed": False
+            "reward": "300 XP"
         },
         "Programmed for Protection": {
             "questtype": "Main",
             "description": "Bullies are oppressing the weak in Auburn Pines! They must be stopped!",
             "how_to_complete": "\nTalk to Travis twice to get the quest."
             "\nRun away from him using the Robot's Boost ability.",
-            "reward": "300 XP",
-            "completed": False
+            "reward": "300 XP"
         },
         "Pie for the Putterpam": {
             "questtype": "Main",
@@ -44,25 +42,22 @@ QUESTS = {
             "how_to_complete": "\nTalk to Mrs. Putterpam to get the quest."
             "\nFind her the missing ingredient (Cherries). (Must complete \"The Patriot's Party\" first.)"
             "\nReturn to her with the ingredient.",
-            "reward": "300 XP",
-            "completed": False
+            "reward": "300 XP"
         },
         "The Patriot's Party": {
             "questtype": "Main",
             "description": "Russell won't let us into his awesome party.",
             "how_to_complete": "\nTalk to Russell to get the quest."
-            "\nTalk to 4 NPC's to build the Liberty Costume. (One has a Costume Pattern and 3 have Costume Pieces)"
+            "\nTalk to 4 NPCs to build the Liberty Costume. (One has a Costume Pattern and 3 have Costume Pieces)"
             "\nTalk again to Russell (as the Liberty Costume) to enter the party.",
-            "reward": "300 XP",
-            "completed": False
+            "reward": "300 XP"
         },
         "These Tombstones Aren't Styrofoam": {
             "questtype": "Main",
             "description": "Get through the cemetery and find Monster HQ!",
-            "how_to_complete": "\nEnter the cemetery to start the quest."
-            "\nTrigger the cutscene at the end of the cemetery to finish the quest.",
-            "reward": "300 XP",
-            "completed": False
+            "how_to_complete": "\nOpen the Monster Gate and enter the Cemetery to start the quest."
+            "\nTrigger the cutscene at the end of the Cemetery to finish the quest.",
+            "reward": "300 XP"
         },
         "Suburbs Bobbing for Apples": {
             "questtype": "Side",
@@ -70,80 +65,70 @@ QUESTS = {
             "how_to_complete": "\nComplete 3 rounds of Apple Bobbing to finish the quest.",
             "reward": "\n20 Candy (Round 1)"
             "\n50 Candy (Round 2)"
-            "\nSweet Tooth Creepy Treat Card (Round 3)",
-            "completed": False
+            "\nSweet Tooth Creepy Treat Card (Round 3)"
         },
         "Auburn Pines Hide 'n' Seek": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Find all six kids hiding in Auburn Pines.",
+            "how_to_complete": "\nTalk to six kids hiding around Auburn Pines."
+            "\nUse the \"Map\" tab within this program if you need help locating any 6 of them.",
+            "reward": "[TODO]"
         },
         "This Card Is So Rare": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Trade with a fellow Creepy Treat collector to get a rare card! ",
+            "how_to_complete": "Trade Scott your duplicate Glop Creepy Treat Card.",
+            "reward": "200 XP\nChoconana Creepy Treat Card"
         },
         "Suburbs Collect 'em All": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Trade with a fellow Creepy Treat collector!",
+            "how_to_complete": "Trade Austin your duplicate Fruity Foam Creepy Treat Card.",
+            "reward": "200 XP\nJelly Has-Beens Creepy Treat Card"
         }
     },
     "Autumn Haven Mall": {
         "Tickets for Treats": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "Earn Your Monster Slayer Badge": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "The Mall-O-Rail is Broken": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "The Dark Side of the Mall": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "Extreme Costume Challenge!": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "This Card Is Rarer": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "Mall Collect 'em All": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "Mall Bobbing for Apples": {
             "questtype": "Side",
@@ -151,45 +136,51 @@ QUESTS = {
             "how_to_complete": "\nComplete 3 rounds of Apple Bobbing to finish the quest.",
             "reward": "\n20 Candy (Round 1)"
             "\n50 Candy (Round 2)"
-            "\nPizza Sundae Creepy Treat Card (Round 3)",
-            "completed": False
+            "\nPizza Sundae Creepy Treat Card (Round 3)"
         },
         "Mall Hide 'n' Seek": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Find all six kids hiding in Autumn Haven Mall.",
+            "how_to_complete": "\nTalk to six kids hiding around Autumn Haven Mall."
+            "\nUse the \"Map\" tab within this program if you need help locating any 6 of them.",
+            "reward": "500 XP\nCandy Pail Upgrade: Pumpkin Pail"
         }
     },
     "Fall Valley": {
         "The Original Costume Quest": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Get our costumes back from the Repugians!",
+            "how_to_complete": "\nHead to Town and obtain the Fry Costume from Chip."
+            "\nHead back to the Repugians and use the Fry Costume to lure both of them into the barn."
+            "\nOpen the Treasure Coffin nearby to retrieve your costumes."
+            "\nLure 3 customers to Chip's Fry Stand while wearing the Fry Costume."
+            "\nTalk to Henry to enter the Carnival."
+            "\nBattle the Monsters near the Ferris Wheel."
+            "\nUse the Ninja Costume to sneak past Orzo."
+            "\nUse the Space Warrior Costume to get through the Darkness to finish the quest.",
+            "reward": "300 XP"
         },
         "All's Fair That Ends Fare": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Something fishy is afoot at the Carnival.",
+            "how_to_complete": "[TODO]",
+            "reward": "[TODO]"
         },
         "Children of the High Fructose Corn Syrup": {
             "questtype": "Main",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "[TODO]",
+            "how_to_complete": "\nEnter the Maze area and talk to the Grubbin to get the quest and Grubbin Costume Pattern."
+            "\nFind the Grubbin Costume Pieces by talking to 3 NPCs in Maze."
+            "\nHead to the Repugian Guard blocking one of the Maze paths and while wearing the Grubbin Costume to finish the quest.",
+            "reward": "300 XP"
         },
         "Fall Valley Hide 'n' Seek": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Find all six kids hiding in Fall Valley.",
+            "how_to_complete": "\nTalk to six kids hiding around Fall Valley."
+            "\nUse the \"Map\" tab within this program if you need help locating any 6 of them.",
+            "reward": "500 XP\nCandy Pail Upgrade: Bat Bucket."
+            "\nNote: Completing this quest actually gives 300XP in-game, but for consistency with other Hide 'n Seek quests, it's set to 500XP here."
         },
         "Fall Valley Bobbing for Apples": {
             "questtype": "Side",
@@ -197,22 +188,19 @@ QUESTS = {
             "how_to_complete": "\nComplete 3 rounds of Apple Bobbing to finish the quest.",
             "reward": "\n20 Candy (Round 1)"
             "\n50 Candy (Round 2)"
-            "\nSugar Bucket Creepy Treat Card (Round 3)",
-            "completed": False
+            "\nSugar Bucket Creepy Treat Card (Round 3)"
         },
         "This Card Is The Rarest": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Trade with a fellow Creepy Treat collector to get a rare card!",
+            "how_to_complete": "Trade Nathan your duplicate Street Chews Creepy Treat Card.",
+            "reward": "200 XP\nMice Crispy Treat Creepy Treat Card"
         },
         "Fall Valley Collect 'em All": {
             "questtype": "Side",
-            "description": "",
-            "how_to_complete": "",
-            "reward": "",
-            "completed": False
+            "description": "Trade with a fellow Creepy Treat collector!",
+            "how_to_complete": "Trade Rebecca your duplicate Unicorn Pellets Creepy Treat Card.",
+            "reward": "200 XP\nJelly Has-Beens Creepy Treat Card"
         }
     }
 }
