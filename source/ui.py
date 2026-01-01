@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from map_editor import MapEditor
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_HOUSES, MAP_IMAGES, QUESTS
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_HOUSES, MAP_IMAGES, QUESTS, QUEST_FLAG_MAP
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
@@ -649,11 +649,9 @@ def create_tabs(root):
     # === Scrollable Canvas ===
     canvas = tk.Canvas(quests_frame, highlightthickness=0)
     scrollbar = ttk.Scrollbar(
-        quests_frame, orient="vertical", command=canvas.yview
-    )
+        quests_frame, orient="vertical", command=canvas.yview)
 
     scrollable = ttk.Frame(canvas)
-
     scrollable.bind(
         "<Configure>",
         lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
@@ -664,17 +662,18 @@ def create_tabs(root):
 
     canvas.grid(row=1, column=0, sticky="nsew")
     scrollbar.grid(row=1, column=1, sticky="ns")
-
     quests_frame.rowconfigure(1, weight=1)
     quests_frame.columnconfigure(0, weight=1)
 
     # === Mouse wheel support ===
+
     def _on_mousewheel(event):
         canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
     # === Toggle helper ===
+
     def toggle_frame(frame, label=None, title=None):
         if frame.winfo_viewable():
             frame.grid_remove()
@@ -687,8 +686,6 @@ def create_tabs(root):
 
     # === Build Quest Log ===
     row = 0
-
-    # Bobbing for apples mapping
     bobbing_map = {
         "Suburbs Bobbing for Apples": (saveio.AppState.suburbsbobbing_var, 30),
         "Mall Bobbing for Apples": (saveio.AppState.mallbobbing_var, 35),
@@ -708,20 +705,38 @@ def create_tabs(root):
 
         world_frame = ttk.Frame(scrollable)
         world_frame.grid(row=row, column=0, sticky="w", padx=30)
-        world_frame.grid_remove()  # collapsed by default
-
+        world_frame.grid()  # collapsed by default # world_frame.grid_remove() to collapse
         world_lbl.bind(
             "<Button-1>",
             lambda e, f=world_frame, l=world_lbl, t=world: toggle_frame(
                 f, l, t)
         )
-
         row += 1
         qrow = 0
 
         for quest_name, data in quests.items():
             # ----- Quest header -----
-            status_var = tk.StringVar(value="")
+            quest_lbl = ttk.Label(
+                world_frame,
+                text=f"▶ {quest_name}",
+                cursor="hand2",
+                font=("Segoe UI", 9, "bold")
+            )
+            quest_lbl.grid(row=qrow, column=0, sticky="w", padx=5, pady=2)
+
+            quest_frame = ttk.Frame(world_frame)
+            quest_frame.grid(row=qrow+1, column=0, sticky="w", padx=20)
+            quest_frame.grid()  # collapsed by default  # quest_frame.grid_remove() to collapse
+            quest_lbl.bind(
+                "<Button-1>",
+                lambda e, f=quest_frame, l=quest_lbl, t=quest_name: toggle_frame(
+                    f, l, t)
+            )
+            qrow += 2
+
+            # ----- Status -----
+            status_var = tk.StringVar(value="❌ Incomplete")
+            # Bobbing quests
             if quest_name in bobbing_map:
                 bobbing_var, threshold = bobbing_map[quest_name]
 
@@ -729,55 +744,68 @@ def create_tabs(root):
                     def inner(*_):
                         score = int(v.get() or 0)
                         s.set("✅ Completed" if score >= t else "❌ Incomplete")
-                    v.trace_add("write", inner)
+                    v.trace_add("write", lambda *args: inner())
                     inner()
                 make_bobbing_updater()
+            # QUEST_FLAG_MAP quests
+            elif quest_name in QUEST_FLAG_MAP:
+                flags = QUEST_FLAG_MAP[quest_name]
 
-            quest_lbl = ttk.Label(
-                world_frame,
-                text=f"▶ {quest_name}",
-                cursor="hand2",
-                font=("Segoe UI", 9, "bold")
-            )
-            quest_lbl.grid(row=qrow, column=0, sticky="w", pady=2)
-            if quest_name in bobbing_map:
-                ttk.Label(world_frame, textvariable=status_var).grid(
-                    row=qrow, column=1, sticky="w", padx=10
-                )
-            qrow += 1
+                def make_flag_updater(s=status_var, f=flags):
+                    def inner(*_):
+                        accomplished = AppState.quest_flags
+                        # Check for special started/completed dict
+                        if isinstance(f, dict):
+                            if any(flag in accomplished for flag in f["started"]):
+                                s.set("▶ In Progress")
+                            if all(flag in accomplished for flag in f.get("completed", [])) and f.get("completed"):
+                                s.set("✅ Completed")
+                            elif not any(flag in accomplished for flag in f["started"]):
+                                s.set("❌ Not Started")
+                        else:
+                            if all(flag in accomplished for flag in f):
+                                s.set("✅ Completed")
+                            elif any(flag in accomplished for flag in f):
+                                s.set("▶ In Progress")
+                            else:
+                                s.set("❌ Not Started")
+                    AppState.quest_flags_var.trace_add(
+                        "write", lambda *args: inner())
+                    inner()
+                make_flag_updater()
 
-            # ----- Collapsible frame -----
-            quest_frame = ttk.Frame(world_frame)
-            quest_frame.grid(row=qrow, column=0, sticky="w", padx=15)
-            quest_frame.grid_remove()  # collapsed by default
-            qrow += 1
-
-            quest_lbl.bind(
-                "<Button-1>",
-                lambda e, f=quest_frame, l=quest_lbl, t=quest_name: toggle_frame(
-                    f, l, t)
-            )
+            ttk.Label(quest_frame, textvariable=status_var).grid(
+                row=0, column=0, sticky="w", pady=(0, 2))
 
             # ----- Description -----
             ttk.Label(
                 quest_frame,
                 text=f"Description: {data.get('description') or 'N/A'}",
                 wraplength=550
-            ).grid(row=0, column=0, sticky="w")
+            ).grid(row=1, column=0, sticky="w")
 
             # ----- How to complete -----
             ttk.Label(
                 quest_frame,
                 text=f"How to complete: {data.get('how_to_complete') or 'N/A'}",
                 wraplength=550
-            ).grid(row=1, column=0, sticky="w", pady=(2, 2))
+            ).grid(row=2, column=0, sticky="w", pady=(2, 2))
 
             # ----- Reward -----
             ttk.Label(
                 quest_frame,
                 text=f"Reward: {data.get('reward') or 'N/A'}",
                 wraplength=550
-            ).grid(row=2, column=0, sticky="w", pady=(2, 2))
+            ).grid(row=3, column=0, sticky="w", pady=(2, 2))
+
+    checkbox_vars = {}  # quest_id -> IntVar
+
+    for qid in AppState.quest_flags:
+        var = tk.IntVar(value=1)  # 1 = completed
+        checkbox = tk.Checkbutton(scrollable, text=qid, variable=var)
+        # use grid inside scrollable
+        checkbox.grid(sticky="w", padx=10, pady=2)
+        checkbox_vars[qid] = var
 
     # ---------- Map Tab ----------
     map_frame = frames["Map"]
