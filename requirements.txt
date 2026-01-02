@@ -1,4 +1,4 @@
 ttkthemes
-datetime
+pyobjc; sys_platform == "darwin" # Required on macOS for Tkinter GUI support in PyInstaller builds
 pyinstaller
 Pillow

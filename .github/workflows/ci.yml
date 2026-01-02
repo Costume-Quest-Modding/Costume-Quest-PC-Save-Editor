@@ -1,61 +1,108 @@
 name: Build Executable with PyInstaller
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
   workflow_dispatch:
+    inputs:
+      target_os:
+        description: 'Which OS to build?'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - windows
+          - linux
+          - macos
 
 jobs:
   build-windows:
+    if: github.event.inputs.target_os == 'windows' || github.event.inputs.target_os == 'all'
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Build with PyInstaller
-      run: pyinstaller --onefile --noconsole --icon=source/icon.ico --add-data=source/icon.ico:. source/cqsaveeditor.py
+      - name: Build with PyInstaller
+        run: pyinstaller --onefile --noconsole --icon=source/icon.ico \
+             --add-data "source/icon.ico;." \
+             --add-data "source/images;images" \
+             source/main.py
 
-    - name: Upload executable as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: cqsaveeditor-windows
-        path: dist/cqsaveeditor.exe
+      - name: Upload executable as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cqsaveeditor-windows
+          path: dist/main.exe
+
 
   build-linux:
+    if: github.event.inputs.target_os == 'linux' || github.event.inputs.target_os == 'all'
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Build with PyInstaller
-      run: pyinstaller --onefile --noconsole --icon=source/icon.ico --add-data=source/icon.ico:. source/cqsaveeditor.py
+      - name: Build with PyInstaller
+        run: pyinstaller --onefile --noconsole --icon=source/icon.ico \
+             --add-data "source/icon.ico:." \
+             --add-data "source/images:images" \
+             source/main.py
 
-    - name: Upload executable as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: cqsaveeditor-linux
-        path: dist/cqsaveeditor
+      - name: Upload executable as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cqsaveeditor-linux
+          path: dist/main
+
+
+  build-macos:
+    if: github.event.inputs.target_os == 'macos' || github.event.inputs.target_os == 'all'
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build with PyInstaller
+        run: pyinstaller --onefile --noconsole --icon=source/icon.ico \
+             --add-data "source/icon.ico:." \
+             --add-data "source/images:images" \
+             source/main.py
+
+      - name: Upload executable as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cqsaveeditor-macos
+          path: dist/main
