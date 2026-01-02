@@ -1,33 +1,14 @@
-name: Build and Release Executables
+name: Build Windows Executable
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      target_os:
-        description: 'Which OS to build?'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - windows
-          - linux
-          - macos
-      version:
-        description: 'Release version (e.g., v1.0.0)'
-        required: true
-        default: 'v0.0.1'
-      notes:
-        description: 'Patch notes / release description'
-        required: false
-        default: 'Initial test release'
 
 jobs:
   build-windows:
-    if: github.event.inputs.target_os == 'windows' || github.event.inputs.target_os == 'all'
     runs-on: windows-latest
-    outputs:
-      artifact-path: dist/main.exe
 
     steps:
       - name: Checkout repository
@@ -44,111 +25,33 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build Windows executable
-        run: pyinstaller --onefile --noconsole --icon=source/icon.ico --add-data "source/icon.ico;." --add-data "source/images;images" source/main.py
+        run: pyinstaller --onefile --noconsole --icon=source/icon.ico --add-data=source/icon.ico:. source/cqsaveeditor.py
 
-      - name: Upload artifact
+      - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: main-windows
-          path: dist/main.exe
+          name: cqsaveeditor-windows
+          path: dist/cqsaveeditor.exe
 
-  build-linux:
-    if: github.event.inputs.target_os == 'linux' || github.event.inputs.target_os == 'all'
+  create-release-manual:
+    needs: build-windows
     runs-on: ubuntu-latest
-    outputs:
-      artifact-path: dist/main
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Build Linux executable
-        run: pyinstaller --onefile --noconsole --icon=source/icon.ico --add-data "source/icon.ico:." --add-data "source/images:images" source/main.py
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: main-linux
-          path: dist/main
-
-  build-macos:
-    if: github.event.inputs.target_os == 'macos' || github.event.inputs.target_os == 'all'
-    runs-on: macos-latest
-    outputs:
-      artifact-path: dist/main
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Build macOS executable
-        run: pyinstaller --onefile --noconsole --icon=source/icon.ico --add-data "source/icon.ico:." --add-data "source/images:images" source/main.py
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: main-macos
-          path: dist/main
-
-  create-release:
-    needs: [build-windows, build-linux, build-macos]
-    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       - name: Download Windows artifact
-        if: needs.build-windows.outputs.artifact-path != ''
         uses: actions/download-artifact@v4
         with:
-          name: main-windows
+          name: cqsaveeditor-windows
           path: artifacts/
 
-      - name: Download Linux artifact
-        if: needs.build-linux.outputs.artifact-path != ''
-        uses: actions/download-artifact@v4
-        with:
-          name: main-linux
-          path: artifacts/
-
-      - name: Download macOS artifact
-        if: needs.build-macos.outputs.artifact-path != ''
-        uses: actions/download-artifact@v4
-        with:
-          name: main-macos
-          path: artifacts/
-
-      - name: Create GitHub release
+      - name: Create GitHub release (manual)
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          name: ${{ github.event.inputs.version }}
-          body: ${{ github.event.inputs.notes }}
+          tag_name: ${{ github.event.inputs.version || 'v1.0.0' }}
+          name: ${{ github.event.inputs.version || 'v1.0.0' }}
+          body: ${{ github.event.inputs.notes || 'Manual release' }}
           draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload assets to release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: artifacts/*
+          prerelease: true
+          files: artifacts/cqsaveeditor.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
