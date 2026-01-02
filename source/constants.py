@@ -21,6 +21,12 @@ MAP_IMAGES = {
     "Fall Valley": os.path.join(BASE_DIR, "images", "maps", "fall_valley.png")
 }
 
+MAP_ICONS = {
+    "house": os.path.join(BASE_DIR, "images", "mapicons", "house.png"),
+    "monster_house": os.path.join(BASE_DIR, "images", "mapicons", "monster_house.png"),
+    # add later, ideas include: shop, chest, npc's, hide and seek kids, bobbing for apples, etc.
+}
+
 QUEST_FLAG_MAP = {
     # Individual component quests
     "Door N Skeleton - First Door": ["DoorNSkeleton_FirstDoor"],

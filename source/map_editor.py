@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
-from constants import MAP_HOUSES, MAP_IMAGES
+from constants import MAP_HOUSES, MAP_IMAGES, MAP_ICONS
 
 
 class MapEditor(ttk.Frame):
@@ -10,6 +10,9 @@ class MapEditor(ttk.Frame):
         super().__init__(parent)
         self.root = self.winfo_toplevel()
         self.max_width, self.max_height = max_size
+
+        # --- Store loaded icon images ---
+        self.icon_images = {}
 
         # --- Top controls ---
         top_frame = ttk.Frame(self)
@@ -26,7 +29,7 @@ class MapEditor(ttk.Frame):
         zoom_frame = ttk.Frame(top_frame)
         zoom_frame.pack(side="left", padx=10)
 
-        self.zoom_levels = [0.5, 0.75, 1, 1.25, 1.5, 2]
+        self.zoom_levels = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
         self.current_zoom = 0.75
 
         self.zoom_label = ttk.Label(
@@ -87,7 +90,7 @@ class MapEditor(ttk.Frame):
 
         # Houses
         self.houses = {}
-        self.house_rects = {}
+        self.house_items = {}  # stores canvas image IDs
 
         # Per-world view state (zoom, offsets, cursor)
         self._world_views = {}
@@ -122,15 +125,15 @@ class MapEditor(ttk.Frame):
         self.orig_img = Image.open(map_path)
         self.orig_w, self.orig_h = self.orig_img.size
 
-        self.current_zoom = 0.75
+        self.current_zoom = 1.00
         self._user_moved = False
         self._close_side_panel()
 
         # Clear canvas
         self.canvas.delete("all")
-        self.house_rects.clear()
+        self.house_items.clear()
 
-        # Re-create the coord label window
+        # Re-create coord label window
         self.coord_label = tk.Label(
             self.canvas, textvariable=self.coord_var, bg="black", fg="white")
         self.coord_window = self.canvas.create_window(
@@ -142,40 +145,32 @@ class MapEditor(ttk.Frame):
         # Create the map image placeholder
         self.canvas_image = self.canvas.create_image(0, 0, anchor="nw")
 
-        # Apply zoom (draws image and houses)
+        # Apply zoom (draws map and houses)
         self._set_zoom(self.current_zoom)
 
-        # Restore saved view for this world (if available)
+        # Restore saved view
         state = self._world_views.get(world_name)
         if state:
-            # restore zoom if different
             if state.get("zoom") is not None and state.get("zoom") != self.current_zoom:
                 self._set_zoom(state["zoom"])
-            # restore offsets
             self.offset_x = state.get("offset_x", self.offset_x)
             self.offset_y = state.get("offset_y", self.offset_y)
             self.canvas.coords(self.canvas_image, self.offset_x, self.offset_y)
-            # reposition house rects using current scale
             scale_x = self.map_img.width / self.orig_w
             scale_y = self.map_img.height / self.orig_h
-            for hid, rect in self.house_rects.items():
+            for hid, item_id in self.house_items.items():
                 x1, y1, x2, y2 = self.houses[hid]["coords"]
-                self.canvas.coords(rect,
+                self.canvas.coords(item_id,
                                    x1 * scale_x + self.offset_x,
-                                   y1 * scale_y + self.offset_y,
-                                   x2 * scale_x + self.offset_x,
-                                   y2 * scale_y + self.offset_y)
-            # restore cursor display
+                                   y1 * scale_y + self.offset_y)
             cur = state.get("cursor")
             if cur:
                 self._last_rel = cur
                 self.coord_var.set(f"X: {int(cur[0])}, Y: {int(cur[1])}")
         else:
-            # nothing saved; ensure coord window position is updated
             self._update_coord_position()
 
     def _change_world(self, value):
-        # persist current world's view before switching
         self._save_view_state()
         self._load_world(value)
 
@@ -216,30 +211,46 @@ class MapEditor(ttk.Frame):
 
         self.canvas.coords(self.canvas_image, self.offset_x, self.offset_y)
 
-        # Clear old rectangles
-        for rect in self.house_rects.values():
-            self.canvas.delete(rect)
-        self.house_rects.clear()
+        # Clear old house images
+        for item in self.house_items.values():
+            self.canvas.delete(item)
+        self.house_items.clear()
 
         # Draw houses
         for hid, house in self.houses.items():
             x1, y1, x2, y2 = house["coords"]
-            rect = self.canvas.create_rectangle(
-                x1 * zoom + self.offset_x,
-                y1 * zoom + self.offset_y,
-                x2 * zoom + self.offset_x,
-                y2 * zoom + self.offset_y,
-                outline="red",
-                width=2,
-                fill="black",
-                tags=hid
-            )
-            self.canvas.tag_bind(rect, "<ButtonRelease-1>",
-                                 lambda e, h=hid: self.show_house_info(h))
-            self.house_rects[hid] = rect
+
+            # Determine icon based on subtype
+            subtype = house.get("subtype", "").lower()
+            icon_key = "monster_house" if subtype == "monster" else "house"
+
+            # Load icon image
+            icon_path = MAP_ICONS.get(icon_key)
+            if icon_path and os.path.isfile(icon_path):
+                img = Image.open(icon_path)
+
+                # Resize icon to fit coords rectangle
+                width = int((x2 - x1) * zoom)
+                height = int((y2 - y1) * zoom)
+                resized_img = img.resize((width, height), Image.NEAREST)
+                tk_icon = ImageTk.PhotoImage(resized_img)
+
+                # Draw at top-left of coords
+                img_id = self.canvas.create_image(
+                    x1 * zoom + self.offset_x,
+                    y1 * zoom + self.offset_y,
+                    anchor="nw",
+                    image=tk_icon,
+                    tags=hid
+                )
+                self.canvas.tag_bind(img_id, "<ButtonRelease-1>",
+                                     lambda e, h=hid: self.show_house_info(h))
+                self.house_items[hid] = img_id
+
+                # Keep reference to avoid garbage collection
+                self.icon_images[hid] = tk_icon
 
         self.zoom_label.config(text=f"{self.current_zoom}x")
-        # ensure coord window remains on top
         self._raise_coord_window()
 
     # --- coords ---
@@ -250,7 +261,6 @@ class MapEditor(ttk.Frame):
                  self.offset_y) / self.current_zoom
         rel_x = max(0, min(rel_x, self.orig_w))
         rel_y = max(0, min(rel_y, self.orig_h))
-        # store last relative map coords for persistence
         self._last_rel = (rel_x, rel_y)
         self.coord_var.set(f"X: {int(rel_x)}, Y: {int(rel_y)}")
 
@@ -263,7 +273,7 @@ class MapEditor(ttk.Frame):
     # --- drag & pan ---
     def _start_drag(self, event):
         item = self.canvas.find_withtag("current")
-        if item and item[0] in self.house_rects.values():
+        if item and item[0] in self.house_items.values():
             return
         self.drag_start = (event.x, event.y)
 
@@ -280,13 +290,11 @@ class MapEditor(ttk.Frame):
         self.canvas.coords(self.canvas_image, self.offset_x, self.offset_y)
         scale_x = self.map_img.width / self.orig_w
         scale_y = self.map_img.height / self.orig_h
-        for hid, rect in self.house_rects.items():
+        for hid, item_id in self.house_items.items():
             x1, y1, x2, y2 = self.houses[hid]["coords"]
-            self.canvas.coords(rect,
+            self.canvas.coords(item_id,
                                x1 * scale_x + self.offset_x,
-                               y1 * scale_y + self.offset_y,
-                               x2 * scale_x + self.offset_x,
-                               y2 * scale_y + self.offset_y)
+                               y1 * scale_y + self.offset_y)
         self._update_coord_position()
 
     def _end_drag(self, event):
@@ -327,7 +335,6 @@ class MapEditor(ttk.Frame):
             self._open_side_panel()
 
     def _save_view_state(self):
-        """Persist the current view state (zoom, offsets, cursor) for the active world."""
         if not hasattr(self, "world_name"):
             return
         self._world_views[self.world_name] = {
@@ -338,7 +345,6 @@ class MapEditor(ttk.Frame):
         }
 
     def _raise_coord_window(self):
-        """Ensure the coord window is on top of the canvas stacking order."""
         try:
             if self.coord_window:
                 self.canvas.tag_raise(self.coord_window)
