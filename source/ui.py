@@ -400,17 +400,29 @@ def create_tabs(root):
     # ---------- Summary Frame ----------
     summary_frame = frames["Summary"]
     row = 0
-    ttk.Label(summary_frame, text="Player Info").grid(
+    ttk.Label(summary_frame, text="Save Info").grid(
         row=row, column=0, sticky="w", padx=10, pady=5)
+    row += 2
+    ttk.Label(summary_frame, text="Player Info").grid(
+        row=2, column=0, sticky="w", padx=10, pady=5)
     ttk.Label(summary_frame, text="World & Position").grid(
-        row=row, column=2, sticky="w", padx=10, pady=5)
+        row=0, column=2, sticky="w", padx=10, pady=5)
     ttk.Label(summary_frame, text="Apple Bobbing High Scores").grid(
         row=8, column=2, sticky="w", padx=10, pady=5)
     ttk.Label(summary_frame, text="Misc. Stats").grid(
         row=12, column=2, sticky="w", padx=10, pady=5)
     row += 1
     # ---------------------------------------------------------
-    #  SECTION 1 — Player Info
+    #  SECTION 1 — Save Info
+    # ---------------------------------------------------------
+
+    ttk.Label(summary_frame, text="Save File Type:").grid(
+        row=1, column=0, sticky="w", padx=25)
+    ttk.Label(summary_frame, textvariable=saveio.AppState.dlc_var,
+              width=33).grid(row=1, column=1, padx=25, pady=5)
+
+    # ---------------------------------------------------------
+    #  SECTION 2 — Player Info
     # ---------------------------------------------------------
 
     ttk.Label(summary_frame, text="Level:").grid(
@@ -438,7 +450,7 @@ def create_tabs(root):
     row += 1
 
     # ---------------------------------------------------------
-    #  SECTION 2 — COLLECTION PROGRESS
+    #  SECTION 3 — COLLECTION PROGRESS
     # ---------------------------------------------------------
 
     ttk.Label(summary_frame, text="Collections").grid(
@@ -489,7 +501,7 @@ def create_tabs(root):
         row += 1
 
     # ---------------------------------------------------------
-    #  SECTION 3 — WORLD & POSITION
+    #  SECTION 4 — WORLD & POSITION
     # ---------------------------------------------------------
     row = 1
     ttk.Label(summary_frame, text="Current Map:").grid(
@@ -517,7 +529,7 @@ def create_tabs(root):
         row += 3  # move row counter past this block
 
     # ---------------------------------------------------------
-    #  SECTION 4 — MISC. STATS
+    #  SECTION 5 — MISC. STATS
     # ---------------------------------------------------------
     bobbing_stats = [
         ("Suburbs:", saveio.AppState.suburbsbobbing_var),

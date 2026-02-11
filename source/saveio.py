@@ -15,6 +15,7 @@ class AppState:
     save_header = b""
     save_text_data = ""
     loading_save = False
+    is_dlc_game = False
     original_candy_value = 0
     last_total_candy = 0
 
@@ -34,6 +35,7 @@ class AppState:
     player_position_vars = None
     camera_position_vars = None
     card_vars = None
+    dlc_var = None  # Tracks DLC status in the UI
 
     @classmethod
     def init_vars(cls, root):
@@ -48,6 +50,7 @@ class AppState:
         cls.mallbobbing_var = tk.StringVar(value="0")
         cls.countrybobbing_var = tk.StringVar(value="0")
         cls.selected_world = tk.StringVar(value="Suburbs")
+        cls.dlc_var = tk.StringVar(value="No Save File Loaded")
         # default to empty costume slots (UI will set defaults)
         cls.costume_vars = [tk.StringVar(value="") for _ in range(3)]
         cls.player_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
@@ -286,6 +289,10 @@ def open_save_dialog():
 
     # set state
     AppState.loading_save = True
+    AppState.is_dlc_game = bool(extract_int(
+        r"IsDLCGame\s*=\s*(\d+);", raw_text, default=0))
+    AppState.dlc_var.set(
+        "Grubbins on Ice" if AppState.is_dlc_game else "Base Game")
     AppState.total_candy_var.set(str(total))
     AppState.candy_var.set(str(candy))
     AppState.original_candy_value = candy
@@ -305,6 +312,8 @@ def open_save_dialog():
         AppState.player_position_vars[i].set(player_pos[i])
         AppState.camera_position_vars[i].set(camera_pos[i])
 
+    # Debug prints
+    print(f"DLC Save Detected: {AppState.is_dlc_game}")
     print("Loaded Quest Flags:", AppState.quest_flags)
 
     AppState.selected_world.set(world)
