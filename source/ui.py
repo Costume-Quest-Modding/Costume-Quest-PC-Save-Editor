@@ -20,6 +20,35 @@ def toggle_frame(frame):
         frame.grid()
 
 
+class Tooltip:
+    """Simple text tooltip for any widget"""
+
+    def __init__(self, widget, text):
+        self.widget = widget
+        self.text = text
+        self.tip_window = None
+        widget.bind("<Enter>", self.show)
+        widget.bind("<Leave>", self.hide)
+
+    def show(self, event=None):
+        if self.tip_window or not self.text:
+            return
+        x = self.widget.winfo_rootx() + 10
+        y = self.widget.winfo_rooty() + 10
+        self.tip_window = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)
+        tw.wm_geometry(f"+{x}+{y}")
+        label = tk.Label(tw, text=self.text, justify="left",
+                         background="#ffffe0", relief="solid", borderwidth=1,
+                         font=("Segoe UI", 9))
+        label.pack(ipadx=4, ipady=2)
+
+    def hide(self, event=None):
+        if self.tip_window:
+            self.tip_window.destroy()
+            self.tip_window = None
+
+
 class ImageTooltip:
     """
     Tooltip for showing images (cards or battle stamps) on hover.
@@ -433,37 +462,51 @@ def create_tabs(root):
     #  SECTION 1 — Save Info
     # ---------------------------------------------------------
 
-    ttk.Label(summary_frame, text="Save File Type:").grid(
+    filetype_label = ttk.Label(summary_frame, text="Save File Type:").grid(
         row=1, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.dlc_var,
-              width=33).grid(row=1, column=1, padx=25, pady=5)
+    filetype_label = ttk.Label(summary_frame, textvariable=saveio.AppState.dlc_var,
+                               width=33)
+    filetype_label.grid(row=1, column=1, padx=25, pady=5)
+    Tooltip(filetype_label, "Indicates whether the loaded save file is from the base game or the Grubbins on Ice DLC.\n"
+            "DLC saves have access to additional features in the editor.")
 
     # ---------------------------------------------------------
     #  SECTION 2 — Player Info
     # ---------------------------------------------------------
 
-    ttk.Label(summary_frame, text="Level:").grid(
+    level_label = ttk.Label(summary_frame, text="Level:").grid(
         row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.level_var,
-              width=33).grid(row=row, column=1, padx=25, pady=5)
+    level_label = ttk.Label(summary_frame, textvariable=saveio.AppState.level_var,
+                            width=33)
+    level_label.grid(row=row, column=1, sticky="w", padx=25, pady=5)
+    Tooltip(level_label, "This is your character's current level.\n"
+            "DLC levels only appear in DLC saves.")
     row += 1
 
-    ttk.Label(summary_frame, text="XP:").grid(
+    xp_label = ttk.Label(summary_frame, text="XP:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.xp_var,
-              width=33).grid(row=row, column=1, padx=25, pady=5)
+    xp_label = ttk.Label(summary_frame, textvariable=saveio.AppState.xp_var,
+                         width=33)
+    xp_label.grid(row=row, column=1, padx=25, pady=5)
+    Tooltip(xp_label, "This is your character's current XP.")
     row += 1
 
-    ttk.Label(summary_frame, text="Candy:").grid(
+    candy_label = ttk.Label(summary_frame, text="Candy:").grid(
         row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.candy_var,
-              width=33).grid(row=row, column=1, padx=25, pady=5)
+    candy_label = ttk.Label(summary_frame, textvariable=saveio.AppState.candy_var,
+                            width=33)
+    candy_label.grid(row=row, column=1, padx=25, pady=5)
+    Tooltip(candy_label, "This is your current amount of candy.")
     row += 1
 
-    ttk.Label(summary_frame, text="Total Candy:").grid(
+    totalcandy_label = ttk.Label(summary_frame, text="Total Candy:").grid(
         row=row, column=0, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.total_candy_var,
-              width=33).grid(row=row, column=1, padx=25, pady=5)
+    totalcandy_label = ttk.Label(summary_frame, textvariable=saveio.AppState.total_candy_var,
+                                 width=33)
+    totalcandy_label.grid(row=row, column=1, padx=25, pady=5)
+    Tooltip(totalcandy_label,
+            "This is your total amount of candy collected.\n"
+            "Doesn't decrease when you spend candy, essentially tracking lifetime candy collection.")
     row += 1
 
     # ---------------------------------------------------------
@@ -475,20 +518,30 @@ def create_tabs(root):
     row += 1
 
     # Battle Stamps
-    ttk.Label(summary_frame, text="Battle Stamps:").grid(
+    battlestamps_label = ttk.Label(summary_frame, text="Battle Stamps:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5
     )
-    ttk.Label(summary_frame, textvariable=battle_progress_text).grid(
+    battlestamps_label = ttk.Label(
+        summary_frame, textvariable=battle_progress_text)
+    battlestamps_label.grid(
         row=row, column=1, sticky="w", padx=25, pady=5
     )
+    Tooltip(battlestamps_label,
+            "Shows how many battle stamps you have collected.\n"
+            "DLC stamps only appear in DLC saves.\n"
+            "Hover over names in the Battle Stamps tab for stamp images.")
     row += 1
 
     # Cards
-    ttk.Label(summary_frame, text="Cards:").grid(
+    cards_label = ttk.Label(summary_frame, text="Cards:").grid(
         row=row, column=0, sticky="w", padx=25, pady=5)
 
-    ttk.Label(summary_frame, textvariable=cards_progress_text).grid(
+    cards_label = ttk.Label(summary_frame, textvariable=cards_progress_text)
+    cards_label.grid(
         row=row, column=1, sticky="w", padx=25, pady=5)
+    Tooltip(cards_label, "Shows how many cards you have collected.\n"
+            "DLC cards only appear in DLC saves.\n"
+            "Hover over names in the Cards tab for card images.")
     row += 1
 
     ttk.Label(summary_frame, text="Costumes:").grid(
@@ -506,9 +559,11 @@ def create_tabs(root):
             saveio.AppState.costume_vars[i].get(),
             saveio.AppState.costume_vars[i].get())  # fallback to internal name
         saveio.AppState.costume_display_vars[i].set(f"{name}: {display_name}")
-        ttk.Label(summary_frame, textvariable=saveio.AppState.costume_display_vars[i]).grid(
-            row=row, column=1, padx=25, pady=5, sticky="w"
-        )
+        lbl = ttk.Label(
+            summary_frame, textvariable=saveio.AppState.costume_display_vars[i])
+        lbl.grid(row=row, column=1, padx=25, pady=5, sticky="w")
+        Tooltip(
+            lbl, f"This shows the currently equipped costume for {name}.\nYou can change it in the Costumes tab.")
         saveio.AppState.costume_vars[i].trace_add(
             "write",
             lambda *args, idx=i, nm=name: saveio.AppState.costume_display_vars[idx].set(
@@ -521,10 +576,12 @@ def create_tabs(root):
     #  SECTION 4 — WORLD & POSITION
     # ---------------------------------------------------------
     row = 1
-    ttk.Label(summary_frame, text="Current Map:").grid(
+    map_label = ttk.Label(summary_frame, text="World:").grid(
         row=row, column=2, sticky="w", padx=25)
-    ttk.Label(summary_frame, textvariable=saveio.AppState.selected_world,
-              width=33).grid(row=row, column=3, padx=25)
+    map_label = ttk.Label(summary_frame, textvariable=saveio.AppState.selected_world,
+                          width=33)
+    map_label.grid(row=row, column=3, padx=25)
+    Tooltip(map_label, "This is the world you are currently in.")
     row += 1
 
     positions = [
@@ -540,8 +597,16 @@ def create_tabs(root):
             ttk.Label(summary_frame, text=f"{axis}:").grid(
                 row=row + i, column=3, sticky="w", padx=25, pady=5
             )
-            ttk.Label(summary_frame, textvariable=vars_list[i], width=15).grid(
+            value_label = ttk.Label(
+                summary_frame, textvariable=vars_list[i], width=15)
+            value_label.grid(
                 row=row + i, column=3, sticky="w", padx=40, pady=5
+            )
+            Tooltip(
+                value_label,
+                f"{label_text} {axis}-coordinate in the world.\n"
+                "Changes if you move the player in-game or via teleport.\n"
+                "Camera position does nothing in the save file and is likely unused."
             )
         row += 3  # move row counter past this block
 
