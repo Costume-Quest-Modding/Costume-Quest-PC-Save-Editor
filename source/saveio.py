@@ -63,6 +63,14 @@ class AppState:
 # ---------------- utility / parsing ----------------
 
 
+def get_allowed_levels():
+    """Return list of allowed level strings based on DLC status."""
+    if AppState.is_dlc_game:
+        return [str(i) for i in range(10, 15)]  # 10–14
+    else:
+        return [str(i) for i in range(1, 11)]   # 1–10
+
+
 def get_level_path_from_selected_world():
     """Return the correct Level= world path string based on selected world."""
     world_name = AppState.selected_world.get()

@@ -358,6 +358,23 @@ def _open_and_fill(root, frames_refs):
     ok = saveio.open_save_dialog()
     if not ok:
         return
+    if saveio.AppState.is_dlc_game:
+        messagebox.showinfo(
+            "Grubbins on Ice Save Loaded",
+            "A Grubbins on Ice save file has been loaded.\n\n"
+            "Base Game + DLC features will be available in the editor."
+        )
+    else:
+        messagebox.showinfo(
+            "Costume Quest Save Loaded",
+            "A Costume Quest save file has been loaded.\n\n"
+            "Base Game features are available. DLC features will not appear or maybe disabled."
+        )
+
+    # Update level dropdown based on DLC
+    frames_refs["level_dropdown"].config(
+        values=saveio.get_allowed_levels()
+    )
     saveio.populate_entries_from_state(
         frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries)
     if hasattr(frames_refs["Battle Stamps"], "update_progress"):
@@ -567,11 +584,14 @@ def create_tabs(root):
     level_dropdown = ttk.Combobox(
         stats_frame,
         textvariable=saveio.AppState.level_var,
-        values=[""] + [str(i) for i in range(1, 15)],
+        values=saveio.get_allowed_levels(),
         width=31,
         state="readonly",
     )
     level_dropdown.grid(row=row, column=1, sticky="w", padx=25, pady=5)
+
+    frames["level_dropdown"] = level_dropdown
+
     for event in ("<<ComboboxSelected>>", "<FocusOut>", "<Return>"):
         level_dropdown.bind(event, saveio.update_xp_from_level)
     row += 1

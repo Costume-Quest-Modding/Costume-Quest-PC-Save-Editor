@@ -2,7 +2,7 @@
 
 A Python GUI Save Editor/Viewer for the Costume Quest PC (Steam) release — View and edit save data safely, with save backups and a simple UI.
 
-> ⚠️ **Note:** DLC save files are currently not supported.
+> ⚠️ **Note:** DLC save file support is in the works. A release is in the works.
 >
 
 ![CQ PC Save Editor Summary](https://i.imgur.com/h0Txpdp.png)
@@ -67,5 +67,5 @@ python -m source.main
 ---
 
 ## ⚠️ Known limitations
-- DLC saves are not supported currently (tracked for future work).  
+- Support for DLC save files is in the works. Expect bugs while things get ironed out.  
 - On Linux, tkinter may not be installed by default — install the distribution package (e.g., `sudo apt install python3-tk`).
