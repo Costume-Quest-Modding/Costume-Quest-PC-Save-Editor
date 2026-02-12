@@ -668,7 +668,16 @@ BATTLE_ITEM_NAMES = {
     "HeadlessBanshee": "Headless Banshee",
     "VegetarianBrew": "Vegetarian Witch's Brew",
     "NoEyedVampireBat": "No-Eyed Vampire Bat",
-    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs"
+    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs",
+    # DLC Battle Stamps below here
+    "MummyGauze": "Mummy Gauze",
+    "GalvanizedGauze": "Galvanized Mummy Gauze",
+    "BlackRose": "Black Rose",
+    "DeviledEgg": "Deviled Egg",
+    "HeadlessBat": "Headless Vampire Bat",
+    "MultiWingBat": "Multi-Winged Vampire Bat",
+    "SkeletonOfWolf": "Skeleton of the Wolf",
+    "RottenPumpGuts": "Rotten Pumpkin Guts"
 }
 
 
