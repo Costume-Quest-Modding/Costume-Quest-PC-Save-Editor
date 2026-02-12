@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from map_editor import MapEditor
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_HOUSES, MAP_IMAGES, QUESTS, QUEST_FLAG_MAP
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_IMAGES, QUESTS, QUEST_FLAG_MAP
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
@@ -226,77 +226,142 @@ class CardsTab(ttk.Frame):
         # Header row
         ttk.Label(self, text="Creepy Treat Cards:").grid(
             row=0, column=0, padx=10, pady=5, sticky="w")
-        ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var,
-                        command=self.toggle_all_cards).grid(row=0, column=1, padx=10, pady=5)
+
+        ttk.Checkbutton(
+            self,
+            text="Toggle All",
+            variable=self.toggle_all_var,
+            command=self.toggle_all_cards
+        ).grid(row=0, column=1, padx=10, pady=5)
+
         ttk.Label(self, textvariable=self.progress_text).grid(
             row=0, column=2, padx=10, pady=5, sticky="w")
-        ttk.Progressbar(self, variable=self.progress_var, maximum=100, length=150).grid(
-            row=0, column=3, padx=10, pady=5, sticky="w")
 
-        # Card entries grid
-        cards_per_col = 18
-        start_row = 1
-        for i in range(54):
-            card_num = i + 1
-            col = (i // cards_per_col) * 2
-            row = start_row + (i % cards_per_col)
-            card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
+        ttk.Progressbar(
+            self,
+            variable=self.progress_var,
+            maximum=100,
+            length=150
+        ).grid(row=0, column=3, padx=10, pady=5, sticky="w")
 
-            lbl = ttk.Label(self, text=card_name)
-            lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+        # ---------------- BASE CARDS ----------------
+        self.base_frame = ttk.Frame(self)
+        self.base_frame.grid(row=1, column=0, columnspan=10, sticky="w")
 
-            # Image tooltip
-            img_path = CARD_IMAGES.get(card_num)
-            if img_path and os.path.isfile(img_path):
-                self._attach_image_tooltip(lbl, img_path)
+        self._build_card_grid(self.base_frame, range(1, 55))
 
-            entry = tk.Entry(self, width=8)
-            entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
-            entry.bind("<KeyRelease>", lambda e: [
-                       self.update_progress(), self.update_missing_cards()])
-            self.entries[card_num] = entry
+        # ---------------- DLC CARDS ----------------
+        self.dlc_frame = ttk.Frame(self)
+        self.dlc_frame.grid(row=2, column=0, columnspan=10, sticky="w")
+
+        # Optional label for clarity
+        ttk.Label(
+            self.dlc_frame,
+            text="--- Grubbins on Ice Cards ---"
+        ).grid(row=0, column=0, columnspan=10, sticky="w", pady=(10, 5))
+
+        self._build_card_grid(self.dlc_frame, range(55, 73), start_row=1)
+
+        # Hide DLC by default
+        self.dlc_frame.grid_remove()
 
         # Missing cards section
-        last_row = start_row + cards_per_col * \
-            ((54 + cards_per_col - 1) // cards_per_col)
         missing_frame = ttk.Frame(self)
-        missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
+        missing_frame.grid(row=3, column=0, columnspan=10, sticky="ew")
         missing_frame.columnconfigure(1, weight=1)
 
         ttk.Label(missing_frame, text="Missing Cards:").grid(
             row=0, column=0, padx=10, pady=5, sticky="w")
-        ttk.Label(missing_frame, textvariable=self.missing_cards_var, anchor="w", wraplength=400).grid(
-            row=0, column=1, sticky="ew", padx=10, pady=5
-        )
 
-        # Auto-wrap
+        ttk.Label(
+            missing_frame,
+            textvariable=self.missing_cards_var,
+            anchor="w",
+            wraplength=400
+        ).grid(row=0, column=1, sticky="ew", padx=10, pady=5)
+
         self.bind("<Configure>", self._update_wrap)
 
+    def _build_card_grid(self, parent, card_range, start_row=0):
+        cards_per_col = 18
+
+        for i, card_num in enumerate(card_range):
+            col = (i // cards_per_col) * 2
+            row = start_row + (i % cards_per_col)
+            card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
+
+            lbl = ttk.Label(parent, text=card_name)
+            lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+
+            img_path = CARD_IMAGES.get(card_num)
+            if img_path and os.path.isfile(img_path):
+                self._attach_image_tooltip(lbl, img_path)
+
+            entry = tk.Entry(parent, width=8)
+            entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
+            entry.bind("<KeyRelease>", lambda e: [
+                self.update_progress(),
+                self.update_missing_cards()
+            ])
+
+            self.entries[card_num] = entry
+
+    def update_dlc_visibility(self):
+        if saveio.AppState.is_dlc_game:
+            self.dlc_frame.grid()
+        else:
+            self.dlc_frame.grid_remove()
+
     def _attach_image_tooltip(self, widget, img_path):
-        """Attach an image tooltip (like your ImageTooltip)"""
         ImageTooltip(widget, img_path)
 
     def _update_wrap(self, event=None):
         width = self.winfo_width()
         if width > 150:
-            self.children.get('!frame').children.get(
-                '!label2').config(wraplength=width - 150)
+            for child in self.winfo_children():
+                if isinstance(child, ttk.Frame):
+                    for sub in child.winfo_children():
+                        if isinstance(sub, ttk.Label) and sub.cget("textvariable"):
+                            sub.config(wraplength=width - 150)
 
     def update_progress(self):
-        total = len(self.entries)
-        collected = sum(1 for e in self.entries.values() if e.get(
-        ).strip().isdigit() and int(e.get().strip()) > 0)
+        if saveio.AppState.is_dlc_game:
+            valid_range = range(1, 73)
+        else:
+            valid_range = range(1, 55)
+
+        total = len(valid_range)
+
+        collected = sum(
+            1 for num in valid_range
+            if self.entries[num].get().strip().isdigit()
+            and int(self.entries[num].get().strip()) > 0
+        )
+
         percent = (collected / total) * 100 if total > 0 else 0
         self.progress_var.set(percent)
-        self.progress_text.set(
-            f"Collected: {collected} / {total} ({percent:.0f}%)")
+
+        if self.progress_text:
+            self.progress_text.set(
+                f"Collected: {collected} / {total} ({percent:.0f}%)"
+            )
 
     def update_missing_cards(self):
-        missing = [CARD_NAMES.get(num, f"Card {num}") for num, e in self.entries.items(
-        ) if not e.get().strip() or e.get().strip() == "0"]
-        if all(not e.get().strip() or e.get().strip() == "0" for e in self.entries.values()):
+        if saveio.AppState.is_dlc_game:
+            valid_range = range(1, 73)
+        else:
+            valid_range = range(1, 55)
+
+        missing = [
+            CARD_NAMES.get(num, f"Card {num}")
+            for num in valid_range
+            if not self.entries[num].get().strip()
+            or self.entries[num].get().strip() == "0"
+        ]
+
+        if len(missing) == len(valid_range):
             self.missing_cards_var.set("All")
-        elif all(e.get().strip() and int(e.get().strip()) > 0 for e in self.entries.values()):
+        elif len(missing) == 0:
             self.missing_cards_var.set("None")
         else:
             self.missing_cards_var.set(", ".join(missing))
@@ -400,12 +465,19 @@ def _open_and_fill(root, frames_refs):
             "Base Game features are available. DLC features will not appear or maybe disabled."
         )
 
+    frames_refs["Cards"].update_dlc_visibility()
+
     # Update level dropdown based on DLC
     frames_refs["level_dropdown"].config(
         values=saveio.get_allowed_levels()
     )
     saveio.populate_entries_from_state(
-        frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries)
+        frames_refs["Cards"].entries,
+        frames_refs["Battle Stamps"].entries)
+
+    frames_refs["Cards"].update_progress()
+    frames_refs["Cards"].update_missing_cards()
+
     if hasattr(frames_refs["Battle Stamps"], "update_progress"):
         frames_refs["Battle Stamps"].update_progress()
     if hasattr(root, "_tracker_win") and root._tracker_win and root._tracker_win.winfo_exists():
@@ -426,7 +498,8 @@ def create_tabs(root):
 
     # Create CardsTab instance
     cards_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
-    cards_frame = CardsTab(notebook, progress_text_var=cards_progress_text)
+    cards_frame = CardsTab(
+        notebook, progress_text_var=cards_progress_text)
     frames["Cards"] = cards_frame
 
     battle_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
@@ -924,4 +997,5 @@ def create_tabs(root):
     # Keep a reference in frames dict if needed
     frames["MapEditor"] = map_editor
 
+    frames["notebook"] = notebook
     return notebook, frames

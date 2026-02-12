@@ -503,13 +503,13 @@ DEBUG_TELEPORTS = {
         "Bobbing for Apples": (126.0, 4.0, 60.0),
         "First Storm Drain": (117.0, 3.5, 161.0),
         "Second Storm Drain": (157.0, 3.5, -5.0),
-        "Cemetery/Scarecrow": (67.0, 9.0, -77.0),
+        "Cemetery/Scarecrow": (67.0, 9.0, -77.0)
     },
     "Autumn Haven Mall": {
         "Mall Entrance": (-103.5, 55.5, 119.5),
         "Central Station": (153.1, 39.4, -185.6),
         "Mall (Second Floor)": (194.0, 38.5, -140.0),
-        "Mall (Third Floor)": (117.5, 45.0, -147.0),
+        "Mall (Third Floor)": (117.5, 45.0, -147.0)
     },
     "Fall Valley": {
         "Vine Cage": (-22.5, 37.5, 117.3),
@@ -518,14 +518,20 @@ DEBUG_TELEPORTS = {
         "Scarecrow": (33.0, 6.0, 41.0),
         "Maze (Center)": (106.5, 3.5, 38.0),
         "Maze (End)": (60.0, 5.0, 93.5),
-        "Dorsilla/Big Bones": (-12.0, 36.0, 122.0),
+        "Dorsilla/Big Bones": (-12.0, 36.0, 122.0)
     },
+    "Repugia": {
+        "Spawn (New Game)": (-90.9, 53.3, -0.4)
+    }
 }
 
 WORLD_PATHS = {
+    # Base Game Worlds
     "Suburbs": "worlds/cq_suburbs/cq_suburbs",
     "Autumn Haven Mall": "worlds/cq_mall_interior/cq_mall_interior",
     "Fall Valley": "worlds/cq_fallvalley/cq_fallvalley",
+    # DLC Worlds
+    "Repugia": "worlds/cq_repugia/cq_repugia"
 }
 
 COSTUME_OPTIONS = [
@@ -607,7 +613,26 @@ CARD_NAMES = {
     51: "Old Lady Fingers",
     52: "Boogie Pie",
     53: "Human Crackers",
-    54: "Gloop"
+    54: "Gloop",
+    # DLC Cards below here
+    55: "Nutty Dumdums",
+    56: "Strawberry Smackdown",
+    57: "Cuttin' Candy",
+    58: "Cake Cod",
+    59: "Dietetic Marzipan",
+    60: "Fansy Dollups",
+    61: "Bubble Onions",
+    62: "Glazed Butter Cubes",
+    63: "Wikkids",
+    64: "Dreamy Dipz",
+    65: "Rainbow Whipz",
+    66: "KLORKS!",
+    67: "Caramold",
+    68: "Sweet Wet Wheat",
+    69: "Maple Crusties",
+    70: "2-Headed Toddlers",
+    71: "Red Hot Foam",
+    72: "Wiggly Woozers"
 }
 
 CARD_IMAGES = {
