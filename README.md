@@ -1,19 +1,19 @@
 # Costume-Quest-PC-Save-Editor
 
-A Python GUI Save Editor/Viewer for the Costume Quest PC (Steam) release — View and edit save data safely, with save backups and a simple UI.
+A Python GUI Save Editor/Viewer for the Steam release of Costume Quest — Edit and view save data safely, with save backups and a simple UI.
 
-> ⚠️ **Note:** DLC save file support is in the works. A release is in the works.
->
+Supports Costume Quest and Grubbins on Ice save files. Currently doesn't support Costume Quest 2.
+> ⚠️ **Note:** DLC save file support is still in the works. Alpha 1.2 is out NOW.
 
-![CQ PC Save Editor Summary](https://i.imgur.com/h0Txpdp.png)
+![CQ PC Save Editor Summary](https://i.imgur.com/fymJ6kZ.png)
 
 ---
 
 ## 🚀 Features
-- **Edit:** Player Level, Experience, Candy, World/Location, Player Position, Equipped Costumes, Cards and Stamps.
-- **View:** Interactive Map (WIP) and Quests (WIP).
-- **Summary:** View all important save info in one convenient tab.  
-- **UI:** Interactive Map (WIP), Save/Save As (.json, .txt, or binary), Manual backups (recommended before editing).  
+- **Summary:** See all your progress from one convenient tab.
+- **Edit:** Player Level, Experience, Candy, World/Location, Battle Stamp, Cards and Equipped Costumes.
+- **View:** View any active/finished Quests (WIP).
+- **UI:** Save/Save As (.json, .txt, or binary), Manual backups (recommended before editing).
 - **Safety:** Existing save file required for writing; editor avoids overwriting by default.
 
 ---
@@ -61,11 +61,11 @@ python -m source.main
 
 ## 🧭 Quick usage
 1. Open an existing Costume Quest save file.  
-2. Edit fields in the main UI (levels, candy, world, positions, costumes).  
+2. Edit fields in the main UI (level, candy, world, positions, costumes).  
 3. Use **Save** to save changes or **Save As...** to export to `.json`, `.txt`, or binary. Backups are manual; use the Backup option before editing (recommended).
 
 ---
 
 ## ⚠️ Known limitations
-- Support for DLC save files is in the works. Expect bugs while things get ironed out.  
+- DLC support is in the works. Expect bugs while things get ironed out.  
 - On Linux, tkinter may not be installed by default — install the distribution package (e.g., `sudo apt install python3-tk`).
