@@ -231,41 +231,58 @@ class CardsTab(ttk.Frame):
         # Card entries grid
         cards_per_col = 18
         start_row = 1
-        for i in range(72):  # 72 cards total (54 base + 18 DLC)
-            card_num = i + 1
+        for i, card_num in enumerate(saveio.get_allowed_cards()):
             col = (i // cards_per_col) * 2
             row = start_row + (i % cards_per_col)
+
             card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
+            img_path = CARD_IMAGES.get(card_num)
 
             lbl = ttk.Label(self, text=card_name)
             lbl.grid(row=row, column=col, sticky='w', padx=10, pady=2)
-
-            # Image tooltip
-            img_path = CARD_IMAGES.get(card_num)
+    
             if img_path and os.path.isfile(img_path):
                 self._attach_image_tooltip(lbl, img_path)
 
             entry = tk.Entry(self, width=8)
             entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
             entry.bind("<KeyRelease>", lambda e: [
-                       self.update_progress(), self.update_missing_cards()])
+                self.update_progress(),
+                self.update_missing_cards()
+            ])
+
             self.entries[card_num] = entry
 
         # Missing cards section
         last_row = start_row + cards_per_col * \
-            ((72 + cards_per_col - 1) // cards_per_col)
+            ((len(saveio.get_allowed_cards()) + cards_per_col - 1) // cards_per_col)
         missing_frame = ttk.Frame(self)
         missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
         missing_frame.columnconfigure(1, weight=1)
 
         ttk.Label(missing_frame, text="Missing Cards:").grid(
             row=0, column=0, padx=10, pady=5, sticky="w")
-        ttk.Label(missing_frame, textvariable=self.missing_cards_var, anchor="w", wraplength=400).grid(
-            row=0, column=1, sticky="ew", padx=10, pady=5
+        self.missing_cards_label = ttk.Label(
+            missing_frame,
+            textvariable=self.missing_cards_var,
+            anchor="w",
+            wraplength=400
         )
+        self.missing_cards_label.grid(
+            row=0, column=1, sticky="ew", padx=10, pady=5
+)
 
         # Auto-wrap
         self.bind("<Configure>", self._update_wrap)
+    
+    def reload_cards(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        self.entries.clear()
+        self._build_ui()
+        self.update_progress()
+        self.update_missing_cards()
 
     def _attach_image_tooltip(self, widget, img_path):
         """Attach an image tooltip (like your ImageTooltip)"""
@@ -274,8 +291,7 @@ class CardsTab(ttk.Frame):
     def _update_wrap(self, event=None):
         width = self.winfo_width()
         if width > 150:
-            self.children.get('!frame').children.get(
-                '!label2').config(wraplength=width - 150)
+            self.missing_cards_label.config(wraplength=width - 150)
 
     def update_progress(self):
         total = len(self.entries)
@@ -398,6 +414,10 @@ def _open_and_fill(root, frames_refs):
     frames_refs["level_dropdown"].config(
         values=saveio.get_allowed_levels()
     )
+
+    # Update cards tab based on DLC
+    frames_refs["Cards"].reload_cards()
+
     saveio.populate_entries_from_state(
         frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries)
     if hasattr(frames_refs["Battle Stamps"], "update_progress"):

@@ -3,9 +3,19 @@ import re
 import os
 import sys
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# =========================
+# PATHS / ENVIRONMENT
+# =========================
+
+BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 STAMP_DIR = os.path.join(BASE_DIR, "images", "battle_stamps")
+
+# =========================
+# GAME PROGRESSION
+# =========================
+
+NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
 XP_THRESHOLDS = {
     1: 0, 2: 2500, 3: 6000, 4: 12000, 5: 20000,
@@ -13,7 +23,9 @@ XP_THRESHOLDS = {
     11: 130000, 12: 160000, 13: 200000, 14: 250000
 }
 
-NAMES = ["Reynold/Wren", "Everett", "Lucy"]
+# =========================
+# QUEST DATA
+# =========================
 
 QUEST_FLAG_MAP = {
     # Individual component quests
@@ -232,6 +244,10 @@ QUESTS = {
     }
 }
 
+# =========================
+# WORLD / TELEPORTS
+# =========================
+
 DEBUG_TELEPORTS = {
     "Suburbs": {
         "Reynold & Wren's House": (-25.5, 3.3, 33.3),
@@ -271,6 +287,10 @@ WORLD_PATHS = {
     "Repugia": "worlds/cq_repugia/cq_repugia"
 }
 
+# =========================
+# COSTUMES
+# =========================
+
 COSTUME_OPTIONS = [
     # Base Game Costumes
     "Robot", "Knight", "Statue Of Liberty",
@@ -302,9 +322,9 @@ COSTUME_DISPLAY_NAMES = {
     "Costume_Yeti": "Yeti"
 }
 
-CARD_PATTERN = re.compile(
-    r'(TrickyTreatCard_(\d+)=InventoryItem\{[^}]*CurrentAmount=)(\d+)(;[^}]*\})'
-)
+# =========================
+# CARDS
+# =========================
 
 CARD_NAMES = {
     # Base Game Cards
@@ -389,9 +409,13 @@ CARD_IMAGES = {
     for num in CARD_NAMES.keys()
 }
 
-BATTLE_ITEM_PATTERN = re.compile(
-    r'(BattleItem_(\w+)=InventoryItem\{[^}]*?CurrentAmount=)(\d+)(;[^}]*\})'
+CARD_PATTERN = re.compile(
+    r'(TrickyTreatCard_(\d+)=InventoryItem\{[^}]*CurrentAmount=)(\d+)(;[^}]*\})'
 )
+
+# =========================
+# BATTLE ITEMS / STAMPS
+# =========================
 
 BATTLE_ITEM_NAMES = {
     # Base Game Stamps
@@ -431,11 +455,11 @@ BATTLE_ITEM_NAMES = {
     "RottenPumpGuts": "Rotten Pumpkin Guts"
 }
 
-
 BATTLE_STAMP_IMAGES = {
     key: os.path.join(STAMP_DIR, f"stamp_{i+1:03}.png")
     for i, key in enumerate(BATTLE_ITEM_NAMES.keys())
 }
 
-# Helper for icon path if needed when packaged
-BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+BATTLE_ITEM_PATTERN = re.compile(
+    r'(BattleItem_(\w+)=InventoryItem\{[^}]*?CurrentAmount=)(\d+)(;[^}]*\})'
+)

@@ -63,6 +63,13 @@ class AppState:
 # ---------------- utility / parsing ----------------
 
 
+def get_allowed_cards():
+    """Return list of allowed card numbers based on DLC status."""
+    if AppState.is_dlc_game:
+        return list(range(1, 73))  # 1–72
+    else:
+        return list(range(1, 55))  # 1–54
+
 def get_allowed_levels():
     """Return list of allowed level strings based on DLC status."""
     if AppState.is_dlc_game:
