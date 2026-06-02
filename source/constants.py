@@ -292,6 +292,7 @@ CARD_PATTERN = re.compile(
 )
 
 CARD_NAMES = {
+    # Base Game Stamps
     1: "Raz-Ums",
     2: "Glop",
     3: "Wobblers",
@@ -345,7 +346,27 @@ CARD_NAMES = {
     51: "Old Lady Fingers",
     52: "Boogie Pie",
     53: "Human Crackers",
-    54: "Gloop"
+    54: "Gloop",
+
+    #DLC Stamps
+    55: "Nutty Dumdums",
+    56: "Strawberry Smackdown",
+    57: "Cuttin' Candy",
+    58: "Cake Cod",
+    59: "Dietetic Marzipan",
+    60: "Fansy Dollups",
+    61: "Bubble Onions",
+    62: "Glazed Butter Cubes",
+    63: "Wikkids",
+    64: "Dreamy Dipz",
+    65: "Rainbow Whipz",
+    66: "KLORKS!",
+    67: "Caramold",
+    68: "Sweet Wet Wheat",
+    69: "Maple Crusties",
+    70: "2-Headed Toddlers",
+    71: "Red Hot Foam",
+    72: "Wiggly Woozers"
 }
 
 CARD_IMAGES = {

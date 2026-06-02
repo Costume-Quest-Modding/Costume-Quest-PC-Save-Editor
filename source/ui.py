@@ -105,7 +105,6 @@ class BattleStampsTab(ttk.Frame):
     def __init__(self, parent, progress_text_var=None):
         super().__init__(parent)
         self.entries = {}
-        self.progress_var = tk.DoubleVar()
         self.toggle_all_var = tk.IntVar()
         self.progress_text = progress_text_var
         self.missing_stamps_var = tk.StringVar(value="All")
@@ -122,13 +121,10 @@ class BattleStampsTab(ttk.Frame):
         ttk.Checkbutton(
             self, text="Toggle All", variable=self.toggle_all_var,
             command=self.toggle_all_stamps
-        ).grid(row=0, column=1, padx=10, pady=5)
+        ).grid(row=0, column=1, padx=2, pady=5)
 
         ttk.Label(self, textvariable=self.progress_text).grid(
             row=0, column=2, padx=10, pady=5, sticky="w"
-        )
-        ttk.Progressbar(self, variable=self.progress_var, maximum=100, length=150).grid(
-            row=0, column=3, padx=10, pady=5, sticky="w"
         )
 
         # Stamp entries grid
@@ -139,7 +135,7 @@ class BattleStampsTab(ttk.Frame):
             col = (i // items_per_col) * 2
 
             lbl = ttk.Label(self, text=name)
-            lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+            lbl.grid(row=row, column=col, sticky='w', padx=10, pady=2)
 
             # Image tooltip
             img_path = BATTLE_STAMP_IMAGES.get(stamp_num)
@@ -182,7 +178,6 @@ class BattleStampsTab(ttk.Frame):
             1 for e in self.entries.values() if e.get().strip().isdigit() and int(e.get().strip()) > 0
         )
         percent = (collected / total) * 100 if total > 0 else 0
-        self.progress_var.set(percent)
         if self.progress_text:
             self.progress_text.set(
                 f"Collected: {collected} / {total} ({percent:.0f}%)")
@@ -212,7 +207,6 @@ class CardsTab(ttk.Frame):
     def __init__(self, parent, progress_text_var=None):
         super().__init__(parent)
         self.entries = {}
-        self.progress_var = tk.DoubleVar()
         self.toggle_all_var = tk.IntVar()
         self.progress_text = progress_text_var
         self.missing_cards_var = tk.StringVar(value="All")
@@ -226,11 +220,9 @@ class CardsTab(ttk.Frame):
         ttk.Label(self, text="Creepy Treat Cards").grid(
             row=0, column=0, padx=10, pady=5, sticky="w")
         ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var,
-                        command=self.toggle_all_cards).grid(row=0, column=1, padx=10, pady=5)
+                        command=self.toggle_all_cards).grid(row=0, column=1, padx=2, pady=5)
         ttk.Label(self, textvariable=self.progress_text).grid(
             row=0, column=2, padx=10, pady=5, sticky="w")
-        ttk.Progressbar(self, variable=self.progress_var, maximum=100, length=150).grid(
-            row=0, column=3, padx=10, pady=5, sticky="w")
 
         # Card entries grid
         cards_per_col = 18
@@ -242,7 +234,7 @@ class CardsTab(ttk.Frame):
             card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
 
             lbl = ttk.Label(self, text=card_name)
-            lbl.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+            lbl.grid(row=row, column=col, sticky='w', padx=10, pady=2)
 
             # Image tooltip
             img_path = CARD_IMAGES.get(card_num)
@@ -286,7 +278,6 @@ class CardsTab(ttk.Frame):
         collected = sum(1 for e in self.entries.values() if e.get(
         ).strip().isdigit() and int(e.get().strip()) > 0)
         percent = (collected / total) * 100 if total > 0 else 0
-        self.progress_var.set(percent)
         self.progress_text.set(
             f"Collected: {collected} / {total} ({percent:.0f}%)")
 
