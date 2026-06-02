@@ -184,11 +184,11 @@ def update_or_add_field(text, field_name, new_value):
         if not value_str.endswith(";"):
             value_str += ";"
         # match any existing line that starts with field_name=
-        pattern = rf"(?m)^{field_name}\s*=\s*.*?;"
+        pattern = fr"{field_name}\s*=\s*.*?;"
         replacement = f"{field_name}={value_str}"
 
     if re.search(pattern, text):
-        return re.sub(pattern, replacement, text)
+        return re.sub(pattern, replacement, text, count=1)
 
     # insert before EquippedCostumes if possible, else append
     insert_point = text.find("EquippedCostumes=")

@@ -261,6 +261,7 @@ WORLD_PATHS = {
     "Suburbs": "worlds/cq_suburbs/cq_suburbs",
     "Autumn Haven Mall": "worlds/cq_mall_interior/cq_mall_interior",
     "Fall Valley": "worlds/cq_fallvalley/cq_fallvalley",
+    "Repugia": "worlds/cq_repugia/cq_repugia"
 }
 
 COSTUME_OPTIONS = [
