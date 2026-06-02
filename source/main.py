@@ -10,8 +10,8 @@ def main():
     # Create main window with a default ttk theme
     root = tk.Tk()
     root.title("Costume Quest PC Save Editor")
-    root.geometry("800x600")
-    root.minsize(800, 600)
+    root.geometry("950x600")
+    root.minsize(950, 600)
 
     style = ttk.Style()
     style.theme_use('clam')

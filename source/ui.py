@@ -88,7 +88,7 @@ class ImageTooltip:
         tw.wm_overrideredirect(True)
 
 
-        bg = "#9b9b9b"  # pick your app theme color
+        bg = "#9b9b9b"
         tw.configure(bg=bg)
         x = self.widget.winfo_pointerx() + 10
         y = self.widget.winfo_pointery() + 10
@@ -231,7 +231,7 @@ class CardsTab(ttk.Frame):
         # Card entries grid
         cards_per_col = 18
         start_row = 1
-        for i in range(54):
+        for i in range(72):  # 72 cards total (54 base + 18 DLC)
             card_num = i + 1
             col = (i // cards_per_col) * 2
             row = start_row + (i % cards_per_col)
@@ -253,7 +253,7 @@ class CardsTab(ttk.Frame):
 
         # Missing cards section
         last_row = start_row + cards_per_col * \
-            ((54 + cards_per_col - 1) // cards_per_col)
+            ((72 + cards_per_col - 1) // cards_per_col)
         missing_frame = ttk.Frame(self)
         missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
         missing_frame.columnconfigure(1, weight=1)

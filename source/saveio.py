@@ -55,7 +55,7 @@ class AppState:
         cls.costume_vars = [tk.StringVar(value="") for _ in range(3)]
         cls.player_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
         cls.camera_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
-        cls.card_vars = {i + 1: tk.IntVar(value=0) for i in range(54)}
+        cls.card_vars = {i + 1: tk.IntVar(value=0) for i in range(72)}
         # Quest tracking
         cls.quest_flags = []  # e.g., QuestAccomplishments
         cls.quest_flags_var = tk.StringVar()  # triggers UI update

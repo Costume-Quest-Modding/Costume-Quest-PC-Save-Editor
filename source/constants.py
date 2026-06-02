@@ -264,13 +264,18 @@ WORLD_PATHS = {
 }
 
 COSTUME_OPTIONS = [
+    # Base Game Costumes
     "Robot", "Knight", "Statue Of Liberty",
     "Space Warrior", "Ninja", "Unicorn",
     "Pumpkin", "Vampire", "French Fries",
-    "Black Cat", "Grubbin", "Pirate", "Eyeball", "Yeti"
+    "Black Cat", "Grubbin",
+    
+    #DLC Costumes
+    "Pirate", "Eyeball", "Yeti"
 ]
 
 COSTUME_DISPLAY_NAMES = {
+    # Base Game Costumes
     "Costume_Robot": "Robot",
     "Costume_Knight": "Knight",
     "Costume_StatueOfLiberty": "Statue of Liberty",
@@ -282,6 +287,8 @@ COSTUME_DISPLAY_NAMES = {
     "Costume_FrenchFries": "French Fries",
     "Costume_BlackCat": "Black Cat",
     "Costume_Grubbin": "Grubbin",
+
+    #DLC Costumes
     "Costume_Pirate": "Pirate",
     "Costume_Eyeball": "Eyeball",
     "Costume_Yeti": "Yeti"
@@ -292,7 +299,7 @@ CARD_PATTERN = re.compile(
 )
 
 CARD_NAMES = {
-    # Base Game Stamps
+    # Base Game Cards
     1: "Raz-Ums",
     2: "Glop",
     3: "Wobblers",
@@ -348,7 +355,7 @@ CARD_NAMES = {
     53: "Human Crackers",
     54: "Gloop",
 
-    #DLC Stamps
+    #DLC Cards
     55: "Nutty Dumdums",
     56: "Strawberry Smackdown",
     57: "Cuttin' Candy",
@@ -379,6 +386,7 @@ BATTLE_ITEM_PATTERN = re.compile(
 )
 
 BATTLE_ITEM_NAMES = {
+    # Base Game Stamps
     "FangOfTheWolf": "Fang of the Wolf",
     "BlackCat": "Black Cat",
     "MovingTombstone": "Moving Tombstone",
@@ -402,7 +410,17 @@ BATTLE_ITEM_NAMES = {
     "HeadlessBanshee": "Headless Banshee",
     "VegetarianBrew": "Vegetarian Witch's Brew",
     "NoEyedVampireBat": "No-Eyed Vampire Bat",
-    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs"
+    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs",
+
+    # DLC Stamps
+    "MummyGauze": "Mummy Gauze",
+    "GalvanizedGauze": "Galvanized Mummy Gauze",
+    "BlackRose": "Black Rose",
+    "DeviledEgg": "Deviled Egg",
+    "HeadlessBat": "Headless Vampire Bat",
+    "MultiWingBat": "Multi-Winged Vampire Bat",
+    "SkeletonOfWolf": "Skeleton of the Wolf",
+    "RottenPumpGuts": "Rotten Pumpkin Guts"
 }
 
 
