@@ -367,7 +367,7 @@ def create_menu(root, frames_refs):
             "How to Use",
             "=== Costume Quest Save Editor Help ===\n\n"
             "Navigation:\n"
-            " - Use the main tabs to access different sections (Summary, Stats, Cards, etc.).\n"
+            " - Use the main tabs to access different sections (Summary, Battle Stamps, Cards, etc.).\n"
             " - Click on entries or dropdowns to edit your save file values.\n\n"
             "File Menu:\n"
             " - Open: Load a Costume Quest save file.\n"
@@ -383,9 +383,9 @@ def create_menu(root, frames_refs):
         label="About",
         command=lambda: messagebox.showinfo(
             "About",
-            "Costume Quest PC Save Editor - Alpha Version 1.1\n"
+            "Costume Quest PC Save Editor - Alpha Version 1.2\n"
             "Made by: DeathMaster001\n\n"
-            "This program allows you to view and edit Costume Quest PC save files. Use responsibly!"
+            "This program allows you to view and edit Costume Quest PC (Steam) save files. Use responsibly!"
         )
     )
     menu_bar.add_cascade(label="Help", menu=help_menu)
