@@ -15,18 +15,6 @@ XP_THRESHOLDS = {
 
 NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
-MAP_IMAGES = {
-    "Suburbs": os.path.join(BASE_DIR, "images", "maps", "suburbs.png"),
-    "Autumn Haven Mall": os.path.join(BASE_DIR, "images", "maps", "mall.png"),
-    "Fall Valley": os.path.join(BASE_DIR, "images", "maps", "fall_valley.png")
-}
-
-MAP_ICONS = {
-    "house": os.path.join(BASE_DIR, "images", "mapicons", "house.png"),
-    "monster_house": os.path.join(BASE_DIR, "images", "mapicons", "monster_house.png"),
-    # add later, ideas include: shop, chest, npc's, hide and seek kids, bobbing for apples, etc.
-}
-
 QUEST_FLAG_MAP = {
     # Individual component quests
     "Door N Skeleton - First Door": ["DoorNSkeleton_FirstDoor"],
@@ -244,259 +232,6 @@ QUESTS = {
     }
 }
 
-MAP_HOUSES = {
-    # Houses are 15x15.
-    "Suburbs": {
-        "StartHouse01": {
-            "coords": (140, 485, 155, 500),
-            "name": "StartHouse01",
-            "category": "House",
-            "subtype": "Cutscene",
-            "internal_name": "N/A",
-            "description": "Reynold/Wren's House",
-            "reward": "N/A"
-        },
-        "StartHouse02": {
-            "coords": (160, 452, 175, 467),
-            "name": "StartHouse02",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "N/A",
-            "description": "N/A",
-            "reward": "100 Candy"
-        },
-        "StartHouse03": {
-            "coords": (180, 442, 195, 457),
-            "name": "StartHouse03",
-            "category": "House",
-            "subtype": "Cutscene",
-            "internal_name": "N/A",
-            "description": "Sibling Gets Kidnapped",
-            "reward": "N/A"
-        },
-        "House01": {
-            "coords": (310, 315, 325, 330),
-            "name": "House01",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor15",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House02": {
-            "coords": (320, 210, 335, 225),
-            "name": "House02",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor18",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House03": {
-            "coords": (405, 155, 420, 170),
-            "name": "House03",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor19",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House04": {
-            "coords": (405, 360, 420, 375),
-            "name": "House04",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor12",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House05": {
-            "coords": (450, 300, 465, 315),
-            "name": "House05",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor14",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House06": {
-            "coords": (508, 358, 523, 373),
-            "name": "House06",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor7",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House07": {
-            "coords": (630, 400, 645, 415),
-            "name": "House07",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor27",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House08": {
-            "coords": (680, 250, 695, 265),
-            "name": "House08",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor22",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House09": {
-            "coords": (585, 115, 600, 130),
-            "name": "House09",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor24",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "House10": {
-            "coords": (480, 135, 495, 150),
-            "name": "House10",
-            "category": "House",
-            "subtype": "Candy",
-            "internal_name": "FriendlySuburbDoor28",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "MonsterHouse01": {
-            "coords": (255, 270, 270, 285),
-            "name": "MonsterHouse01",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor1",
-            "description": "N/A",
-            "reward": "25 Candy"
-        },
-        "MonsterHouse02": {
-            "coords": (370, 260, 385, 275),
-            "name": "MonsterHouse02",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor2",
-            "description": "N/A",
-            "reward": "25 Candy"
-        },
-        "MonsterHouse03": {
-            "coords": (580, 365, 595, 380),
-            "name": "MonsterHouse03",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor3",
-            "description": "N/A",
-            "reward": "25 Candy"
-        },
-        "MonsterHouse04": {
-            "coords": (475, 200, 490, 215),
-            "name": "MonsterHouse04",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor4",
-            "description": "N/A",
-            "reward": "25 Candy"
-        },
-        "MonsterHouse05": {
-            "coords": (685, 350, 700, 365),
-            "name": "MonsterHouse05",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor5",
-            "description": "N/A",
-            "reward": "25 Candy"
-        },
-        "MonsterHouse06": {
-            "coords": (520, 70, 535, 85),
-            "name": "MonsterHouse06",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor6",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "MonsterHouse07": {
-            "coords": (650, 160, 665, 175),
-            "name": "MonsterHouse07",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor7",
-            "description": "N/A",
-            "reward": "50 Candy"
-        },
-        "MonsterHouse08": {
-            "coords": (458, 423, 473, 438),
-            "name": "MonsterHouse08",
-            "category": "House",
-            "subtype": "Monster",
-            "internal_name": "MonsterSuburbDoor8",
-            "description": "N/A",
-            "reward": "25 Candy"
-        }
-    },
-    "Autumn Haven Mall": {
-        "Kiosk_01": {
-            "coords": (150, 150, 200, 200),
-            "name": "1",
-            "category": "2",
-            "subtype": "3",
-            "internal_name": "4",
-            "description": "5",
-            "reward": "6"
-        },
-        "Store_01": {
-            "coords": (260, 140, 330, 210),
-            "name": "1",
-            "category": "2",
-            "subtype": "3",
-            "internal_name": "4",
-            "description": "5",
-            "reward": "6"
-        },
-        "Store_02": {
-            "coords": (390, 100, 460, 170),
-            "name": "1",
-            "category": "2",
-            "subtype": "3",
-            "internal_name": "4",
-            "description": "5",
-            "reward": "6"
-        }
-    },
-    "Fall Valley": {
-        "Tent_01": {
-            "coords": (80, 220, 140, 280),
-            "name": "1",
-                    "category": "2",
-                    "subtype": "3",
-                    "internal_name": "4",
-                    "description": "5",
-                    "reward": "6"
-        },
-        "Festival_Stand": {
-            "coords": (200, 160, 250, 210),
-            "name": "1",
-            "category": "2",
-            "subtype": "3",
-            "internal_name": "4",
-            "description": "5",
-            "reward": "6"
-        },
-        "House_01": {
-            "coords": (420, 120, 470, 170),
-            "name": "1",
-            "category": "2",
-            "subtype": "3",
-            "internal_name": "4",
-            "description": "5",
-            "reward": "6"
-        }
-    }
-}
-
 DEBUG_TELEPORTS = {
     "Suburbs": {
         "Reynold & Wren's House": (-25.5, 3.3, 33.3),
@@ -529,10 +264,10 @@ WORLD_PATHS = {
 }
 
 COSTUME_OPTIONS = [
-    "Costume_Robot", "Costume_Knight", "Costume_StatueOfLiberty",
-    "Costume_SpaceWarrior", "Costume_Ninja", "Costume_Unicorn",
-    "Costume_Pumpkin", "Costume_Vampire", "Costume_FrenchFries",
-    "Costume_BlackCat", "Costume_Grubbin"
+    "Robot", "Knight", "Statue Of Liberty",
+    "Space Warrior", "Ninja", "Unicorn",
+    "Pumpkin", "Vampire", "French Fries",
+    "Black Cat", "Grubbin", "Pirate", "Eyeball", "Yeti"
 ]
 
 COSTUME_DISPLAY_NAMES = {
@@ -546,7 +281,10 @@ COSTUME_DISPLAY_NAMES = {
     "Costume_Vampire": "Vampire",
     "Costume_FrenchFries": "French Fries",
     "Costume_BlackCat": "Black Cat",
-    "Costume_Grubbin": "Grubbin"
+    "Costume_Grubbin": "Grubbin",
+    "Costume_Pirate": "Pirate",
+    "Costume_Eyeball": "Eyeball",
+    "Costume_Yeti": "Yeti"
 }
 
 CARD_PATTERN = re.compile(

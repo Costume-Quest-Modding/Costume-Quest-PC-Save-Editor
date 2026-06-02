@@ -184,7 +184,7 @@ def update_or_add_field(text, field_name, new_value):
         if not value_str.endswith(";"):
             value_str += ";"
         # match any existing line that starts with field_name=
-        pattern = fr"{field_name}\s*=\s*.*?;"
+        pattern = rf"(?m)^{field_name}\s*=\s*.*?;"
         replacement = f"{field_name}={value_str}"
 
     if re.search(pattern, text):
@@ -222,7 +222,7 @@ def update_save_data(
     text = update_or_add_field(text, "TotalCandyAmount", new_total)
     text = update_or_add_field(text, "PlayerPosition", player_pos)
     text = update_or_add_field(text, "CameraPosition", camera_pos)
-    costume_str = ",".join([c for c in costumes if c])
+    costume_str = ",".join([f"Costume_{c}" if not c.startswith("Costume_") else c for c in costumes if c])
     text = re.sub(r"EquippedCostumes=\[[^\]]*\];",
                   f"EquippedCostumes=[{costume_str}];", text)
     text = update_or_add_field(text, "RobotRampJumos", robotjumps)
@@ -238,8 +238,10 @@ def extract_save_data(text):
     candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
     candy = int(candy_matches[-1].group(1)) if candy_matches else 0
     costume_match = re.search(r"EquippedCostumes=\[([^\]]*)\];", text)
-    costumes = [c.strip() for c in costume_match.group(
-        1).split(",") if c.strip()] if costume_match else []
+    costumes = [c.strip().replace("Costume_", "")
+    for c in costume_match.group(1).split(",")
+    if c.strip()] if costume_match else []
+    
     xp = extract_int(r"ExperiencePoints\s*=\s*(\d+);", text)
     robot_jumps = extract_int(r"RobotRampJumos=(\d+)", text)
     monster_bashes = extract_int(r"MonsterPailBashes=(\d+)", text)

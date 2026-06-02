@@ -5,8 +5,7 @@ from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
-from map_editor import MapEditor
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, MAP_HOUSES, MAP_IMAGES, QUESTS, QUEST_FLAG_MAP
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, QUESTS, QUEST_FLAG_MAP
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
@@ -117,7 +116,7 @@ class BattleStampsTab(ttk.Frame):
 
     def _build_ui(self):
         # Header row
-        ttk.Label(self, text="Battle Stamps:").grid(
+        ttk.Label(self, text="Battle Stamps").grid(
             row=0, column=0, padx=10, pady=5, sticky="w"
         )
         ttk.Checkbutton(
@@ -224,7 +223,7 @@ class CardsTab(ttk.Frame):
 
     def _build_ui(self):
         # Header row
-        ttk.Label(self, text="Creepy Treat Cards:").grid(
+        ttk.Label(self, text="Creepy Treat Cards").grid(
             row=0, column=0, padx=10, pady=5, sticky="w")
         ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var,
                         command=self.toggle_all_cards).grid(row=0, column=1, padx=10, pady=5)
@@ -420,7 +419,6 @@ def create_tabs(root):
         "Stats & World": ttk.Frame(notebook),
         "Battle Stamps": ttk.Frame(notebook),
         "Costumes": ttk.Frame(notebook),
-        "Map": ttk.Frame(notebook),
         "Quests": ttk.Frame(notebook),
     }
 
@@ -440,7 +438,6 @@ def create_tabs(root):
     notebook.add(frames["Battle Stamps"], text="Battle Stamps")
     notebook.add(frames["Cards"], text="Cards")
     notebook.add(frames["Costumes"], text="Costumes")
-    notebook.add(frames["Map"], text="Map")
     notebook.add(frames["Quests"], text="Quests")
 
     # ---------- Summary Frame ----------
@@ -728,13 +725,29 @@ def create_tabs(root):
 
     # ---------- Costumes Frame ----------
     costumes_frame = frames["Costumes"]
+    row = 0
+
+    ttk.Label(costumes_frame, text="Costumes").grid(
+        row=row, column=0, padx=10, pady=5, sticky="w")
+    row += 1
+    ttk.Label(costumes_frame, text="Costume Pieces").grid(
+        row=row, column=0, padx=10, pady=5, sticky="w")
+    row += 1
     ttk.Label(costumes_frame, text="Equipped Costumes").grid(
-        row=0, column=0, padx=10, pady=5)
+        row=row, column=0, padx=10, pady=5, sticky="w")
+
     for i, name in enumerate(NAMES):
         ttk.Label(costumes_frame, text=name).grid(
-            row=i, column=1, padx=10, pady=5)
-        ttk.Combobox(costumes_frame, textvariable=saveio.AppState.costume_vars[i], values=COSTUME_OPTIONS, width=30).grid(
-            row=i, column=2, sticky="w", padx=10, pady=5)
+            row=row, column=1, padx=10, pady=5)
+
+        ttk.Combobox(
+            costumes_frame,
+            textvariable=saveio.AppState.costume_vars[i],
+            values=COSTUME_OPTIONS,
+            width=30
+        ).grid(row=row, column=2, sticky="w", padx=10, pady=5)
+
+        row += 1
 
     # ---------- Quests ----------
     quests_frame = frames["Quests"]
@@ -905,23 +918,5 @@ def create_tabs(root):
         # use grid inside scrollable
         checkbox.grid(sticky="w", padx=10, pady=2)
         checkbox_vars[qid] = var
-
-    # ---------- Map Tab ----------
-    map_frame = frames["Map"]
-
-    # Pick the default world and map path
-    default_world = "Suburbs"
-    map_path = MAP_IMAGES.get(default_world)
-
-    # Create the MapEditor inside the Map tab
-    map_editor = MapEditor(
-        map_frame,
-        initial_world="Suburbs",
-        max_size=(800, 575)
-    )
-    map_editor.pack(fill="both", expand=True)
-
-    # Keep a reference in frames dict if needed
-    frames["MapEditor"] = map_editor
 
     return notebook, frames
