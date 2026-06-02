@@ -86,6 +86,10 @@ class ImageTooltip:
         # Create tooltip window
         self.tip_window = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(True)
+
+
+        bg = "#9b9b9b"  # pick your app theme color
+        tw.configure(bg=bg)
         x = self.widget.winfo_pointerx() + 10
         y = self.widget.winfo_pointery() + 10
         tw.wm_geometry(f"+{x}+{y}")
