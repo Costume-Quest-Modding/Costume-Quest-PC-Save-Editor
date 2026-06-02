@@ -10,7 +10,7 @@ STAMP_DIR = os.path.join(BASE_DIR, "images", "battle_stamps")
 XP_THRESHOLDS = {
     1: 0, 2: 2500, 3: 6000, 4: 12000, 5: 20000,
     6: 31000, 7: 45000, 8: 62000, 9: 82000, 10: 105000,
-    11: 130000, 12: 160000, 13: 200000, 14: 250000,
+    11: 130000, 12: 160000, 13: 200000, 14: 250000
 }
 
 NAMES = ["Reynold/Wren", "Everett", "Lucy"]
@@ -238,13 +238,13 @@ DEBUG_TELEPORTS = {
         "Bobbing for Apples": (126.0, 4.0, 60.0),
         "First Storm Drain": (117.0, 3.5, 161.0),
         "Second Storm Drain": (157.0, 3.5, -5.0),
-        "Cemetery/Scarecrow": (67.0, 9.0, -77.0),
+        "Cemetery/Scarecrow": (67.0, 9.0, -77.0)
     },
     "Autumn Haven Mall": {
         "Mall Entrance": (-103.5, 55.5, 119.5),
         "Central Station": (153.1, 39.4, -185.6),
         "Mall (Second Floor)": (194.0, 38.5, -140.0),
-        "Mall (Third Floor)": (117.5, 45.0, -147.0),
+        "Mall (Third Floor)": (117.5, 45.0, -147.0)
     },
     "Fall Valley": {
         "Vine Cage": (-22.5, 37.5, 117.3),
@@ -253,7 +253,14 @@ DEBUG_TELEPORTS = {
         "Scarecrow": (33.0, 6.0, 41.0),
         "Maze (Center)": (106.5, 3.5, 38.0),
         "Maze (End)": (60.0, 5.0, 93.5),
-        "Dorsilla/Big Bones": (-12.0, 36.0, 122.0),
+        "Dorsilla/Big Bones": (-12.0, 36.0, 122.0)
+    },
+    "Repugia": {
+        "Main Area": (-90.9, 53.3, -0.4),
+        "Grubbin Elder": (-23.4, 53.3, -7.2),
+        "Trowbow Elder": (52.4, 60.7, 21.1),
+        "Crestwailer Elder": (29.7, 69.0, -26.0),
+        "Araxia": (-29.5, 77.1, -29.8)
     },
 }
 
