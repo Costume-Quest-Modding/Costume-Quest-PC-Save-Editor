@@ -468,7 +468,7 @@ def create_tabs(root):
     ttk.Label(summary_frame, text="Apple Bobbing High Scores").grid(
         row=8, column=2, sticky="w", padx=10, pady=5)
     ttk.Label(summary_frame, text="Misc. Stats").grid(
-        row=12, column=2, sticky="w", padx=10, pady=5)
+        row=13, column=2, sticky="w", padx=10, pady=5)
     row += 1
     # ---------------------------------------------------------
     #  SECTION 1 — Save Info
@@ -628,7 +628,8 @@ def create_tabs(root):
     bobbing_stats = [
         ("Suburbs:", saveio.AppState.suburbsbobbing_var),
         ("Autumn Haven Mall:", saveio.AppState.mallbobbing_var),
-        ("Fall Valley:", saveio.AppState.countrybobbing_var)
+        ("Fall Valley:", saveio.AppState.countrybobbing_var),
+        ("Repugia:", saveio.AppState.countrybobbing_var) # uses same variable as Fall Valley Bobbing
     ]
     row = 9
     for label_text, var in bobbing_stats:
@@ -642,7 +643,7 @@ def create_tabs(root):
         ("Robot Ramp Jumps:", saveio.AppState.robotjumps_var),
         ("Monster Pail Bashes:", saveio.AppState.monsterbashes_var),
     ]
-    row = 13
+    row = 14
     for label_text, var in misc_stats:
         ttk.Label(summary_frame, text=label_text).grid(
             row=row, column=2, sticky="w", padx=25, pady=5)
@@ -815,6 +816,7 @@ def create_tabs(root):
         "Suburbs Bobbing for Apples": (saveio.AppState.suburbsbobbing_var, 30),
         "Mall Bobbing for Apples": (saveio.AppState.mallbobbing_var, 35),
         "Fall Valley Bobbing for Apples": (saveio.AppState.countrybobbing_var, 40),
+        "Bobbing for Eyeballs": (saveio.AppState.countrybobbing_var, 45) # Repugia | uses same variable as Fall Valley Bobbing
     }
 
     for world, quests in QUESTS.items():
