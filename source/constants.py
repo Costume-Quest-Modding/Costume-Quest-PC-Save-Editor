@@ -62,6 +62,7 @@ QUEST_FLAG_MAP = {
 
 QUESTS = {
     "Suburbs": {
+        # World 1 Info Finished and Correct
         "Robot Repair": {
             "questtype": "Main",
             "description": "Dorsilla ruined my costume! I need to rebuild it!",
@@ -71,7 +72,8 @@ QUESTS = {
         "Programmed for Protection": {
             "questtype": "Main",
             "description": "Bullies are oppressing the weak in Auburn Pines! They must be stopped!",
-            "how_to_complete": "\n- Talk to Travis twice to get the quest."
+            "how_to_complete": "\n- Talk to Travis get the quest."
+            "\n- Talk to Travis again to start the chase."
             "\n- Run away from him using the Robot's Boost ability.",
             "reward": "300 XP"
         },
@@ -80,7 +82,7 @@ QUESTS = {
             "description": "Mrs. Putterpam is in need of a pie ingredient.",
             "how_to_complete": "\n- Talk to Mrs. Putterpam to get the quest."
             "\n- Find her the missing ingredient (Cherries). (Must complete \"The Patriot's Party\" first.)"
-            "\n- Return to her with the ingredient.",
+            "\n- Talk to her to return the ingredient.",
             "reward": "300 XP"
         },
         "The Patriot's Party": {
@@ -109,8 +111,8 @@ QUESTS = {
         "Auburn Pines Hide 'n' Seek": {
             "questtype": "Side",
             "description": "Find all six kids hiding in Auburn Pines.",
-            "how_to_complete": "\n- Talk to six kids hiding around Auburn Pines.",
-            "reward": "[TODO]"
+            "how_to_complete": "\n- Find/Talk to all six kids playing hide and seek around Auburn Pines.",
+            "reward": "\n- Candy Pail Upgrade: Tote Bag\n- 500 XP\n +3 AP"# The game actually gives 300XP for this quest, but for consistency with other Hide 'n Seek quests, it's set to 500XP here.
         },
         "This Card Is So Rare": {
             "questtype": "Side",
@@ -126,41 +128,51 @@ QUESTS = {
         }
     },
     "Autumn Haven Mall": {
+        # World 2 Info NEEDS FINISHED AND VERIFIED
         "Tickets for Treats": {
             "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
+            "description": "Free the kids from their indentured gaming.",
+            "how_to_complete": "\n- Talk to one of the kids playing games in the Arcade to get the quest."
+            "\n- Talk to BoJonn or his assistant and defeat them to complete the quest.",
+            "reward": "\n- Costume Material: Scarf\n- 300 XP"
         },
         "Earn Your Monster Slayer Badge": {
             "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
+            "description": "Prove you're a Monster Slayer by defeating enemies on the second floor of the Mall and collecting their MONSTER HORNS.",
+            "how_to_complete": "\n- Talk to Pablo or Derek to trigger the quest."
+            "\n- Defeat 3 enemies and collect their Monster Horns from Mall's second floor."
+            "\n- Talk to Pablo or Derek again to complete the quest.",
+            "reward": "\n- Access to 3rd Floor\n- Ninja Costume\n- 300 XP"
         },
         "The Mall-O-Rail is Broken": {
             "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
+            "description": "Help Sid fix the Mall-O-Rail.",
+            "how_to_complete": "\n- Enter Light Mall and Talk to Sid to get the quest."
+            "\n- Head to the Arcade and complete \"The Patriot's Party\" quest to access BoJonn 3.)"
+            "\n- Take the Mall-O-Rail and Talk to Sid again to complete the quest.",
+            "reward": "\n- Costume Material: Rope\n- 300 XP"
         },
         "The Dark Side of the Mall": {
             "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
+            "description": "The Light Side of the Mall awaits.",
+            "how_to_complete": "\n- Head through the Dark Mall and collect the Costume Pattern from the Security Guard"
+            "\n- Collect all 3 Costume Pieces from the 3 NPCs."
+            "\n- Trigger the cutscene at the end of the Cemetery to finish the quest.",
+            "reward": "300 XP"
         },
         "Extreme Costume Challenge!": {
-            "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
+            "questtype": "Side",
+            "description": "If we win, we might get awesome prizes!",
+            "how_to_complete": "\n- Talk to the Announcer to obtain the Quest. (Must have Lucy to trigger the quest and must havethe Liberty Costume to complete the quest.)"
+            "\n- Find and Talk to all 3 Judges."
+            "\n- Equip \"Robot\",  \"Knight\" and \"Statue of Liberty\" for the Contest and talk to the Announcer again to complete the quest.",
+            "reward": "\n- Unicorn Costume Pattern\n- 300 XP"
         },
         "This Card Is Rarer": {
             "questtype": "Side",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
+            "description": "Trade with a fellow Creepy Treat collector to get a rare card!",
+            "how_to_complete": "\n- Trade Carlos your duplicate Cinnamon Brain Creepy Treat Card.",
+            "reward": "\n- 200 XP\n- Gummy Water Creepy Treat Card"
         },
         "Mall Collect 'em All": {
             "questtype": "Side",
@@ -179,8 +191,9 @@ QUESTS = {
         "Mall Hide 'n' Seek": {
             "questtype": "Side",
             "description": "Find all six kids hiding in Autumn Haven Mall.",
-            "how_to_complete": "\n- Talk to six kids hiding around Autumn Haven Mall.",
-            "reward": "\n- 500 XP\n- Candy Pail Upgrade: Pumpkin Pail"
+            "how_to_complete": "\n- Find/Talk to all six kids playing hide and seek around Autumn Haven Mall.",
+            "reward": "\n- Candy Pail Upgrade: Pumpkin Pail\n 500 XP\n +5 AP",
+            # The game actually gives 300XP for this quest, but for consistency with other Hide 'n Seek quests, it's set to 500XP here.
         }
     },
     "Fall Valley": {
