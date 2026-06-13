@@ -27,47 +27,38 @@ XP_THRESHOLDS = {
 # QUEST DATA
 # =========================
 
-QUEST_FLAG_MAP = {
-    # Individual component quests
-    "Door N Skeleton - First Door": ["DoorNSkeleton_FirstDoor"],
-    "Door N Skeleton - Second Door": ["DoorNSkeleton_SecondDoor"],
-    "Suburbs MQ1 - Car Wreck": ["Burbs_MQ1_CarWreck"],
-    "L_010 - No Costume Started": ["L_010_NoCostumeStarted"],
-
-    # Parent quests
-    # Robot Repair
-    "Robot Repair": {
-        "started": [
-            "DoorNSkeleton_FirstDoor",
-            "DoorNSkeleton_SecondDoor",
-            "Burbs_MQ1_CarWreck",
-            "L_010_NoCostumeStarted"
-        ],
-        "completed": [
-            "DoorNSkeleton_FirstDoor",
-            "DoorNSkeleton_SecondDoor",
-            "Burbs_MQ1_CarWreck",
-            "L_010_NoCostumeStarted",
-            "L_010_BashTutorialDone",
-            "RobotPiece_TreasureChest1",
-            "RobotPiece_TreasureChest2",
-            "RobotPiece_TreasureChest3",
-            "L_010_TreasureTutorialDone",
-            "Burbs_MQ1_Ramp",
-            "RobotRamp"
-        ]
-    }
-}
-
 
 QUESTS = {
     "Suburbs": {
         # World 1 Info Finished and Correct
+        # Now adding Quest Flags
         "Robot Repair": {
             "questtype": "Main",
             "description": "Dorsilla ruined my costume! I need to rebuild it!",
             "how_to_complete": "\n- Open all 3 treasure coffins in the alley to rebuild the Robot costume.",
-            "reward": "300 XP"
+            "reward": "300 XP",
+
+            "flags": {
+                "started": [
+                    "DoorNSkeleton_FirstDoor",
+                    "DoorNSkeleton_SecondDoor",
+                    "Burbs_MQ1_CarWreck",
+                    "L_010_NoCostumeStarted"
+                ],
+                "completed": [
+                    "DoorNSkeleton_FirstDoor",
+                    "DoorNSkeleton_SecondDoor",
+                    "Burbs_MQ1_CarWreck",
+                    "L_010_NoCostumeStarted",
+                    "L_010_BashTutorialDone",
+                    "RobotPiece_TreasureChest1",
+                    "RobotPiece_TreasureChest2",
+                    "RobotPiece_TreasureChest3",
+                    "L_010_TreasureTutorialDone",
+                    "Burbs_MQ1_Ramp",
+                    "RobotRamp"
+                ]
+            }
         },
         "Programmed for Protection": {
             "questtype": "Main",
@@ -75,7 +66,21 @@ QUESTS = {
             "how_to_complete": "\n- Talk to Travis get the quest."
             "\n- Talk to Travis again to start the chase."
             "\n- Run away from him using the Robot's Boost ability.",
-            "reward": "300 XP"
+            "reward": "300 XP",
+
+            "flags": {
+                "started": [
+                    "Burbs_MQ_02_Started"
+                ],
+                "completed": [
+                    "Burbs_MQ_02_Started",
+                    "Burbs_MQ_02_RaceInProgress",
+                    "Burbs_MQ_02_WinCutscene",
+                    "BMQ2_RaceOver",
+                    "L01_bAlreadyInteracted",
+                    "L01_bEverettJoinedParty"
+                ]
+            }
         },
         "Pie for the Putterpam": {
             "questtype": "Main",
@@ -106,7 +111,19 @@ QUESTS = {
             "how_to_complete": "\n- Complete 3 rounds of Apple Bobbing to finish the quest.",
             "reward": "\n- 20 Candy (Round 1)"
             "\n- 50 Candy (Round 2)"
-            "\n- Sweet Tooth Creepy Treat Card (Round 3)"
+            "\n- Sweet Tooth Creepy Treat Card (Round 3)",
+
+            "flags": {
+                "started": [
+                    "Burbs_SQ_01_Started"
+                ],
+                "completed": [
+                    "Burbs_SQ_01_Started",
+                    "Burbs_SQ_01_Compl_1",
+                    "Burbs_SQ_01_Compl_2",
+                    "Burbs_SQ_01_Compl_3"
+                ]
+            }
         },
         "Auburn Pines Hide 'n' Seek": {
             "questtype": "Side",

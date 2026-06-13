@@ -5,7 +5,7 @@ from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, QUESTS, QUEST_FLAG_MAP
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, QUESTS
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
@@ -812,12 +812,6 @@ def create_tabs(root):
 
     # === Build Quest Log ===
     row = 0
-    bobbing_map = {
-        "Suburbs Bobbing for Apples": (saveio.AppState.suburbsbobbing_var, 30),
-        "Mall Bobbing for Apples": (saveio.AppState.mallbobbing_var, 35),
-        "Fall Valley Bobbing for Apples": (saveio.AppState.countrybobbing_var, 40),
-        "Bobbing for Eyeballs": (saveio.AppState.countrybobbing_var, 45) # Repugia | uses same variable as Fall Valley Bobbing
-    }
 
     for world, quests in QUESTS.items():
         # ----- World header -----
@@ -864,43 +858,28 @@ def create_tabs(root):
             qrow += 2
 
             # ----- Status -----
-            status_var = tk.StringVar(value="❌ Incomplete")
-            # Bobbing quests
-            if quest_name in bobbing_map:
-                bobbing_var, threshold = bobbing_map[quest_name]
-
-                def make_bobbing_updater(v=bobbing_var, s=status_var, t=threshold):
-                    def inner(*_):
-                        score = int(v.get() or 0)
-                        s.set("✅ Completed" if score >= t else "❌ Incomplete")
-                    v.trace_add("write", lambda *args: inner())
-                    inner()
-                make_bobbing_updater()
-            # QUEST_FLAG_MAP quests
-            elif quest_name in QUEST_FLAG_MAP:
-                flags = QUEST_FLAG_MAP[quest_name]
+            status_var = tk.StringVar(value="❌ Not Started")
+            # Quests Flags
+            if "flags" in data:
+                flags = data["flags"]
 
                 def make_flag_updater(s=status_var, f=flags):
                     def inner(*_):
                         accomplished = AppState.quest_flags
-                        # Check for special started/completed dict
-                        if isinstance(f, dict):
-                            if any(flag in accomplished for flag in f["started"]):
-                                s.set("▶ In Progress")
-                            if all(flag in accomplished for flag in f.get("completed", [])) and f.get("completed"):
-                                s.set("✅ Completed")
-                            elif not any(flag in accomplished for flag in f["started"]):
-                                s.set("❌ Not Started")
+
+                        started = f.get("started", [])
+                        completed = f.get("completed", [])
+
+                        if completed and all(flag in accomplished for flag in completed):
+                            s.set("✅ Completed")
+                        elif any(flag in accomplished for flag in started):
+                            s.set("▶ In Progress")
                         else:
-                            if all(flag in accomplished for flag in f):
-                                s.set("✅ Completed")
-                            elif any(flag in accomplished for flag in f):
-                                s.set("▶ In Progress")
-                            else:
-                                s.set("❌ Not Started")
-                    AppState.quest_flags_var.trace_add(
-                        "write", lambda *args: inner())
+                            s.set("❌ Not Started")
+
+                    AppState.quest_flags_var.trace_add("write", lambda *args: inner())
                     inner()
+
                 make_flag_updater()
 
             ttk.Label(quest_frame, textvariable=status_var).grid(
@@ -926,14 +905,5 @@ def create_tabs(root):
                 text=f"Reward: {data.get('reward') or 'N/A'}",
                 wraplength=550
             ).grid(row=3, column=0, sticky="w", pady=(2, 2))
-
-    checkbox_vars = {}  # quest_id -> IntVar
-
-    for qid in AppState.quest_flags:
-        var = tk.IntVar(value=1)  # 1 = completed
-        checkbox = tk.Checkbutton(scrollable, text=qid, variable=var)
-        # use grid inside scrollable
-        checkbox.grid(sticky="w", padx=10, pady=2)
-        checkbox_vars[qid] = var
 
     return notebook, frames
