@@ -317,6 +317,7 @@ QUESTS = {
 DEBUG_TELEPORTS = {
     "Suburbs": {
         "Reynold & Wren's House": (-25.5, 3.3, 33.3),
+        "Everett/Knight Costume": (11.3,2.9,22.2),
         "Bobbing for Apples": (126.0, 4.0, 60.0),
         "First Storm Drain": (117.0, 3.5, 161.0),
         "Second Storm Drain": (157.0, 3.5, -5.0),
