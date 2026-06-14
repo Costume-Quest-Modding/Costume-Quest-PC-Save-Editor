@@ -3,17 +3,9 @@ import re
 import os
 import sys
 
-# =========================
-# PATHS / ENVIRONMENT
-# =========================
-
 BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 STAMP_DIR = os.path.join(BASE_DIR, "images", "battle_stamps")
-
-# =========================
-# GAME PROGRESSION
-# =========================
 
 NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
@@ -23,10 +15,95 @@ XP_THRESHOLDS = {
     11: 130000, 12: 160000, 13: 200000, 14: 250000
 }
 
-# =========================
-# QUEST DATA
-# =========================
+#Costume Pattern/Pieces
+COSTUME_PIECES = {
+    "Robot": {
+        "CostumePattern_Robot": "Robot Pattern",
+        "CostumePiece_Wheelies": "Roller Skate Shoes",
+        "CostumePiece_CardboardBox": "Cardboard Box",
+        "CostumePiece_AluminumFoil": "Aluminum Foil"
+    },
+    "Knight": {
+        "CostumePattern_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+    },
+    "Statue of Liberty": {
+        "CostumePattern_StatueOfLiberty": "Statue of Liberty Pattern",
+        "CostumePiece_Sheet": "Sheet",
+        "CostumePiece_Cardboard": "Cardboard",
+        "CostumePiece_FeatherDuster": "Feather Duster",
+    },
+    "Space Warrior": {
+        "CostumePattern_SpaceWarrior": "Space Warrior Pattern",
+        "CostumePiece_SafetyVisor": "Safety Visor",
+        "CostumePiece_EmptySodaBottle": "Empty Soda Bottle",
+        "CostumePiece_SnowBoots": "Snow Boots",
+    },
+    "Ninja": {
+        "CostumePattern_Ninja": "Ninja Pattern",
+        "CostumePiece_SweatPants": "Sweat Pants",
+        "CostumePiece_Scarf": "Scarf",
+        "CostumePiece_Rope": "Rope",
+    },
+    "Unicorn": {
+        "CostumePattern_Unicorn": "Unicorn Pattern",
+        "CostumePiece_Fabric": "Fabric",
+        "CostumePiece_Glitter": "Glitter",
+        "CostumePiece_Yarn": "Yarn",
+    },
+    "Pumpkin": {
+        "CostumePattern_Pumpkin": "Pumpkin Pattern",
+        "CostumePiece_PaperMache": "Paper Mache",
+        "CostumePiece_OrangePaint": "Paint",
+        "CostumePiece_Leaves": "Leaves",
+    },
+    "Vampire": {
+        "CostumePattern_Vampire": "Vampire Pattern",
+        "CostumePiece_BlackCloth": "Black Cloth",
+        "CostumePiece_ScaryFangs": "Scary Fangs",
+        "CostumePiece_WhiteMakeup": "White Makeup",
+    },
+    "French Fries": {
+        "CostumePattern_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+    },
+    "Black Cat": {
+        "CostumePattern_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+    },
+    "Grubbin": {
+        "CostumePattern_Grubbin": "Grubbin Pattern",
+        "CostumePiece_BurlapSack": "Burlap Sack",
+        "CostumePiece_DirtySocks": "Dirty Socks",
+        "CostumePiece_GrubbinMask": "Grubbin Mask",
+    },
 
+    #DLC Costumes
+    "Pirate": {
+        "CostumePattern_Pirate": "Pirate Pattern",
+        "CostumePiece_Newspaper": "Newspaper",
+        "CostumePiece_Hook": "Hook",
+        "CostumePiece_EyePatch": "Eye Patch",
+    },
+    "Eyeball": {
+        "CostumePattern_Eyeball": "Eyeball Pattern",
+        "CostumePiece_TrackSuit": "Track Suit",
+        "CostumePiece_WireMesh": "Wire Mesh",
+        "CostumePiece_CrepePaper": "Crepe Paper",
+    },
+    "Yeti": {
+        "CostumePattern_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+        "CostumePiece_": "",
+    }
+}
 
 QUESTS = {
     "Suburbs": {
@@ -46,14 +123,14 @@ QUESTS = {
                     "L_010_NoCostumeStarted"
                 ],
                 "completed": [
-                    "DoorNSkeleton_FirstDoor",
-                    "DoorNSkeleton_SecondDoor",
+                    "DoorNSkeleton_FirstDoor", # First Door Completed
+                    "DoorNSkeleton_SecondDoor", # Second Door Completed
                     "Burbs_MQ1_CarWreck",
                     "L_010_NoCostumeStarted",
                     "L_010_BashTutorialDone",
-                    "RobotPiece_TreasureChest1",
-                    "RobotPiece_TreasureChest2",
-                    "RobotPiece_TreasureChest3",
+                    "RobotPiece_TreasureChest1", # Aluminum Foil
+                    "RobotPiece_TreasureChest2", # 
+                    "RobotPiece_TreasureChest3", # 
                     "L_010_TreasureTutorialDone",
                     "Burbs_MQ1_Ramp",
                     "RobotRamp"
@@ -70,14 +147,14 @@ QUESTS = {
 
             "flags": {
                 "started": [
-                    "Burbs_MQ_02_Started"
+                    "Burbs_MQ_02_Started" # Quest Started
                 ],
                 "completed": [
-                    "Burbs_MQ_02_Started",
-                    "Burbs_MQ_02_RaceInProgress",
-                    "Burbs_MQ_02_WinCutscene",
-                    "BMQ2_RaceOver",
-                    "L01_bAlreadyInteracted",
+                    "Burbs_MQ_02_Started", # Quest Started
+                    "Burbs_MQ_02_RaceInProgress", # Race in Progress
+                    "Burbs_MQ_02_WinCutscene", # Win Cutscene
+                    "BMQ2_RaceOver", # Race Finished
+                    "L01_bAlreadyInteracted", 
                     "L01_bEverettJoinedParty"
                 ]
             }
@@ -96,7 +173,25 @@ QUESTS = {
             "how_to_complete": "\n- Talk to Russell to get the quest."
             "\n- Talk to 4 NPCs to build the Liberty Costume. (One has a Costume Pattern and 3 have Costume Pieces)"
             "\n- Talk again to Russell (as the Liberty Costume) to enter the party.",
-            "reward": "300 XP"
+            "reward": "300 XP",
+
+            "flags": {
+                "started": [
+                    "Burbs_MQ_04_Started" # Quest Started
+                ],
+                "completed": [
+                    "Burbs_MQ_04_Started", # Quest Started
+                    "Burbs_MQ_04_Lackey1", # Lackey 1
+                    "Burbs_MQ_04_Lackey2", # Lackey 2
+                    "Burbs_MQ_04_Lackey3", # Lackey 3
+                    "Suburbs_OpenedManholeB", # Manhole B Opened
+                    "StatuePiece_TreasureChest1", # Liberty Costume Piece 1
+                    "StatuePiece_TreasureChest2", # Liberty Costume Piece 2
+                    "PatriotQuestRamp", # Ramp 1
+                    "PatriotQuestRamp2", # Ramp 2
+                    "BMQ4_bEverettHint" # Everett Hint for Liberty Costume
+                ]
+            }
         },
         "These Tombstones Aren't Styrofoam": {
             "questtype": "Main",
@@ -115,13 +210,13 @@ QUESTS = {
 
             "flags": {
                 "started": [
-                    "Burbs_SQ_01_Started"
+                    "Burbs_SQ_01_Started" # Quest Started
                 ],
                 "completed": [
-                    "Burbs_SQ_01_Started",
-                    "Burbs_SQ_01_Compl_1",
-                    "Burbs_SQ_01_Compl_2",
-                    "Burbs_SQ_01_Compl_3"
+                    "Burbs_SQ_01_Started", # Quest Started
+                    "Burbs_SQ_01_Compl_1", # Round 1 Completed
+                    "Burbs_SQ_01_Compl_2", # Round 2 Completed
+                    "Burbs_SQ_01_Compl_3" # Round 3 Completed
                 ]
             }
         },
@@ -327,10 +422,6 @@ QUESTS = {
     }
 }
 
-# =========================
-# WORLD / TELEPORTS
-# =========================
-
 DEBUG_TELEPORTS = {
     "Suburbs": {
         "Reynold & Wren's House": (-25.5, 3.3, 33.3),
@@ -371,10 +462,6 @@ WORLD_PATHS = {
     "Repugia": "worlds/cq_repugia/cq_repugia"
 }
 
-# =========================
-# COSTUMES
-# =========================
-
 COSTUME_OPTIONS = [
     # Base Game Costumes
     "Robot", "Knight", "Statue Of Liberty",
@@ -405,10 +492,6 @@ COSTUME_DISPLAY_NAMES = {
     "Costume_Eyeball": "Eyeball",
     "Costume_Yeti": "Yeti"
 }
-
-# =========================
-# CARDS
-# =========================
 
 CARD_NAMES = {
     # Base Game Cards
@@ -496,10 +579,6 @@ CARD_IMAGES = {
 CARD_PATTERN = re.compile(
     r'(TrickyTreatCard_(\d+)=InventoryItem\{[^}]*CurrentAmount=)(\d+)(;[^}]*\})'
 )
-
-# =========================
-# BATTLE ITEMS / STAMPS
-# =========================
 
 BATTLE_ITEM_NAMES = {
     # Base Game Stamps
