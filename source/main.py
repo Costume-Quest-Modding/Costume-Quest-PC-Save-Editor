@@ -3,16 +3,18 @@ import os
 import saveio
 import ui
 import tkinter as tk
+import constants
 from tkinter import ttk
 
 
 def main():
-    # Create main window with a default ttk theme
+    # Create main window
     root = tk.Tk()
     root.title("Costume Quest PC Save Editor")
     root.geometry("950x600")
     root.minsize(950, 600)
 
+    # Set style to Clam
     style = ttk.Style()
     style.theme_use('clam')
 
@@ -27,7 +29,6 @@ def main():
     ui.create_menu(root, frames_map)
 
     # set icon if available
-    import constants
     icon_path = os.path.join(constants.BASE_DIR, "icon.ico")
     if os.path.exists(icon_path):
         try:
