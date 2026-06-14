@@ -5,7 +5,7 @@ from datetime import datetime
 from tkinter import filedialog, messagebox
 import tkinter as tk
 from constants import (
-    XP_THRESHOLDS, WORLD_PATHS, CARD_PATTERN, CARD_NAMES,
+    XP_THRESHOLDS, WORLD_PATHS, CARD_PATTERN,
     BATTLE_ITEM_PATTERN, BATTLE_ITEM_NAMES
 )
 
