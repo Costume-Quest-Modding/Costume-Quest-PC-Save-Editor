@@ -5,7 +5,7 @@ from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, QUESTS
+from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, QUESTS, COSTUME_PIECES
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
 
@@ -745,10 +745,25 @@ def create_tabs(root):
 
     ttk.Label(costumes_frame, text="Costumes").grid(
         row=row, column=0, padx=10, pady=5, sticky="w")
-    row += 1
+    # Card entries grid
+    costumes_per_col = 5
+    start_row = 0
+    for i, name in enumerate(COSTUME_OPTIONS):
+        col = (i // costumes_per_col)
+        row = start_row + (i % costumes_per_col)
+
+        ttk.Checkbutton(
+            costumes_frame,
+            text=name,
+            width=15
+        ).grid(row=row, column=col + 1, sticky="w", padx=10, pady=5)
+
+    row += 6
+
     ttk.Label(costumes_frame, text="Costume Pieces").grid(
         row=row, column=0, padx=10, pady=5, sticky="w")
     row += 1
+
     ttk.Label(costumes_frame, text="Equipped Costumes").grid(
         row=row, column=0, padx=10, pady=5, sticky="w")
 
@@ -760,9 +775,8 @@ def create_tabs(root):
             costumes_frame,
             textvariable=saveio.AppState.costume_vars[i],
             values=COSTUME_OPTIONS,
-            width=30
+            width=15
         ).grid(row=row, column=2, sticky="w", padx=10, pady=5)
-
         row += 1
 
     # ---------- Quests ----------
