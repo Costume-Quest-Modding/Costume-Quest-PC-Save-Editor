@@ -11,8 +11,7 @@ NAMES = ["Reynold/Wren", "Everett", "Lucy"]
 
 XP_THRESHOLDS = {
     1: 0, 2: 2500, 3: 6000, 4: 12000, 5: 20000,
-    6: 31000, 7: 45000, 8: 62000, 9: 82000, 10: 105000,
-    11: 130000, 12: 160000, 13: 200000, 14: 250000
+    6: 31000, 7: 45000, 8: 62000, 9: 82000, 10: 105000
 }
 
 #Costume Pattern/Pieces
@@ -82,26 +81,6 @@ COSTUME_PIECES = {
         "CostumePiece_BurlapSack": "Burlap Sack",
         "CostumePiece_DirtySocks": "Dirty Socks",
         "CostumePiece_GrubbinMask": "Grubbin Mask",
-    },
-
-    #DLC Costumes
-    "Pirate": {
-        "CostumePattern_Pirate": "Pirate Pattern",
-        "CostumePiece_Newspaper": "Newspaper",
-        "CostumePiece_Hook": "Hook",
-        "CostumePiece_EyePatch": "Eye Patch",
-    },
-    "Eyeball": {
-        "CostumePattern_Eyeball": "Eyeball Pattern",
-        "CostumePiece_TrackSuit": "Track Suit",
-        "CostumePiece_WireMesh": "Wire Mesh",
-        "CostumePiece_CrepePaper": "Crepe Paper",
-    },
-    "Yeti": {
-        "CostumePattern_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
     }
 }
 
@@ -363,62 +342,6 @@ QUESTS = {
             "how_to_complete": "\n- Trade Rebecca your duplicate Unicorn Pellets Creepy Treat Card.",
             "reward": "\n- 200 XP\n- Jelly Has-Beens Creepy Treat Card"
         }
-    },
-    "Repugia": {
-        "Viva Repugia": {
-            "questtype": "Main",
-            "description": "The revolutionaries need more recruits to join their cause.",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "Hook, Line & Freethinker": {
-            "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "Grubbin Lovin'": {
-            "questtype": "Main",
-            "description": "How can we get the Grubbin Elder to open the Trowbog Gate?",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "Tome of the Trowbogs": {
-            "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "The Case of the Missing Yeti": {
-            "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "Save the Escapees": {
-            "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "Bobbing for Eyeballs": {
-            "questtype": "Side",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "This Card is ULTRA Rare": {
-            "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        },
-        "Repugia Collect 'em All": {
-            "questtype": "Main",
-            "description": "[TODO]",
-            "how_to_complete": "[TODO]",
-            "reward": "[TODO]"
-        }
     }
 }
 
@@ -445,21 +368,13 @@ DEBUG_TELEPORTS = {
         "Maze (Center)": (106.5, 3.5, 38.0),
         "Maze (End)": (60.0, 5.0, 93.5),
         "Dorsilla/Big Bones": (-12.0, 36.0, 122.0)
-    },
-    "Repugia": {
-        "Main Area": (-90.9, 53.3, -0.4),
-        "Grubbin Elder": (-23.4, 53.3, -7.2),
-        "Trowbow Elder": (52.4, 60.7, 21.1),
-        "Crestwailer Elder": (29.7, 69.0, -26.0),
-        "Araxia": (-29.5, 77.1, -29.8)
-    },
+    }
 }
 
 WORLD_PATHS = {
     "Suburbs": "worlds/cq_suburbs/cq_suburbs",
     "Autumn Haven Mall": "worlds/cq_mall_interior/cq_mall_interior",
-    "Fall Valley": "worlds/cq_fallvalley/cq_fallvalley",
-    "Repugia": "worlds/cq_repugia/cq_repugia"
+    "Fall Valley": "worlds/cq_fallvalley/cq_fallvalley"
 }
 
 COSTUME_OPTIONS = [
@@ -467,10 +382,7 @@ COSTUME_OPTIONS = [
     "Robot", "Knight", "Statue Of Liberty",
     "Space Warrior", "Ninja", "Unicorn",
     "Pumpkin", "Vampire", "French Fries",
-    "Black Cat", "Grubbin",
-    
-    #DLC Costumes
-    "Pirate", "Eyeball", "Yeti"
+    "Black Cat", "Grubbin"
 ]
 
 COSTUME_DISPLAY_NAMES = {
@@ -485,12 +397,7 @@ COSTUME_DISPLAY_NAMES = {
     "Costume_Vampire": "Vampire",
     "Costume_FrenchFries": "French Fries",
     "Costume_BlackCat": "Black Cat",
-    "Costume_Grubbin": "Grubbin",
-
-    #DLC Costumes
-    "Costume_Pirate": "Pirate",
-    "Costume_Eyeball": "Eyeball",
-    "Costume_Yeti": "Yeti"
+    "Costume_Grubbin": "Grubbin"
 }
 
 CARD_NAMES = {
@@ -548,27 +455,7 @@ CARD_NAMES = {
     51: "Old Lady Fingers",
     52: "Boogie Pie",
     53: "Human Crackers",
-    54: "Gloop",
-
-    #DLC Cards
-    55: "Nutty Dumdums",
-    56: "Strawberry Smackdown",
-    57: "Cuttin' Candy",
-    58: "Cake Cod",
-    59: "Dietetic Marzipan",
-    60: "Fansy Dollups",
-    61: "Bubble Onions",
-    62: "Glazed Butter Cubes",
-    63: "Wikkids",
-    64: "Dreamy Dipz",
-    65: "Rainbow Whipz",
-    66: "KLORKS!",
-    67: "Caramold",
-    68: "Sweet Wet Wheat",
-    69: "Maple Crusties",
-    70: "2-Headed Toddlers",
-    71: "Red Hot Foam",
-    72: "Wiggly Woozers"
+    54: "Gloop"
 }
 
 CARD_IMAGES = {
@@ -605,17 +492,7 @@ BATTLE_ITEM_NAMES = {
     "HeadlessBanshee": "Headless Banshee",
     "VegetarianBrew": "Vegetarian Witch's Brew",
     "NoEyedVampireBat": "No-Eyed Vampire Bat",
-    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs",
-
-    # DLC Stamps
-    "MummyGauze": "Mummy Gauze",
-    "GalvanizedGauze": "Galvanized Mummy Gauze",
-    "BlackRose": "Black Rose",
-    "DeviledEgg": "Deviled Egg",
-    "HeadlessBat": "Headless Vampire Bat",
-    "MultiWingBat": "Multi-Winged Vampire Bat",
-    "SkeletonOfWolf": "Skeleton of the Wolf",
-    "RottenPumpGuts": "Rotten Pumpkin Guts"
+    "BowlOfEyeballs": "Bowl of Bloodshot Eyeballs"
 }
 
 BATTLE_STAMP_IMAGES = {

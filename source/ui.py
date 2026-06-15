@@ -397,26 +397,10 @@ def _open_and_fill(root, frames_refs):
     ok = saveio.open_save_dialog()
     if not ok:
         return
-    if saveio.AppState.is_dlc_game:
-        messagebox.showinfo(
-            "Grubbins on Ice Save Loaded",
-            "A Grubbins on Ice save file has been loaded.\n\n"
-            "Base Game + DLC features will be available in the editor."
-        )
-    else:
-        messagebox.showinfo(
-            "Costume Quest Save Loaded",
-            "A Costume Quest save file has been loaded.\n\n"
-            "Base Game features are available. DLC features will not appear or maybe disabled."
-        )
-
-    # Update level dropdown based on DLC
-    frames_refs["level_dropdown"].config(
-        values=saveio.get_allowed_levels()
+    messagebox.showinfo(
+        "Costume Quest Save Loaded",
+        "Save file loaded successfully."
     )
-
-    # Update cards tab based on DLC
-    frames_refs["Cards"].reload_cards()
 
     saveio.populate_entries_from_state(
         frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries)
@@ -458,11 +442,8 @@ def create_tabs(root):
     # ---------- Summary Frame ----------
     summary_frame = frames["Summary"]
     row = 0
-    ttk.Label(summary_frame, text="Save Info").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 2
     ttk.Label(summary_frame, text="Player Info").grid(
-        row=2, column=0, sticky="w", padx=10, pady=5)
+        row=0, column=0, sticky="w", padx=10, pady=5)
     ttk.Label(summary_frame, text="World & Position").grid(
         row=0, column=2, sticky="w", padx=10, pady=5)
     ttk.Label(summary_frame, text="Apple Bobbing High Scores").grid(
@@ -470,20 +451,9 @@ def create_tabs(root):
     ttk.Label(summary_frame, text="Misc. Stats").grid(
         row=13, column=2, sticky="w", padx=10, pady=5)
     row += 1
-    # ---------------------------------------------------------
-    #  SECTION 1 — Save Info
-    # ---------------------------------------------------------
-
-    filetype_label = ttk.Label(summary_frame, text="Save File Type:").grid(
-        row=1, column=0, sticky="w", padx=25)
-    filetype_label = ttk.Label(summary_frame, textvariable=saveio.AppState.dlc_var,
-                               width=33)
-    filetype_label.grid(row=1, column=1, padx=25, pady=5)
-    Tooltip(filetype_label, "Indicates whether the loaded save file is from the base game or the Grubbins on Ice DLC.\n"
-            "DLC saves have access to additional features in the editor.")
 
     # ---------------------------------------------------------
-    #  SECTION 2 — Player Info
+    #  SECTION 1 — Player Info
     # ---------------------------------------------------------
 
     level_label = ttk.Label(summary_frame, text="Level:").grid(
@@ -491,8 +461,7 @@ def create_tabs(root):
     level_label = ttk.Label(summary_frame, textvariable=saveio.AppState.level_var,
                             width=33)
     level_label.grid(row=row, column=1, sticky="w", padx=25, pady=5)
-    Tooltip(level_label, "This is your character's current level.\n"
-            "DLC levels only appear in DLC saves.")
+    Tooltip(level_label, "This is your character's current level.")
     row += 1
 
     xp_label = ttk.Label(summary_frame, text="XP:").grid(
@@ -522,7 +491,7 @@ def create_tabs(root):
     row += 1
 
     # ---------------------------------------------------------
-    #  SECTION 3 — COLLECTION PROGRESS
+    #  SECTION 2 — COLLECTION PROGRESS
     # ---------------------------------------------------------
 
     ttk.Label(summary_frame, text="Collections").grid(
@@ -540,7 +509,6 @@ def create_tabs(root):
     )
     Tooltip(battlestamps_label,
             "Shows how many battle stamps you have collected.\n"
-            "DLC stamps only appear in DLC saves.\n"
             "Hover over names in the Battle Stamps tab for stamp images.")
     row += 1
 
@@ -552,7 +520,6 @@ def create_tabs(root):
     cards_label.grid(
         row=row, column=1, sticky="w", padx=25, pady=5)
     Tooltip(cards_label, "Shows how many cards you have collected.\n"
-            "DLC cards only appear in DLC saves.\n"
             "Hover over names in the Cards tab for card images.")
     row += 1
 
@@ -585,7 +552,7 @@ def create_tabs(root):
         row += 1
 
     # ---------------------------------------------------------
-    #  SECTION 4 — WORLD & POSITION
+    #  SECTION 3 — WORLD & POSITION
     # ---------------------------------------------------------
     row = 1
     map_label = ttk.Label(summary_frame, text="World:").grid(
@@ -623,13 +590,12 @@ def create_tabs(root):
         row += 3  # move row counter past this block
 
     # ---------------------------------------------------------
-    #  SECTION 5 — MISC. STATS
+    #  SECTION 4 — MISC. STATS
     # ---------------------------------------------------------
     bobbing_stats = [
         ("Suburbs:", saveio.AppState.suburbsbobbing_var),
         ("Autumn Haven Mall:", saveio.AppState.mallbobbing_var),
-        ("Fall Valley:", saveio.AppState.countrybobbing_var),
-        ("Repugia:", saveio.AppState.countrybobbing_var) # uses same variable as Fall Valley Bobbing
+        ("Fall Valley:", saveio.AppState.countrybobbing_var)
     ]
     row = 9
     for label_text, var in bobbing_stats:
@@ -662,7 +628,7 @@ def create_tabs(root):
     level_dropdown = ttk.Combobox(
         stats_frame,
         textvariable=saveio.AppState.level_var,
-        values=saveio.get_allowed_levels(),
+        values=[str(i) for i in range(1, 11)],
         width=31,
         state="readonly",
     )
