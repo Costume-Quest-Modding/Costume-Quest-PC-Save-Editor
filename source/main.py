@@ -1,4 +1,3 @@
-# main.py
 import os
 import saveio
 import ui

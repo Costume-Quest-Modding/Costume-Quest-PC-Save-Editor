@@ -1,4 +1,3 @@
-# constants.py
 import re
 import os
 import sys
