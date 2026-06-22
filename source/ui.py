@@ -5,9 +5,11 @@ from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
 from widgets import Tooltip, ImageTooltip, create_vector_editor
-from constants import NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES, CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES, WORLD_PATHS, DEBUG_TELEPORTS, QUESTS, COSTUME_PIECES
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
+from constants import (
+    NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES,
+    CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES,
+    WORLD_PATHS, DEBUG_TELEPORTS, QUESTS
+)
 
 
 class BattleStampsTab(ttk.Frame):

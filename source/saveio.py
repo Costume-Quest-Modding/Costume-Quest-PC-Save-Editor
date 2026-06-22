@@ -6,7 +6,7 @@ from tkinter import filedialog, messagebox
 import tkinter as tk
 from constants import (
     XP_THRESHOLDS, WORLD_PATHS, CARD_PATTERN,
-    BATTLE_ITEM_PATTERN, BATTLE_ITEM_NAMES
+    BATTLE_ITEM_NAMES, BATTLE_ITEM_PATTERN
 )
 
 
@@ -271,11 +271,6 @@ def open_save_dialog():
             binary_data = f.read()
         header = binary_data[:8]
         raw = binary_data[8:]
-        # try to find {Level=...} section for path detection
-        start = raw.find(b"{Level=")
-        end = raw.find(b"}", start)
-        section = raw[start:end +
-                      1].decode(errors="ignore") if start != -1 and end != -1 else ""
         # decode whole raw text
         raw_text = raw.decode(errors="ignore")
 
