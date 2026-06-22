@@ -55,10 +55,9 @@ class ImageTooltip:
     Keeps pixel art crisp using Image.NEAREST.
     """
 
-    def __init__(self, widget, img_path, scale_stamps=True):
+    def __init__(self, widget, img_path):
         self.widget = widget
         self.img_path = img_path
-        self.scale_stamps = False  # set to "scale_stamps" to upscale 64x64 image
         self.tip_window = None
         self.photo = None
 
@@ -75,11 +74,6 @@ class ImageTooltip:
         # Load image
         img = Image.open(self.img_path)
         w, h = img.size
-
-        # If it's a small stamp and scaling is enabled, double it
-        if self.scale_stamps and (w, h) == (64, 64):
-            img = img.resize((w * 2, h * 2), Image.NEAREST)
-        # Otherwise, keep original size (e.g., 128x128 cards)
 
         self.photo = ImageTk.PhotoImage(img)
 
@@ -184,7 +178,7 @@ class BattleStampsTab(ttk.Frame):
         percent = (collected / total) * 100 if total > 0 else 0
         if self.progress_text:
             self.progress_text.set(
-                f"Collected: {collected} / {total} ({percent:.0f}%)")
+                f"{collected} / {total} ({percent:.0f}%)")
 
     def update_missing_stamps(self):
         missing = [
@@ -299,7 +293,7 @@ class CardsTab(ttk.Frame):
         ).strip().isdigit() and int(e.get().strip()) > 0)
         percent = (collected / total) * 100 if total > 0 else 0
         self.progress_text.set(
-            f"Collected: {collected} / {total} ({percent:.0f}%)")
+            f"{collected} / {total} ({percent:.0f}%)")
 
     def update_missing_cards(self):
         missing = [CARD_NAMES.get(num, f"Card {num}") for num, e in self.entries.items(
@@ -385,7 +379,8 @@ def create_menu(root, frames_refs):
             "About",
             "Costume Quest PC Save Editor - Alpha Version 1.2\n"
             "Made by: DeathMaster001\n\n"
-            "This program allows you to view and edit Costume Quest PC (Steam) save files. Use responsibly!"
+            "A save editor for Costume Quest (PC/Steam).\n"
+            "Edit player stats, costumes, quests, cards, battle stamps, and more."
         )
     )
     menu_bar.add_cascade(label="Help", menu=help_menu)
@@ -397,10 +392,6 @@ def _open_and_fill(root, frames_refs):
     ok = saveio.open_save_dialog()
     if not ok:
         return
-    messagebox.showinfo(
-        "Costume Quest Save Loaded",
-        "Save file loaded successfully."
-    )
 
     saveio.populate_entries_from_state(
         frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries)
@@ -409,6 +400,11 @@ def _open_and_fill(root, frames_refs):
     if hasattr(root, "_tracker_win") and root._tracker_win and root._tracker_win.winfo_exists():
         if hasattr(root._tracker_win, "update_applebobbing_progress"):
             root._tracker_win.update_applebobbing_progress()
+    
+    messagebox.showinfo(
+        "Costume Quest Save Loaded",
+        "Save file loaded successfully."
+    )
 
 
 def create_tabs(root):
@@ -422,11 +418,11 @@ def create_tabs(root):
     }
 
     # Create CardsTab instance
-    cards_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
+    cards_progress_text = tk.StringVar(value="0 / 0 (0%)")
     cards_frame = CardsTab(notebook, progress_text_var=cards_progress_text)
     frames["Cards"] = cards_frame
 
-    battle_progress_text = tk.StringVar(value="Collected: 0 / 0 (0%)")
+    battle_progress_text = tk.StringVar(value="0 / 0 (0%)")
     battlestamps_frame = BattleStampsTab(
         notebook, progress_text_var=battle_progress_text)
     frames["Battle Stamps"] = battlestamps_frame
