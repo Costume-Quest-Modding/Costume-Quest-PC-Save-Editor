@@ -1,5 +1,6 @@
 import os
 import saveio
+import save_writer
 from saveio import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -9,6 +10,8 @@ from constants import (
     CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES,
     WORLD_PATHS, DEBUG_TELEPORTS, QUESTS
 )
+
+CARD_IDS = range(1, 55)
 
 
 class BattleStampsTab(ttk.Frame):
@@ -145,7 +148,7 @@ class CardsTab(ttk.Frame):
         # Card entries grid
         cards_per_col = 18
         start_row = 1
-        for i, card_num in enumerate(saveio.get_allowed_cards()):
+        for i, card_num in enumerate(CARD_IDS):
             col = (i // cards_per_col) * 2
             row = start_row + (i % cards_per_col)
 
@@ -166,7 +169,7 @@ class CardsTab(ttk.Frame):
 
         # Missing cards section
         last_row = start_row + cards_per_col * \
-            ((len(saveio.get_allowed_cards()) + cards_per_col - 1) // cards_per_col)
+            ((len(CARD_IDS) + cards_per_col - 1) // cards_per_col)
         missing_frame = ttk.Frame(self)
         missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
         missing_frame.columnconfigure(1, weight=1)
@@ -244,11 +247,11 @@ def create_menu(root, frames_refs):
     file_menu = make_menu(menu_bar)
     file_menu.add_command(
         label="Open", command=lambda: _open_and_fill(root, frames_refs))
-    file_menu.add_command(label="Save", command=lambda: saveio.save_changes(
-        frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
-    file_menu.add_command(label="Save As...", command=lambda: saveio.save_as(
-        frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
-    file_menu.add_command(label="Backup Save File", command=saveio.backup_save)
+    file_menu.add_command(label="Save", command=lambda: save_writer.save_changes(
+        saveio.AppState, frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
+    file_menu.add_command(label="Save As...", command=lambda: save_writer.save_as(
+        saveio.AppState, frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
+    file_menu.add_command(label="Backup Save File", command=save_writer.backup_save(saveio.AppState))
     file_menu.add_separator()
     file_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="File", menu=file_menu)

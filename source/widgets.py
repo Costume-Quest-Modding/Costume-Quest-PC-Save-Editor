@@ -3,6 +3,7 @@ from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 
+# Creates a editor for vectors (PlayerPosition and CameraPosition)
 def create_vector_editor(parent, label_text, variables, state="normal"):
     frame = ttk.Frame(parent)
     frame.columnconfigure(1, weight=1)
@@ -18,9 +19,8 @@ def create_vector_editor(parent, label_text, variables, state="normal"):
                 row=i + 1, column=2, padx=10, pady=2, sticky="w")
     return frame
 
+# Simple text tooltip for any widget
 class Tooltip:
-    """Simple text tooltip for any widget"""
-
     def __init__(self, widget, text):
         self.widget = widget
         self.text = text
