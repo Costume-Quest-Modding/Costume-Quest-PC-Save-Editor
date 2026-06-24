@@ -1,17 +1,61 @@
 import re
-import shutil
-from datetime import datetime
-from tkinter import filedialog, messagebox
-from save_state import AppState
-from constants import WORLD_PATHS, BATTLE_ITEM_NAMES
+from constants import WORLD_PATHS, BATTLE_ITEM_NAMES, XP_THRESHOLDS
 
+def extract_save_data(text):
+    total = extract_int(r"TotalCandyAmount=(\d+);", text)
+    candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
+    candy = int(candy_matches[-1].group(1)) if candy_matches else 0
+    costume_match = re.search(r"EquippedCostumes=\[([^\]]*)\];", text)
+    costumes = [c.strip().replace("Costume_", "")
+    for c in costume_match.group(1).split(",")
+    if c.strip()] if costume_match else []
+    
+    xp = extract_int(r"ExperiencePoints\s*=\s*(\d+);", text)
+    robot_jumps = extract_int(r"RobotRampJumos=(\d+)", text)
+    monster_bashes = extract_int(r"MonsterPailBashes=(\d+)", text)
+    suburbsbobbing = extract_int(r"SuburbsBobbingHighScore=(\d+)", text)
+    mallbobbing = extract_int(r"MallBobbingHighScore=(\d+)", text)
+    countrybobbing = extract_int(r"CountryBobbingHighScore=(\d+)", text)
+    player_position = extract_vector3(
+        r"PlayerPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
+    camera_position = extract_vector3(
+        r"CameraPosition=<([-.\d]+),([-.\d]+),([-.\d]+)>", text)
+
+    match = re.search(r"Level=([^;]+);", text)
+    world = next((k for k, v in WORLD_PATHS.items()
+                 if v in match.group(1)), "Suburbs") if match else "Suburbs"
+    return (
+        total, candy, costumes, xp,
+        robot_jumps, monster_bashes,
+        suburbsbobbing, mallbobbing, countrybobbing,
+        player_position, camera_position, world
+    )
+
+
+def extract_int(pattern, text, default=0):
+    match = re.search(pattern, text)
+    return int(match.group(1)) if match else default
+
+
+def extract_vector3(pattern, text):
+    match = re.search(pattern, text)
+    if match:
+        return tuple(float(match.group(i)) for i in range(1, 4))
+    return (0.0, 0.0, 0.0)
+
+
+def extract_quests(text):
+    """
+    Returns a list of completed quest IDs from the QuestAccomplishments=[...] list.
+    """
+    match = re.search(r"QuestAccomplishments=\[([A-Za-z0-9_,]+)\];", text)
+    if match:
+        quests_str = match.group(1)
+        # Split by comma and remove empty strings
+        return [q.strip() for q in quests_str.split(",") if q.strip()]
+    return []
 
 # ---------------- helpers ----------------
-
-def get_level_path_from_selected_world(AppState):
-    world_name = AppState.selected_world.get()
-    return WORLD_PATHS.get(world_name, WORLD_PATHS["Suburbs"])
-
 
 def update_or_add_field(text, field_name, new_value):
     is_vector = field_name in ["PlayerPosition", "CameraPosition"]
@@ -49,7 +93,7 @@ def update_or_add_field(text, field_name, new_value):
 
 def update_save_data(
     text,
-    AppState,
+    selected_world,
     new_level,
     xp,
     new_candy,
@@ -63,7 +107,7 @@ def update_save_data(
     mallbobbing,
     countrybobbing
 ):
-    text = update_or_add_field(text, "Level", get_level_path_from_selected_world(AppState))
+    text = update_or_add_field(text, "Level", get_level_path_from_selected_world(selected_world))
     text = update_or_add_field(text, "ExperiencePoints", xp)
     text = update_or_add_field(text, "CandyAmount", new_candy)
     text = update_or_add_field(text, "TotalCandyAmount", new_total)
@@ -140,106 +184,12 @@ def replace_quests(text, quest_flags):
 
     return text.strip() + "\n" + insert_text
 
+def calculate_level_from_xp(xp):
+    for lvl in sorted(XP_THRESHOLDS, reverse=True):
+        if xp >= XP_THRESHOLDS[lvl]:
+            return lvl
+    return 1
 
-# ---------------- public API ----------------
-
-def save_changes(AppState, cards_entries, battle_entries):
-    path = AppState.save_path.get()
-    if not path:
-        messagebox.showerror("Error", "No save loaded")
-        return False
-
-    try:
-        updated = AppState.save_text_data
-
-        updated = replace_cards(updated, cards_entries)
-        updated = replace_battle(updated, battle_entries)
-        updated = replace_quests(updated, AppState.quest_flags)
-
-        updated = update_save_data(
-            updated,
-            AppState,
-            int(AppState.level_var.get()),
-            int(AppState.xp_var.get()),
-            int(AppState.candy_var.get()),
-            int(AppState.total_candy_var.get()),
-            tuple(v.get() for v in AppState.player_position_vars),
-            tuple(v.get() for v in AppState.camera_position_vars),
-            [v.get() for v in AppState.costume_vars],
-            int(AppState.robotjumps_var.get()),
-            int(AppState.monsterbashes_var.get()),
-            int(AppState.suburbsbobbing_var.get()),
-            int(AppState.mallbobbing_var.get()),
-            int(AppState.countrybobbing_var.get()),
-        )
-
-        with open(path, "wb") as f:
-            f.write(AppState.save_header)
-            f.write(updated.encode("utf-8"))
-
-        AppState.save_text_data = updated
-        messagebox.showinfo("Saved", "Save file updated!")
-        return True
-
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
-        return False
-
-
-def save_as(AppState, cards_entries, battle_entries):
-    if not AppState.save_text_data:
-        messagebox.showerror("Error", "No save loaded")
-        return False
-
-    path = filedialog.asksaveasfilename(
-        defaultextension=".txt",
-        filetypes=[("JSON", "*.json"), ("Text", "*.txt"), ("All", "*.*")]
-    )
-
-    if not path:
-        return False
-
-    try:
-        updated = replace_cards(updated, AppState.save_text_data, cards_entries)
-        updated = replace_battle(updated, AppState.save_text_data, battle_entries)
-        updated = replace_quests(updated, AppState.quest_flags)
-
-        if path.endswith(".json"):
-            import json
-            json.dump({
-                "Level": int(AppState.level_var.get()),
-                "XP": int(AppState.xp_var.get()),
-                "Candy": int(AppState.candy_var.get()),
-                "TotalCandy": int(AppState.total_candy_var.get()),
-            }, open(path, "w"), indent=4)
-
-        elif path.endswith(".txt"):
-            open(path, "w", encoding="utf-8").write(updated)
-
-        else:
-            with open(path, "wb") as f:
-                f.write(AppState.save_header)
-                f.write(updated.encode("utf-8"))
-
-        messagebox.showinfo("Saved", f"Saved to {path}")
-        return True
-
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
-        return False
-
-
-def backup_save(AppState):
-    path = AppState.save_path.get()
-    if not path:
-        messagebox.showerror("Error", "No save loaded")
-        return False
-
-    try:
-        backup_path = f"{path}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        shutil.copy2(path, backup_path)
-        messagebox.showinfo("Backup", backup_path)
-        return True
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
-        return False
+def get_level_path_from_selected_world(selected_world):
+    #world_name = AppState.selected_world.get()
+    return WORLD_PATHS.get(selected_world, WORLD_PATHS["Suburbs"])

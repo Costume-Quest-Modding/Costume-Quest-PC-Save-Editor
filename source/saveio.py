@@ -3,19 +3,15 @@ import shutil
 from datetime import datetime
 from tkinter import filedialog, messagebox
 import tkinter as tk
-from save_parser import extract_save_data, extract_quests, calculate_level_from_xp
-from save_state import AppState
+import save_data
+from save_data import extract_save_data, extract_quests, calculate_level_from_xp
+from state import AppState
 from constants import (
     XP_THRESHOLDS, WORLD_PATHS, CARD_PATTERN,
     BATTLE_ITEM_NAMES, BATTLE_ITEM_PATTERN
 )
 
 # ---------------- utility / parsing ----------------
-
-def get_level_path_from_selected_world():
-    """Return the correct Level= world path string based on selected world."""
-    world_name = AppState.selected_world.get()
-    return WORLD_PATHS.get(world_name, WORLD_PATHS["Suburbs"])
 
 def update_current_candy(text, new_value):
     "Update only the CurrentCandy field without touching other MaxCandyAmount fields."
@@ -129,6 +125,142 @@ def open_save_dialog():
     AppState.loading_save = False
     return True
 
+def build_save_text(text, AppState, cards_entries, battle_entries):
+    text = save_data.replace_cards(text, cards_entries)
+    text = save_data.replace_battle(text, battle_entries)
+    text = save_data.replace_quests(text, AppState.quest_flags)
+
+    text = save_data.update_save_data(
+        text,
+        AppState.selected_world.get(),
+        new_level = int(AppState.level_var.get()),
+        xp = int(AppState.xp_var.get()),
+        new_candy = int(AppState.candy_var.get()),
+        new_total = int(AppState.total_candy_var.get()),
+        player_pos= tuple(v.get() for v in AppState.player_position_vars),
+        camera_pos= tuple(v.get() for v in AppState.camera_position_vars),
+        costumes = [v.get() for v in AppState.costume_vars],
+        robotjumps = int(AppState.robotjumps_var.get()),
+        monsterbashes = int(AppState.monsterbashes_var.get()),
+        suburbsbobbing = int(AppState.suburbsbobbing_var.get()),
+        mallbobbing = int(AppState.mallbobbing_var.get()),
+        countrybobbing = int(AppState.countrybobbing_var.get()),
+    )
+
+    return text
+
+def save_changes(AppState, cards_entries, battle_entries):
+    path = AppState.save_path.get()
+    if not path:
+        messagebox.showerror("Error", "No save file loaded")
+        return False
+
+    try:
+        updated = build_save_text(
+            AppState.save_text_data,
+            AppState,
+            cards_entries,
+            battle_entries
+        )
+
+        with open(path, "wb") as f:
+            f.write(AppState.save_header)
+            f.write(updated.encode("utf-8"))
+
+        AppState.save_text_data = updated
+        messagebox.showinfo("Saved", "Save file updated!")
+        return True
+
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
+        return False
+
+
+def save_as(AppState, cards_entries, battle_entries):
+    if not AppState.save_text_data:
+        messagebox.showerror("Error", "No save file loaded")
+        return False
+
+    path = filedialog.asksaveasfilename(
+        defaultextension=".",
+        filetypes=[("JSON", "*.json"), ("Plain Text", "*.txt"), ("All", "*.*")]
+    )
+
+    if not path:
+        return False
+
+    try:
+        updated = build_save_text(
+            AppState.save_text_data,
+            AppState,
+            cards_entries,
+            battle_entries
+        )
+
+        if path.endswith(".json"):
+            import json
+            json.dump({
+                "Level": int(AppState.level_var.get()),
+                "ExperiencePoints": int(AppState.xp_var.get()),
+                "CandyAmount": int(AppState.candy_var.get()),
+                "TotalCandyAmount": int(AppState.total_candy_var.get()),
+                "SelectedWorld": str(AppState.selected_world.get()),
+                "PlayerPosition": [v.get() for v in AppState.player_position_vars],
+                "CameraPosition": [v.get() for v in AppState.camera_position_vars],
+                "EquippedCostumes": [v.get() for v in AppState.costume_vars],
+                "RobotRampJumps": int(AppState.robotjumps_var.get()),
+                "MonsterPailBashes": int(AppState.monsterbashes_var.get()),
+                "SuburbsBobbingHighScore": int(AppState.suburbsbobbing_var.get()),
+                "MallBobbingHighScore": int(AppState.mallbobbing_var.get()),
+                "CountryBobbingHighScore": int(AppState.countrybobbing_var.get()),
+            }, open(path, "w"), indent=4)
+
+        elif path.endswith(".txt"):
+            data = [
+                f"Level: {AppState.level_var.get()}",
+                f"Experience Points: {AppState.xp_var.get()}",
+                f"Current Candy Amount: {AppState.candy_var.get()}",
+                f"Total Candy Amount: {AppState.total_candy_var.get()}",
+                f"Selected World: {AppState.selected_world.get()}",
+                f"Player Position: {[v.get() for v in AppState.player_position_vars]}",
+                f"Camera Position: {[v.get() for v in AppState.camera_position_vars]}",
+                f"Equipped Costumes: {', '.join(v.get() for v in AppState.costume_vars)}",
+                f"Robot Ramp Jumps: {AppState.robotjumps_var.get()}",
+                f"Monster Pail Bashes: {AppState.monsterbashes_var.get()}",
+                f"Suburbs Bobbing High Score: {AppState.suburbsbobbing_var.get()}",
+                f"Mall Bobbing High Score: {AppState.mallbobbing_var.get()}",
+                f"Country Bobbing High Score: {AppState.countrybobbing_var.get()}",
+            ]
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("\n".join(data))
+
+        else:
+            with open(path, "wb") as f:
+                f.write(AppState.save_header)
+                f.write(updated.encode("utf-8"))
+
+        messagebox.showinfo("Success", f"File successfully saved to {path}")
+        return True
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to save: {e}")
+        return False
+
+
+def backup_save():
+    path = AppState.save_path.get()
+    if not path:
+        messagebox.showerror("Error", "No save file loaded")
+        return False
+
+    try:
+        backup_path = f"{path}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        shutil.copy2(path, backup_path)
+        messagebox.showinfo("Backup Created", f"Backup saved as:{backup_path}")
+        return True
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
+        return False
 
 def populate_entries_from_state(cards_entries, battle_entries):
     if not AppState.save_text_data:

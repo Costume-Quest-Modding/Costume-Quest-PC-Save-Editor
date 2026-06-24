@@ -1,239 +1,15 @@
 import os
 import saveio
-import save_writer
-from saveio import AppState
+from tabs.stamps import BattleStampsTab
+from tabs.cards import CardsTab
+from state import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
 from widgets import Tooltip, ImageTooltip, create_vector_editor
 from constants import (
     NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES,
-    CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES,
     WORLD_PATHS, DEBUG_TELEPORTS, QUESTS
 )
-
-CARD_IDS = range(1, 55)
-
-
-class BattleStampsTab(ttk.Frame):
-    def __init__(self, parent, progress_text_var=None):
-        super().__init__(parent)
-        self.entries = {}
-        self.toggle_all_var = tk.IntVar()
-        self.progress_text = progress_text_var
-        self.missing_stamps_var = tk.StringVar(value="All")
-
-        self._build_ui()
-        self.update_progress()
-        self.update_missing_stamps()
-
-    def _build_ui(self):
-        # Header row
-        ttk.Label(self, text="Battle Stamps").grid(
-            row=0, column=0, padx=10, pady=5, sticky="w"
-        )
-        ttk.Checkbutton(
-            self, text="Toggle All", variable=self.toggle_all_var,
-            command=self.toggle_all_stamps
-        ).grid(row=0, column=1, padx=2, pady=5)
-
-        ttk.Label(self, textvariable=self.progress_text).grid(
-            row=0, column=2, padx=10, pady=5, sticky="w"
-        )
-
-        # Stamp entries grid
-        items_per_col = 9
-        start_row = 1
-        for i, (stamp_num, name) in enumerate(BATTLE_ITEM_NAMES.items()):
-            row = start_row + (i % items_per_col)
-            col = (i // items_per_col) * 2
-
-            lbl = ttk.Label(self, text=name)
-            lbl.grid(row=row, column=col, sticky='w', padx=10, pady=2)
-
-            # Image tooltip
-            img_path = BATTLE_STAMP_IMAGES.get(stamp_num)
-            if img_path and os.path.isfile(img_path):
-                ImageTooltip(lbl, img_path)
-
-            entry = tk.Entry(self, width=8)
-            entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
-            entry.bind("<KeyRelease>", lambda e: [
-                       self.update_progress(), self.update_missing_stamps()])
-            self.entries[stamp_num] = entry
-
-        # Missing stamps section
-        last_row = start_row + (len(BATTLE_ITEM_NAMES) //
-                                items_per_col + 1) * items_per_col
-        missing_frame = ttk.Frame(self)
-        missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
-        missing_frame.columnconfigure(1, weight=1)
-
-        ttk.Label(missing_frame, text="Missing Stamps:").grid(
-            row=0, column=0, padx=10, pady=5, sticky="w"
-        )
-        ttk.Label(missing_frame, textvariable=self.missing_stamps_var, anchor="w", wraplength=400).grid(
-            row=0, column=1, sticky="ew", padx=10, pady=5
-        )
-
-        # Auto-wrap
-        self.bind("<Configure>", self._update_wrap)
-
-    def _update_wrap(self, event=None):
-        width = self.winfo_width()
-        if width > 150:
-            # Only one missing stamps label exists
-            self.children.get(list(self.children.keys())[-1]).children.get(list(self.children.get(
-                list(self.children.keys())[-1]).children.keys())[1]).config(wraplength=width - 150)
-
-    def update_progress(self):
-        total = len(self.entries)
-        collected = sum(
-            1 for e in self.entries.values() if e.get().strip().isdigit() and int(e.get().strip()) > 0
-        )
-        percent = (collected / total) * 100 if total > 0 else 0
-        if self.progress_text:
-            self.progress_text.set(
-                f"{collected} / {total} ({percent:.0f}%)")
-
-    def update_missing_stamps(self):
-        missing = [
-            BATTLE_ITEM_NAMES.get(num, f"Stamp {num}") for num, e in self.entries.items()
-            if not e.get().strip() or e.get().strip() == "0"
-        ]
-        if all(not e.get().strip() or e.get().strip() == "0" for e in self.entries.values()):
-            self.missing_stamps_var.set("All")
-        elif all(e.get().strip() and int(e.get().strip()) > 0 for e in self.entries.values()):
-            self.missing_stamps_var.set("None")
-        else:
-            self.missing_stamps_var.set(", ".join(missing))
-
-    def toggle_all_stamps(self):
-        val = "1" if self.toggle_all_var.get() else "0"
-        for e in self.entries.values():
-            e.delete(0, tk.END)
-            e.insert(0, val)
-        self.update_progress()
-        self.update_missing_stamps()
-
-
-class CardsTab(ttk.Frame):
-    def __init__(self, parent, progress_text_var=None):
-        super().__init__(parent)
-        self.entries = {}
-        self.toggle_all_var = tk.IntVar()
-        self.progress_text = progress_text_var
-        self.missing_cards_var = tk.StringVar(value="All")
-
-        self._build_ui()
-        self.update_progress()
-        self.update_missing_cards()
-    
-    def on_change(self, event=None):
-        self.update_progress()
-        self.update_missing_cards()
-    
-    def is_collected(self, entry):
-        value = entry.get().strip()
-        return value.isdigit() and int(value) > 0
-
-    def _build_ui(self):
-        # Header row
-        ttk.Label(self, text="Creepy Treat Cards").grid(
-            row=0, column=0, padx=10, pady=5, sticky="w")
-        ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var,
-                        command=self.toggle_all_cards).grid(row=0, column=1, padx=2, pady=5)
-        ttk.Label(self, textvariable=self.progress_text).grid(
-            row=0, column=2, padx=10, pady=5, sticky="w")
-
-        # Card entries grid
-        cards_per_col = 18
-        start_row = 1
-        for i, card_num in enumerate(CARD_IDS):
-            col = (i // cards_per_col) * 2
-            row = start_row + (i % cards_per_col)
-
-            card_name = CARD_NAMES.get(card_num, f"Card {card_num}")
-            img_path = CARD_IMAGES.get(card_num)
-
-            lbl = ttk.Label(self, text=card_name)
-            lbl.grid(row=row, column=col, sticky='w', padx=10, pady=2)
-    
-            if img_path and os.path.isfile(img_path):
-                self._attach_image_tooltip(lbl, img_path)
-
-            entry = tk.Entry(self, width=8)
-            entry.grid(row=row, column=col + 1, sticky='w', padx=5, pady=2)
-            entry.bind("<KeyRelease>", self.on_change)
-
-            self.entries[card_num] = entry
-
-        # Missing cards section
-        last_row = start_row + cards_per_col * \
-            ((len(CARD_IDS) + cards_per_col - 1) // cards_per_col)
-        missing_frame = ttk.Frame(self)
-        missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
-        missing_frame.columnconfigure(1, weight=1)
-
-        ttk.Label(missing_frame, text="Missing Cards:").grid(
-            row=0, column=0, padx=10, pady=5, sticky="w")
-        self.missing_cards_label = ttk.Label(
-            missing_frame,
-            textvariable=self.missing_cards_var,
-            anchor="w",
-            wraplength=400
-        )
-        self.missing_cards_label.grid(
-            row=0, column=1, sticky="ew", padx=10, pady=5
-)
-
-        # Auto-wrap
-        self.bind("<Configure>", self._update_wrap)
-    
-    def reload_cards(self):
-        for widget in self.winfo_children():
-            widget.destroy()
-
-        self.entries.clear()
-        self._build_ui()
-        self.update_progress()
-        self.update_missing_cards()
-
-    def _attach_image_tooltip(self, widget, img_path):
-        """Attach an image tooltip (like your ImageTooltip)"""
-        ImageTooltip(widget, img_path)
-
-    def _update_wrap(self, event=None):
-        width = self.winfo_width()
-        if width > 150:
-            self.missing_cards_label.config(wraplength=width - 150)
-
-    def update_progress(self):
-        total = len(self.entries)
-        collected = sum(1 for e in self.entries.values() if self.is_collected(e))
-        percent = (collected / total) * 100 if total > 0 else 0
-        self.progress_text.set(
-            f"{collected} / {total} ({percent:.0f}%)")
-
-    def update_missing_cards(self):
-        missing = [CARD_NAMES.get(num, f"Card {num}")
-            for num, e in self.entries.items()
-            if not self.is_collected(e)
-        ]
-        if all(not e.get().strip() or e.get().strip() == "0" for e in self.entries.values()):
-            self.missing_cards_var.set("All")
-        elif all(e.get().strip() and int(e.get().strip()) > 0 for e in self.entries.values()):
-            self.missing_cards_var.set("None")
-        else:
-            self.missing_cards_var.set(", ".join(missing))
-
-    def toggle_all_cards(self):
-        val = "1" if self.toggle_all_var.get() else "0"
-        for e in self.entries.values():
-            e.delete(0, tk.END)
-            e.insert(0, val)
-        self.update_progress()
-        self.update_missing_cards()
-
 
 # ---------- UI builder ----------
 
@@ -247,11 +23,11 @@ def create_menu(root, frames_refs):
     file_menu = make_menu(menu_bar)
     file_menu.add_command(
         label="Open", command=lambda: _open_and_fill(root, frames_refs))
-    file_menu.add_command(label="Save", command=lambda: save_writer.save_changes(
+    file_menu.add_command(label="Save", command=lambda: saveio.save_changes(
         saveio.AppState, frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
-    file_menu.add_command(label="Save As...", command=lambda: save_writer.save_as(
+    file_menu.add_command(label="Save As...", command=lambda: saveio.save_as(
         saveio.AppState, frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
-    file_menu.add_command(label="Backup Save File", command=save_writer.backup_save(saveio.AppState))
+    file_menu.add_command(label="Backup Save File", command=saveio.backup_save)
     file_menu.add_separator()
     file_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="File", menu=file_menu)
