@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from state import AppState
 import saveio
 from constants import (COSTUME_OPTIONS, NAMES)
 
