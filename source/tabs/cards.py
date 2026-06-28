@@ -1,15 +1,8 @@
 import os
-import saveio
-from tabs.stamps import BattleStampsTab
-from state import AppState
 import tkinter as tk
-from tkinter import ttk, messagebox
-from widgets import Tooltip, ImageTooltip, create_vector_editor
-from constants import (
-    NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES,
-    CARD_NAMES, CARD_IMAGES, BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES,
-    WORLD_PATHS, DEBUG_TELEPORTS, QUESTS
-)
+from tkinter import ttk
+from widgets import ImageTooltip
+from constants import (CARD_NAMES, CARD_IMAGES)
 
 CARD_IDS = range(1, 55)
 
