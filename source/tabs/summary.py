@@ -5,11 +5,12 @@ from widgets import Tooltip
 from constants import (NAMES, COSTUME_DISPLAY_NAMES, COSTUME_OPTIONS)
 
 class SummaryTab(ttk.Frame):
-    def __init__(self, parent, battle_progress_text, cards_progress_text):
+    def __init__(self, parent, battle_progress_text, cards_progress_text, costumes_progress_text):
         super().__init__(parent)
 
         self.battle_progress_text = battle_progress_text
         self.cards_progress_text = cards_progress_text
+        self.costumes_progress_text = costumes_progress_text
 
         self._build_ui()
 
@@ -98,6 +99,10 @@ class SummaryTab(ttk.Frame):
 
         ttk.Label(self, text="Costumes:").grid(
             row=row, column=0, sticky="w", padx=25, pady=5)
+        costumes_label = ttk.Label(self, textvariable=self.costumes_progress_text)
+        costumes_label.grid(
+            row=row, column=1, sticky="w", padx=25, pady=5)
+        Tooltip(costumes_label, "Shows how many costumes you have collected.")
         row += 1
 
         ttk.Label(self, text="Equipped Costumes:").grid(

@@ -6,11 +6,10 @@ from constants import (COSTUME_OPTIONS, NAMES)
 class CostumesTab(ttk.Frame):
     def __init__(self, parent, progress_text_var=None):
         super().__init__(parent)
-
         self.entries = {}
         self.toggle_all_var = tk.StringVar(value="0")
-        self.missing_costumes_var = tk.StringVar(value="All")
         self.progress_text = progress_text_var
+        self.missing_costumes_var = tk.StringVar(value="All")
 
         self._build_ui()
         self.toggle_all_costumes()
@@ -87,8 +86,7 @@ class CostumesTab(ttk.Frame):
         for var in self.entries.values():
             var.set(val)
 
-        self.update_progress()
-        self.update_missing_costumes()
+        self.on_change()
 
     def update_progress(self):
         total = len(self.entries)

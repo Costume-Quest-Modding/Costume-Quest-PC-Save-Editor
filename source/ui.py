@@ -95,6 +95,7 @@ def create_tabs(root):
     #Shared progress variables
     battle_progress_text = tk.StringVar(value="0 / 0 (0%)")
     cards_progress_text = tk.StringVar(value="0 / 0 (0%)")
+    costumes_progress_text = tk.StringVar(value="0 / 0 (0%)")
 
     frames = {}
 
@@ -102,7 +103,8 @@ def create_tabs(root):
     summary_frame = SummaryTab(
         notebook,
         battle_progress_text = battle_progress_text,
-        cards_progress_text = cards_progress_text
+        cards_progress_text = cards_progress_text,
+        costumes_progress_text = costumes_progress_text,
     )
     frames["Summary"] = summary_frame
 
@@ -124,7 +126,7 @@ def create_tabs(root):
     progress_var = tk.StringVar(value="0 / 0 (0%)")
     costumes_frame = CostumesTab(
         notebook,
-        progress_var
+        progress_text_var=costumes_progress_text
     )
     frames["Costumes"] = costumes_frame
 
