@@ -11,8 +11,6 @@ class StatsTab(ttk.Frame):
         self._build_ui()
 
     def _build_ui(self):
-
-    # ---------- Stats & World Frame ----------
         row = 0
         ttk.Label(self, text="Stats").grid(
             row=row, column=0, sticky="w", padx=10, pady=5)

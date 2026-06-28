@@ -10,8 +10,6 @@ class QuestsTab(ttk.Frame):
         self._build_ui()
 
     def _build_ui(self):
-        # ---------- Quests ----------
-
         ttk.Label(self, text="Quests").grid(
             row=0, column=0, sticky="w", padx=10, pady=5
         )

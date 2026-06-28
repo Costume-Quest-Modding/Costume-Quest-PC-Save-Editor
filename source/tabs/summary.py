@@ -14,8 +14,6 @@ class SummaryTab(ttk.Frame):
         self._build_ui()
 
     def _build_ui(self):
-
-    # ---------- Summary Frame ----------
         row = 0
         ttk.Label(self, text="Player Info").grid(
             row=0, column=0, sticky="w", padx=10, pady=5)
