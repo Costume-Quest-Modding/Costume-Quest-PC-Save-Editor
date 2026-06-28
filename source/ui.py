@@ -121,7 +121,11 @@ def create_tabs(root):
     frames["Cards"] = cards_frame
 
     # Create CostumesTab instance
-    costumes_frame = CostumesTab(notebook)
+    progress_var = tk.StringVar(value="0 / 0 (0%)")
+    costumes_frame = CostumesTab(
+        notebook,
+        progress_var
+    )
     frames["Costumes"] = costumes_frame
 
     # Create StatsTab instance
