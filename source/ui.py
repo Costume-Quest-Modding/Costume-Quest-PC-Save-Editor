@@ -4,6 +4,7 @@ from tabs.stamps import BattleStampsTab
 from tabs.cards import CardsTab
 from tabs.quests import QuestsTab
 from tabs.costumes import CostumesTab
+from tabs.stats import StatsTab
 from state import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -90,8 +91,7 @@ def _open_and_fill(root, frames_refs):
 def create_tabs(root):
     notebook = ttk.Notebook(root)
     frames = {
-        "Summary": ttk.Frame(notebook),
-        "Stats & World": ttk.Frame(notebook),
+        "Summary": ttk.Frame(notebook)
     }
 
     # Create CardsTab instance
@@ -109,6 +109,9 @@ def create_tabs(root):
 
     costumes_frame = CostumesTab(notebook)
     frames["Costumes"] = costumes_frame
+
+    stats_frame = StatsTab(notebook)
+    frames["Stats & World"] = stats_frame
 
     # Add tabs in the desired order
     notebook.add(frames["Summary"], text="Summary")
@@ -295,93 +298,5 @@ def create_tabs(root):
         ttk.Label(summary_frame, textvariable=var, width=33, anchor="w").grid(
             row=row, column=3, sticky="w", padx=25, pady=5)
         row += 1
-
-    # ---------- Stats & World Frame ----------
-    stats_frame = frames["Stats & World"]
-    ttk.Label(stats_frame, text="Stats").grid(
-        row=row, column=0, sticky="w", padx=10, pady=5)
-    row += 1
-
-    ttk.Label(stats_frame, text="Level:").grid(
-        row=row, column=0, sticky="w", padx=25, pady=5)
-    level_dropdown = ttk.Combobox(
-        stats_frame,
-        textvariable=saveio.AppState.level_var,
-        values=[str(i) for i in range(1, 11)],
-        width=31,
-        state="readonly",
-    )
-    level_dropdown.grid(row=row, column=1, sticky="w", padx=25, pady=5)
-
-    frames["level_dropdown"] = level_dropdown
-
-    for event in ("<<ComboboxSelected>>", "<FocusOut>", "<Return>"):
-        level_dropdown.bind(event, saveio.update_xp_from_level)
-    row += 1
-
-    ttk.Label(stats_frame, text="XP:").grid(
-        row=row, column=0, sticky="w", padx=25, pady=5)
-    ttk.Entry(stats_frame, textvariable=saveio.AppState.xp_var, width=33).grid(
-        row=row, column=1, padx=25, pady=5, sticky="w")
-    row += 1
-
-    ttk.Label(stats_frame, text="Candy:").grid(
-        row=row, column=0, sticky="w", padx=25, pady=5)
-    ttk.Entry(stats_frame, textvariable=saveio.AppState.candy_var, width=33).grid(
-        row=row, column=1, padx=25, pady=5, sticky="w")
-    row += 2
-
-    ttk.Label(stats_frame, text="World, Location and Position").grid(
-        row=row, column=0, padx=10, pady=5, sticky="w")
-    row += 1
-    ttk.Label(stats_frame, text="World:").grid(
-        row=row, column=0, padx=25, pady=5, sticky="w")
-    ttk.Combobox(stats_frame, textvariable=saveio.AppState.selected_world, values=list(
-        WORLD_PATHS.keys()), width=31, state="readonly").grid(row=row, column=1, padx=25, pady=5, sticky="w")
-    row += 1
-
-    # Location dropdown variable
-    location_var = tk.StringVar(value="")  # initially empty
-
-    ttk.Label(stats_frame, text="Location:").grid(
-        row=row, column=0, padx=25, pady=5, sticky="w")
-    location_cb = ttk.Combobox(
-        stats_frame, textvariable=location_var, values=[], width=31, state="readonly")
-    location_cb.grid(row=row, column=1, padx=25, pady=5, sticky="w")
-    row += 1
-
-    def update_locations(*args):
-        world = saveio.AppState.selected_world.get()
-        if world in DEBUG_TELEPORTS:
-            location_cb["values"] = list(DEBUG_TELEPORTS[world].keys())
-            location_var.set("")  # reset selection
-        else:
-            location_cb["values"] = []
-            location_var.set("")
-
-    saveio.AppState.selected_world.trace_add("write", update_locations)
-
-    def teleport_to_location(*args):
-        world = saveio.AppState.selected_world.get()
-        location = location_var.get()
-        if world in DEBUG_TELEPORTS and location in DEBUG_TELEPORTS[world]:
-            x, y, z = DEBUG_TELEPORTS[world][location]
-            vars = saveio.AppState.player_position_vars
-            vars[0].set(x)
-            vars[1].set(y)
-            vars[2].set(z)
-
-    location_var.trace_add("write", teleport_to_location)
-
-    player_position_frame2 = create_vector_editor(
-        stats_frame, "Player Position:", saveio.AppState.player_position_vars)
-    player_position_frame2.grid(
-        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
-    row += 1
-
-    camera_position_frame2 = create_vector_editor(
-        stats_frame, "Camera Position:", saveio.AppState.camera_position_vars)
-    camera_position_frame2.grid(
-        row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
 
     return notebook, frames
