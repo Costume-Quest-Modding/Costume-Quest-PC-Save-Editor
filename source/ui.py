@@ -3,6 +3,7 @@ import saveio
 from tabs.stamps import BattleStampsTab
 from tabs.cards import CardsTab
 from tabs.quests import QuestsTab
+from tabs.costumes import CostumesTab
 from state import AppState
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -91,7 +92,6 @@ def create_tabs(root):
     frames = {
         "Summary": ttk.Frame(notebook),
         "Stats & World": ttk.Frame(notebook),
-        "Costumes": ttk.Frame(notebook)
     }
 
     # Create CardsTab instance
@@ -106,6 +106,9 @@ def create_tabs(root):
 
     quests_frame = QuestsTab(notebook)
     frames["Quests"] = quests_frame
+
+    costumes_frame = CostumesTab(notebook)
+    frames["Costumes"] = costumes_frame
 
     # Add tabs in the desired order
     notebook.add(frames["Summary"], text="Summary")
@@ -380,45 +383,5 @@ def create_tabs(root):
         stats_frame, "Camera Position:", saveio.AppState.camera_position_vars)
     camera_position_frame2.grid(
         row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
-
-    # ---------- Costumes Frame ----------
-    costumes_frame = frames["Costumes"]
-    row = 0
-
-    ttk.Label(costumes_frame, text="Costumes").grid(
-        row=row, column=0, padx=10, pady=5, sticky="w")
-    # Card entries grid
-    costumes_per_col = 5
-    start_row = 0
-    for i, name in enumerate(COSTUME_OPTIONS):
-        col = (i // costumes_per_col)
-        row = start_row + (i % costumes_per_col)
-
-        ttk.Checkbutton(
-            costumes_frame,
-            text=name,
-            width=15
-        ).grid(row=row, column=col + 1, sticky="w", padx=10, pady=5)
-
-    row += 6
-
-    ttk.Label(costumes_frame, text="Costume Pieces").grid(
-        row=row, column=0, padx=10, pady=5, sticky="w")
-    row += 1
-
-    ttk.Label(costumes_frame, text="Equipped Costumes").grid(
-        row=row, column=0, padx=10, pady=5, sticky="w")
-
-    for i, name in enumerate(NAMES):
-        ttk.Label(costumes_frame, text=name).grid(
-            row=row, column=1, padx=10, pady=5)
-
-        ttk.Combobox(
-            costumes_frame,
-            textvariable=saveio.AppState.costume_vars[i],
-            values=COSTUME_OPTIONS,
-            width=15
-        ).grid(row=row, column=2, sticky="w", padx=10, pady=5)
-        row += 1
 
     return notebook, frames
