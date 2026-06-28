@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import re
+import saveio
 from constants import WORLD_PATHS, BATTLE_ITEM_NAMES, XP_THRESHOLDS
 
 @dataclass(frozen=True)
@@ -134,7 +135,7 @@ def update_save_data(
 ):
     text = update_or_add_field(text, "Level", get_level_path_from_selected_world(selected_world))
     text = update_or_add_field(text, "ExperiencePoints", xp)
-    text = update_or_add_field(text, "CandyAmount", new_candy)
+    text = saveio.update_current_candy(text, new_candy)
     text = update_or_add_field(text, "TotalCandyAmount", new_total)
     text = update_or_add_field(text, "PlayerPosition", player_pos)
     text = update_or_add_field(text, "CameraPosition", camera_pos)

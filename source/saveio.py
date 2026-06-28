@@ -32,21 +32,6 @@ def update_current_candy(text, new_value):
     return updated_text
 
 
-def on_candy_change(*args):
-    if AppState.loading_save:
-        return
-    try:
-        new_candy = int(AppState.candy_var.get())
-        delta = new_candy - AppState.original_candy_value
-        total = int(AppState.total_candy_var.get()) + delta
-        AppState.total_candy_var.set(str(total))
-        total = max(0, total)
-        AppState.total_candy_var.set(total)
-        AppState.original_candy_value = new_candy
-    except ValueError:
-        pass
-
-
 def update_xp_from_level(*args):
     try:
         level = int(AppState.level_var.get())
