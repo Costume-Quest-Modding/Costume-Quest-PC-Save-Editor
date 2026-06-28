@@ -83,42 +83,36 @@ def open_save_dialog():
         # decode whole raw text
         raw_text = raw.decode(errors="ignore")
 
-        # parse
-        (
-            total, candy, costumes, xp,
-            robotjumps, monsterbashes,
-            suburbsbobbing, mallbobbing, countrybobbing,
-            player_pos, camera_pos, world
-        ) = extract_save_data(raw_text)
+        parsed = extract_save_data(raw_text)
     except Exception as e:
         messagebox.showerror("Load Error", f"Failed to parse save file:\n{e}")
         return False
 
     # set state
     AppState.loading_save = True
-    AppState.total_candy_var.set(str(total))
-    AppState.candy_var.set(str(candy))
-    AppState.original_candy_value = candy
-    AppState.xp_var.set(str(xp))
-    AppState.level_var.set(str(calculate_level_from_xp(xp)))
-    AppState.robotjumps_var.set(str(robotjumps))
-    AppState.monsterbashes_var.set(str(monsterbashes))
-    AppState.suburbsbobbing_var.set(str(suburbsbobbing))
-    AppState.mallbobbing_var.set(str(mallbobbing))
-    AppState.countrybobbing_var.set(str(countrybobbing))
+    AppState.total_candy_var.set(str(parsed.total_candy))
+    AppState.candy_var.set(str(parsed.current_candy))
+    AppState.original_candy_value = parsed.current_candy
+    AppState.xp_var.set(str(parsed.experience_points))
+    AppState.level_var.set(str(calculate_level_from_xp(parsed.experience_points)))
+    AppState.robotjumps_var.set(str(parsed.robot_ramp_jumps))
+    AppState.monsterbashes_var.set(str(parsed.monster_pail_bashes))
+    AppState.suburbsbobbing_var.set(str(parsed.suburbs_bobbing_high_score))
+    AppState.mallbobbing_var.set(str(parsed.mall_bobbing_high_score))
+    AppState.countrybobbing_var.set(str(parsed.country_bobbing_high_score))
     # --- QUESTS ---
     AppState.quest_flags = extract_quests(raw_text)
     AppState.quest_flags_var.set(",".join(AppState.quest_flags))
 
     for i in range(3):
-        AppState.costume_vars[i].set(costumes[i] if i < len(costumes) else "")
-        AppState.player_position_vars[i].set(player_pos[i])
-        AppState.camera_position_vars[i].set(camera_pos[i])
+        AppState.costume_vars[i].set(parsed.equipped_costumes[i] if i < len(parsed.equipped_costumes) else "")
+        AppState.player_position_vars[i].set(parsed.player_position[i])
+        AppState.camera_position_vars[i].set(parsed.camera_position[i])
 
     # Debug prints
     print("Loaded Quest Flags:", AppState.quest_flags)
 
-    AppState.selected_world.set(world)
+    AppState.selected_world.set(parsed.world)
     AppState.save_path.set(path)
     AppState.save_header = header
     AppState.save_text_data = raw_text

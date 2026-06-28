@@ -1,7 +1,24 @@
+from dataclasses import dataclass
 import re
 from constants import WORLD_PATHS, BATTLE_ITEM_NAMES, XP_THRESHOLDS
 
-def extract_save_data(text):
+@dataclass(frozen=True)
+class ParsedSaveData:
+    total_candy: int
+    current_candy: int
+    equipped_costumes: list[str]
+    experience_points: int
+    robot_ramp_jumps: int
+    monster_pail_bashes: int
+    suburbs_bobbing_high_score: int
+    mall_bobbing_high_score: int
+    country_bobbing_high_score: int
+    player_position: tuple[float, float, float]
+    camera_position: tuple[float, float, float]
+    world: str
+
+
+def extract_save_data(text) -> ParsedSaveData:
     total = extract_int(r"TotalCandyAmount=(\d+);", text)
     candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
     candy = int(candy_matches[-1].group(1)) if candy_matches else 0
@@ -24,11 +41,19 @@ def extract_save_data(text):
     match = re.search(r"Level=([^;]+);", text)
     world = next((k for k, v in WORLD_PATHS.items()
                  if v in match.group(1)), "Suburbs") if match else "Suburbs"
-    return (
-        total, candy, costumes, xp,
-        robot_jumps, monster_bashes,
-        suburbsbobbing, mallbobbing, countrybobbing,
-        player_position, camera_position, world
+    return ParsedSaveData(
+        total_candy=total,
+        current_candy=candy,
+        equipped_costumes=costumes,
+        experience_points=xp,
+        robot_ramp_jumps=robot_jumps,
+        monster_pail_bashes=monster_bashes,
+        suburbs_bobbing_high_score=suburbsbobbing,
+        mall_bobbing_high_score=mallbobbing,
+        country_bobbing_high_score=countrybobbing,
+        player_position=player_position,
+        camera_position=camera_position,
+        world=world,
     )
 
 
