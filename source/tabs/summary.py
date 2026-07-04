@@ -35,7 +35,7 @@ class SummaryTab(ttk.Frame):
         level_label = ttk.Label(self, textvariable=saveio.AppState.level_var,
                                 width=33)
         level_label.grid(row=row, column=1, sticky="w", padx=25, pady=5)
-        Tooltip(level_label, "This is your character's current level.")
+        Tooltip(level_label, "This displays the character's current level.")
         row += 1
 
         xp_label = ttk.Label(self, text="XP:").grid(
@@ -43,7 +43,7 @@ class SummaryTab(ttk.Frame):
         xp_label = ttk.Label(self, textvariable=saveio.AppState.xp_var,
                             width=33)
         xp_label.grid(row=row, column=1, padx=25, pady=5)
-        Tooltip(xp_label, "This is your character's current XP.")
+        Tooltip(xp_label, "This displays the character's current XP.")
         row += 1
 
         candy_label = ttk.Label(self, text="Candy:").grid(
@@ -51,7 +51,7 @@ class SummaryTab(ttk.Frame):
         candy_label = ttk.Label(self, textvariable=saveio.AppState.candy_var,
                                 width=33)
         candy_label.grid(row=row, column=1, padx=25, pady=5)
-        Tooltip(candy_label, "This is your current amount of candy.")
+        Tooltip(candy_label, "This displays the current amount of candy.")
         row += 1
 
         totalcandy_label = ttk.Label(self, text="Total Candy:").grid(
@@ -60,8 +60,8 @@ class SummaryTab(ttk.Frame):
                                     width=33)
         totalcandy_label.grid(row=row, column=1, padx=25, pady=5)
         Tooltip(totalcandy_label,
-                "This is your total amount of candy collected.\n"
-                "Doesn't decrease when you spend candy, essentially tracking lifetime candy collection.")
+                "This displays the total amount of candy collected.\n"
+                "Doesn't decrease when candy is spent, essentially tracking lifetime candy collection.")
         row += 1
 
         # ---------------------------------------------------------
@@ -82,7 +82,7 @@ class SummaryTab(ttk.Frame):
             row=row, column=1, sticky="w", padx=25, pady=5
         )
         Tooltip(battlestamps_label,
-                "Shows how many battle stamps you have collected.\n"
+                "This Shows how many battle stamps you have collected.\n"
                 "Hover over names in the Battle Stamps tab for stamp images.")
         row += 1
 

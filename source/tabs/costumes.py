@@ -25,7 +25,7 @@ class CostumesTab(ttk.Frame):
                         command=self.toggle_all_costumes).grid(row=row, column=1, sticky="w", padx=10, pady=5)
         ttk.Label(self, textvariable=self.progress_text).grid(
             row=0, column=2, padx=10, pady=5, sticky="w")
-        # Card entries grid
+        # Costume entries grid
         costumes_per_col = 5
         start_row = 1
         for i, name in enumerate(COSTUME_OPTIONS):

@@ -1,19 +1,14 @@
 import os
 import saveio
+import tkinter as tk
+from tkinter import ttk, messagebox
+from widgets import create_vector_editor
 from tabs.stamps import BattleStampsTab
 from tabs.cards import CardsTab
 from tabs.quests import QuestsTab
 from tabs.costumes import CostumesTab
 from tabs.stats import StatsTab
 from tabs.summary import SummaryTab
-from state import AppState
-import tkinter as tk
-from tkinter import ttk, messagebox
-from widgets import Tooltip, ImageTooltip, create_vector_editor
-from constants import (
-    NAMES, COSTUME_OPTIONS, COSTUME_DISPLAY_NAMES,
-    WORLD_PATHS, DEBUG_TELEPORTS, QUESTS
-)
 
 # ---------- UI builder ----------
 
