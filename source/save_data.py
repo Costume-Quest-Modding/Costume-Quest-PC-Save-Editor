@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import re
 import saveio
-from constants import WORLD_PATHS, BATTLE_ITEM_NAMES, XP_THRESHOLDS
+from constants import WORLD_PATHS, BATTLE_ITEM_NAMES, XP_THRESHOLDS, COSTUME_DISPLAY_NAMES
 
 @dataclass(frozen=True)
 class ParsedSaveData:
@@ -140,10 +140,18 @@ def update_save_data(
     text = update_or_add_field(text, "PlayerPosition", player_pos)
     text = update_or_add_field(text, "CameraPosition", camera_pos)
 
+    display_to_save = {
+        display: full_name.replace("Costume_", "", 1)
+        for full_name, display in COSTUME_DISPLAY_NAMES.items()
+    }
+
     costume_str = ",".join(
-        f"Costume_{c}" if not c.startswith("Costume_") else c
+        f"Costume_{display_to_save.get(c, c)}"
+        if not c.startswith("Costume_")
+        else c
         for c in costumes if c
     )
+    
     text = re.sub(
         r"EquippedCostumes=\[[^\]]*\];",
         f"EquippedCostumes=[{costume_str}];",

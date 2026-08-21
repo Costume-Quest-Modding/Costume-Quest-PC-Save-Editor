@@ -7,7 +7,7 @@ import save_data
 from save_data import extract_save_data, extract_quests, calculate_level_from_xp
 from state import AppState
 from constants import (
-    XP_THRESHOLDS, WORLD_PATHS, CARD_PATTERN,
+    COSTUME_DISPLAY_NAMES, XP_THRESHOLDS, WORLD_PATHS, CARD_PATTERN,
     BATTLE_ITEM_NAMES, BATTLE_ITEM_PATTERN
 )
 
@@ -90,7 +90,21 @@ def open_save_dialog():
     AppState.quest_flags_var.set(",".join(AppState.quest_flags))
 
     for i in range(3):
-        AppState.costume_vars[i].set(parsed.equipped_costumes[i] if i < len(parsed.equipped_costumes) else "")
+        if i < len(parsed.equipped_costumes):
+            save_name = parsed.equipped_costumes[i]
+
+            # Convert internal save name to the friendly display name
+            display_name = next(
+                (display for full_name, display in COSTUME_DISPLAY_NAMES.items()
+                if full_name == f"Costume_{save_name}"),
+                save_name
+            )
+
+            AppState.costume_vars[i].set(display_name)
+        else:
+            AppState.costume_vars[i].set("")
+            
+        # Set player and camera positions
         AppState.player_position_vars[i].set(parsed.player_position[i])
         AppState.camera_position_vars[i].set(parsed.camera_position[i])
 
