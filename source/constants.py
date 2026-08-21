@@ -388,7 +388,7 @@ COSTUME_DISPLAY_NAMES = {
     # Base Game Costumes
     "Costume_Robot": "Robot",
     "Costume_Knight": "Knight",
-    "Costume_StatueOfLiberty": "Statue of Liberty",
+    "Costume_StatueOfLiberty": "Statue Of Liberty",
     "Costume_SpaceWarrior": "Space Warrior",
     "Costume_Ninja": "Ninja",
     "Costume_Unicorn": "Unicorn",
