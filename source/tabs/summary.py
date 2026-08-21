@@ -82,7 +82,7 @@ class SummaryTab(ttk.Frame):
             row=row, column=1, sticky="w", padx=25, pady=5
         )
         Tooltip(battlestamps_label,
-                "This Shows how many battle stamps you have collected.\n"
+                "Shows how many battle stamps you have collected.\n"
                 "Hover over names in the Battle Stamps tab for stamp images.")
         row += 1
 
