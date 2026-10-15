@@ -14,6 +14,10 @@ class QuestsTab(ttk.Frame):
             row=0, column=0, sticky="w", padx=10, pady=5
         )
 
+        ttk.Label(self, text="Note: Quests won't update till another save has occurred.", anchor="center").grid(
+            row=2, column=0, sticky="ew", padx=20, pady=5
+        )
+        
         quest_summary_var = tk.StringVar(
             value="Completed: 0 / 0    In Progress: 0    Not Started: 0"
         )

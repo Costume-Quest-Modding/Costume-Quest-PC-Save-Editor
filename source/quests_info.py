@@ -292,8 +292,15 @@ QUESTS = {
             "\n- Pizza Sundae Creepy Treat Card (Round 3)",
 
             "flags": {
-                "started": [],
-                "completed": []
+                "started": [
+                    "Mall_SQ_04_Started", # Quest Started],
+                ],
+                "completed": [
+                    "Mall_SQ_04_Started", # Quest Started
+                    "Mall_SQ_04_Compl_1", # Round 1 Completed
+                    "Mall_SQ_04_Compl_2", # Round 2 Completed
+                    "Mall_SQ_04_Compl_3" # Round 3 Completed
+                ]
             }
         },
         "Mall Hide 'n' Seek": {
@@ -390,8 +397,15 @@ QUESTS = {
             "\n- Sugar Bucket Creepy Treat Card (Round 3)",
 
             "flags": {
-                "started": [],
-                "completed": []
+                "started": [
+                    "Country_SQ_02_Started", # Quest Started],
+                ],
+                "completed": [
+                    "Country_SQ_02_Started", # Quest Started
+                    "Country_SQ_02_Compl_1", # Round 1 Completed
+                    "Country_SQ_02_Compl_2", # Round 2 Completed
+                    "Country_SQ_02_Compl_3" # Round 3 Completed
+                ]
             }
         },
         "This Card Is The Rarest": {
