@@ -16,7 +16,7 @@ class SummaryTab(ttk.Frame):
 
     def _build_ui(self):
         row = 0
-        ttk.Label(self, text="Player Info").grid(
+        ttk.Label(self, text="Stats").grid(
             row=0, column=0, sticky="w", padx=10, pady=5)
         ttk.Label(self, text="World & Position").grid(
             row=0, column=2, sticky="w", padx=10, pady=5)
@@ -27,7 +27,7 @@ class SummaryTab(ttk.Frame):
         row += 1
 
         # ---------------------------------------------------------
-        #  SECTION 1 — Player Info
+        #  SECTION 1 — Player Stats
         # ---------------------------------------------------------
 
         level_label = ttk.Label(self, text="Level:").grid(
@@ -102,11 +102,21 @@ class SummaryTab(ttk.Frame):
         costumes_label = ttk.Label(self, textvariable=self.costumes_progress_text)
         costumes_label.grid(
             row=row, column=1, sticky="w", padx=25, pady=5)
-        Tooltip(costumes_label, "Shows how many costumes you have collected.")
+        Tooltip(costumes_label, "Shows how many costumes you have collected.\n"
+                        "Hover over names in the Costumes & Pieces tab for costume images.")
         row += 1
 
-        ttk.Label(self, text="Equipped Costumes:").grid(
-            row=row, column=0, padx=35, pady=5)
+        # ---------------------------------------------------------
+        #  SECTION 4 — Equipment (Costumes & Battle Stamps)
+        # ---------------------------------------------------------
+
+        ttk.Label(self, text="Equipment").grid(
+            row=row, column=0, sticky="w", padx=10, pady=5)
+        row += 1
+
+        ttk.Label(self, text="Costumes:").grid(
+            row=row, column=0, sticky="w", padx=25, pady=5)
+        row += 1
 
         saveio.AppState.costume_display_vars = [tk.StringVar() for _ in NAMES]
         for i, name in enumerate(NAMES):
@@ -115,18 +125,56 @@ class SummaryTab(ttk.Frame):
             display_name = COSTUME_DISPLAY_NAMES.get(
                 saveio.AppState.costume_vars[i].get(),
                 saveio.AppState.costume_vars[i].get())  # fallback to internal name
-            saveio.AppState.costume_display_vars[i].set(f"{name}: {display_name}")
+            saveio.AppState.costume_display_vars[i].set(f"{name} {display_name}")
+            ttk.Label(self, text=name).grid(
+                row=row, column=0, sticky="w", padx=40, pady=5
+            )
             lbl = ttk.Label(
-                self, textvariable=saveio.AppState.costume_display_vars[i])
-            lbl.grid(row=row, column=1, padx=25, pady=5, sticky="w")
+                self, textvariable=saveio.AppState.costume_vars[i]
+            )
+            lbl.grid(row=row, column=1, sticky="w", padx=10, pady=5)
             Tooltip(
-                lbl, f"This shows the currently equipped costume for {name}.\nYou can change it in the Costumes tab.")
+                lbl, f"Shows the currently equipped costume for {name}.\nYou can change it in the Stats, Equips & World tab.")
             saveio.AppState.costume_vars[i].trace_add(
                 "write",
                 lambda *args, idx=i, nm=name: saveio.AppState.costume_display_vars[idx].set(
                     f"{nm}: {COSTUME_DISPLAY_NAMES.get(saveio.AppState.costume_vars[idx].get(), saveio.AppState.costume_vars[idx].get())}"
                 ),
             )
+            row += 1
+
+        ttk.Label(self, text="Battle Stamps:").grid(
+            row=row, column=0, sticky="w", padx=25, pady=5)
+        row += 1
+    
+        saveio.AppState.stamp_display_vars = [tk.StringVar() for _ in NAMES]
+
+        for i, name in enumerate(NAMES):
+            stamp = saveio.AppState.stamp_vars[i].get() or "None"
+            saveio.AppState.stamp_display_vars[i].set(stamp)
+
+            ttk.Label(self, text=name).grid(
+                row=row, column=0, sticky="w", padx=40, pady=5
+            )
+
+            lbl = ttk.Label(
+                self, textvariable=saveio.AppState.stamp_display_vars[i]
+            )
+            lbl.grid(row=row, column=1, sticky="w", padx=10, pady=5)
+
+            Tooltip(
+                lbl,
+                f"Shows the currently equipped battle stamp for {name}.\n"
+                "You can change it in the Stats, Equips & World tab."
+            )
+
+            saveio.AppState.stamp_vars[i].trace_add(
+                "write",
+                lambda *args, idx=i: saveio.AppState.stamp_display_vars[idx].set(
+                    saveio.AppState.stamp_vars[idx].get() or "None"
+                ),
+            )
+
             row += 1
 
         # ---------------------------------------------------------

@@ -24,10 +24,14 @@ def extract_save_data(text) -> ParsedSaveData:
     candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
     candy = int(candy_matches[-1].group(1)) if candy_matches else 0
     costume_match = re.search(r"EquippedCostumes=\[([^\]]*)\];", text)
-    costumes = [c.strip().replace("Costume_", "")
-    for c in costume_match.group(1).split(",")
-    if c.strip()] if costume_match else []
-    
+    costumes = [
+        c.strip().replace("Costume_", "")
+        for c in costume_match.group(1).split(",")
+        if c.strip()
+    ] if costume_match else []
+
+    costumes += ["None"] * (3 - len(costumes))
+        
     xp = extract_int(r"ExperiencePoints\s*=\s*(\d+);", text)
     robot_jumps = extract_int(r"RobotRampJumos=(\d+)", text)
     monster_bashes = extract_int(r"MonsterPailBashes=(\d+)", text)
@@ -177,7 +181,8 @@ def update_save_data(
         f"Costume_{display_to_save.get(c, c)}"
         if not c.startswith("Costume_")
         else c
-        for c in costumes if c
+        for c in costumes
+        if c and c != "None"
     )
     
     text = re.sub(
