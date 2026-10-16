@@ -81,6 +81,34 @@ def extract_quests(text):
         return [q.strip() for q in quests_str.split(",") if q.strip()]
     return []
 
+# Extracts the equipped stamps for Everett, Reynold/Wren, and Lucy from the save data.
+def extract_equipped_stamps(text):
+    match = re.search(r"\{Everett=[^{}]*\}", text)
+
+    if not match:
+        return ["", "", ""]
+
+    entries = dict(
+        entry.split("=", 1)
+        for entry in match.group()[1:-1].split(";")
+        if "=" in entry
+    )
+
+    def get_stamp(character):
+        value = entries.get(character, "").strip()
+
+        if value.startswith("BattleItem_"):
+            stamp = value[len("BattleItem_"):]
+            return BATTLE_ITEM_NAMES.get(stamp, stamp)
+
+        return ""
+
+    return [
+        get_stamp("Everett"),
+        get_stamp("Reynold") if "Reynold" in entries else get_stamp("Wren"),
+        get_stamp("Lucy"),
+    ]
+
 # ---------------- helpers ----------------
 
 def update_or_add_field(text, field_name, new_value):
@@ -217,6 +245,40 @@ def replace_quests(text, quest_flags):
         return text[:insert_point] + insert_text + text[insert_point:]
 
     return text.strip() + "\n" + insert_text
+
+# Replaces the equipped stamps for Everett, Reynold/Wren, and Lucy in the save data.
+def replace_equipped_stamps(text, stamps):
+    match = re.search(r"\{Everett=[^{}]*\}", text)
+
+    # If the equipped-stamps block isn't found, leave the save unchanged.
+    if not match:
+        return text
+
+    original = match.group()
+
+    middle_character = (
+        "Wren" if re.search(r"\bWren=", original) else "Reynold"
+    )
+
+    reverse_names = {
+        display: internal
+        for internal, display in BATTLE_ITEM_NAMES.items()
+    }
+
+    characters = ["Everett", middle_character, "Lucy"]
+    entries = []
+
+    for character, stamp in zip(characters, stamps):
+        internal_name = reverse_names.get(stamp, stamp)
+
+        if internal_name and stamp != "None":
+            entries.append(f"{character}=BattleItem_{internal_name};")
+        else:
+            entries.append(f"{character}=;")
+
+    replacement = "{" + "".join(entries) + "}"
+
+    return text[:match.start()] + replacement + text[match.end():]
 
 def calculate_level_from_xp(xp):
     for lvl in sorted(XP_THRESHOLDS, reverse=True):

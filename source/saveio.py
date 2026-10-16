@@ -108,6 +108,21 @@ def open_save_dialog():
         AppState.player_position_vars[i].set(parsed.player_position[i])
         AppState.camera_position_vars[i].set(parsed.camera_position[i])
 
+    # --- Equipped Stamps ---
+    stamps_available = bool(
+        re.search(r"\{Everett=[^{}]*\}", raw_text)
+    )
+
+    for dropdown in AppState.stamp_dropdowns:
+        dropdown.configure(
+            state="normal" if stamps_available else "disabled"
+        )
+
+    equipped_stamps = save_data.extract_equipped_stamps(raw_text)
+
+    for i, stamp in enumerate(equipped_stamps):
+        AppState.stamp_vars[i].set(stamp if stamp else "None")
+
     # Debug prints
     print("Loaded Quest Flags:", AppState.quest_flags)
 
@@ -138,6 +153,11 @@ def build_save_text(text, AppState, cards_entries, battle_entries):
         suburbsbobbing = int(AppState.suburbsbobbing_var.get()),
         mallbobbing = int(AppState.mallbobbing_var.get()),
         countrybobbing = int(AppState.countrybobbing_var.get()),
+    )
+
+    text = save_data.replace_equipped_stamps(
+        text,
+        [v.get() for v in AppState.stamp_vars]
     )
 
     return text

@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import saveio
 from widgets import create_vector_editor
-from constants import (COSTUME_OPTIONS, NAMES, WORLD_PATHS, DEBUG_TELEPORTS)
+from constants import (BATTLE_ITEM_NAMES, COSTUME_OPTIONS, NAMES, WORLD_PATHS, DEBUG_TELEPORTS)
 
 class StatsTab(ttk.Frame):
     def __init__(self, parent):
@@ -148,27 +148,32 @@ class StatsTab(ttk.Frame):
                 equips_frame,
                 textvariable=saveio.AppState.costume_vars[i],
                 values=COSTUME_OPTIONS,
-                width=15
+                width=30
             ).grid(row=row, column=1, sticky="w", padx=10, pady=5)
 
             row += 1
 
-        ttk.Label(equips_frame, text="Battle Stamps: (Not implemented yet)").grid(
+        ttk.Label(equips_frame, text="Battle Stamps:").grid(
             row=row, column=0, columnspan=2, padx=25, pady=5, sticky="w"
         )
         row += 1
+
+        saveio.AppState.stamp_dropdowns = []
 
         for i, name in enumerate(NAMES):
             ttk.Label(equips_frame, text=name).grid(
                 row=row, column=0, padx=50, pady=5, sticky="w"
             )
 
-            ttk.Combobox(
+            dropdown = ttk.Combobox(
                 equips_frame,
-                textvariable=saveio.AppState.costume_vars[i],
-                values=COSTUME_OPTIONS,
-                width=15
-            ).grid(row=row, column=1, sticky="w", padx=10, pady=5)
+                textvariable=saveio.AppState.stamp_vars[i],
+                values=["None"] + list(BATTLE_ITEM_NAMES.values()),
+                width=30
+            )
+            dropdown.grid(row=row, column=1, sticky="w", padx=10, pady=5)
+
+            saveio.AppState.stamp_dropdowns.append(dropdown)
 
             row += 1
 

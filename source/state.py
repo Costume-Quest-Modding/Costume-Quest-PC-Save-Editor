@@ -26,6 +26,12 @@ class AppState:
     selected_world = None
 
     costume_vars = None
+
+    # Equipped Stamps and dropdown menu variables
+    stamp_vars = None
+    stamps_available = None
+    stamp_dropdowns = []
+    
     player_position_vars = None
     camera_position_vars = None
     card_vars = None
@@ -52,6 +58,7 @@ class AppState:
         cls.selected_world = tk.StringVar(value="Suburbs")
 
         cls.costume_vars = [tk.StringVar(value="") for _ in range(3)]
+        cls.stamp_vars = [tk.StringVar(value="") for _ in range(3)]
         cls.player_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
         cls.camera_position_vars = [tk.DoubleVar(value=0.0) for _ in range(3)]
 
