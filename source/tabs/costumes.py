@@ -41,6 +41,14 @@ class CostumesTab(ttk.Frame):
         # Costume entries grid
         costumes_per_col = 3
         start_row = 2
+
+        # Keep stamp names and entries together
+        # Let unused horizontal space remain at the right
+        for col in range(20):
+            self.columnconfigure(col, weight=0)
+
+        self.columnconfigure(9, weight=1)
+
         for i, (costume_num, name) in enumerate(COSTUME_DISPLAY_NAMES.items()):
             col = (i // costumes_per_col)
             row = start_row + (i % costumes_per_col)
@@ -70,37 +78,68 @@ class CostumesTab(ttk.Frame):
 
         row += 6
 
+        ttk.Separator(self, orient="horizontal").grid(
+            row=row, column=0, columnspan=10, sticky="ew", padx=10, pady=5
+        )
+        row += 1
+
         ttk.Label(self, text="Costume Pieces").grid(
             row=row, column=0, padx=10, pady=5, sticky="w")
         row += 1
 
-        ttk.Label(self, text="Equipped Costumes").grid(
-            row=row, column=0, padx=10, pady=5, sticky="w")
+    # Missing costumes section
+        ttk.Separator(self, orient="horizontal").grid(
+            row=row, column=0, columnspan=10, sticky="ew", padx=10, pady=5
+        )
+        row += 1
 
-        for i, name in enumerate(NAMES):
-            ttk.Label(self, text=name).grid(
-                row=row, column=1, padx=10, pady=5)
+        missing_frame = ttk.Frame(self)
+        missing_frame.grid(
+            row=row, column=0, columnspan=10, sticky="ew"
+        )
+        missing_frame.columnconfigure(1, weight=1)
 
-            ttk.Combobox(
-                self,
-                textvariable=saveio.AppState.costume_vars[i],
-                values=COSTUME_OPTIONS,
-                width=15
-            ).grid(row=row, column=2, sticky="w", padx=10, pady=5)
-            row += 1
+        ttk.Label(missing_frame, text="Missing Costumes:").grid(
+            row=0, column=0, padx=10, pady=5, sticky="w"
+        )
+
+        self.missing_costumes_label = ttk.Label(
+            missing_frame,
+            textvariable=self.missing_costumes_var,
+            anchor="w",
+            wraplength=400
+        )
+        self.missing_costumes_label.grid(
+            row=0, column=1, sticky="ew", padx=10, pady=5
+        )
+
+        # Auto-wrap
+        self.bind("<Configure>", self._update_wrap)
+
+    def _update_wrap(self, event=None):
+        width = self.winfo_width()
+        if width > 150:
+            self.missing_costumes_label.configure(
+                wraplength=width - 150
+            )
 
     def update_missing_costumes(self):
         owned = {
-            name for name, var in self.entries.items()
+            costume_num
+            for costume_num, var in self.entries.items()
             if var.get() == "1"
         }
 
         if not owned:
             self.missing_costumes_var.set("All")
-        elif len(owned) == len(COSTUME_OPTIONS):
+        elif len(owned) == len(self.entries):
             self.missing_costumes_var.set("None")
         else:
-            missing = [c for c in COSTUME_OPTIONS if c not in owned]
+            missing = [
+                name
+                for costume_num, name in COSTUME_DISPLAY_NAMES.items()
+                if costume_num not in owned
+            ]
             self.missing_costumes_var.set(", ".join(missing))
 
     def toggle_all_costumes(self):

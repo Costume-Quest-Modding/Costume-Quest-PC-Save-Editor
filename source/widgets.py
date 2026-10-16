@@ -16,7 +16,7 @@ def create_vector_editor(parent, label_text, variables, state="normal"):
 
     # Move coordinate labels and textboxes to the right
     coords_frame = ttk.Frame(frame)
-    coords_frame.grid(row=1, column=0, sticky="w", padx=(120, 0))
+    coords_frame.grid(row=1, column=0, sticky="w", padx=(35, 0))
 
     for i, (axis, var) in enumerate(zip(["X", "Y", "Z"], variables)):
         ttk.Label(coords_frame, text=f"{axis}:").grid(

@@ -123,11 +123,11 @@ def create_tabs(root):
         notebook,
         progress_text_var=costumes_progress_text
     )
-    frames["Costumes"] = costumes_frame
+    frames["Costumes & Pieces"] = costumes_frame
 
     # Create StatsTab instance
     stats_frame = StatsTab(notebook)
-    frames["Stats & World"] = stats_frame
+    frames["Stats, Equips & World"] = stats_frame
 
     # Create QuestsTab instance
     quests_frame = QuestsTab(notebook)
@@ -137,8 +137,8 @@ def create_tabs(root):
     notebook.add(frames["Summary"], text="Summary")
     notebook.add(frames["Battle Stamps"], text="Battle Stamps")
     notebook.add(frames["Cards"], text="Cards")
-    notebook.add(frames["Costumes"], text="Costumes")
-    notebook.add(frames["Stats & World"], text="Stats & World")
+    notebook.add(frames["Costumes & Pieces"], text="Costumes & Pieces")
+    notebook.add(frames["Stats, Equips & World"], text="Stats, Equips & World")
     notebook.add(frames["Quests"], text="Quests")
 
     return notebook, frames

@@ -92,7 +92,7 @@ class CardsTab(ttk.Frame):
         )
         self.missing_cards_label.grid(
             row=0, column=1, sticky="ew", padx=10, pady=5
-)
+        )
 
         # Auto-wrap
         self.bind("<Configure>", self._update_wrap)

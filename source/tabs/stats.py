@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import saveio
 from widgets import create_vector_editor
-from constants import (WORLD_PATHS, DEBUG_TELEPORTS)
+from constants import (COSTUME_OPTIONS, NAMES, WORLD_PATHS, DEBUG_TELEPORTS)
 
 class StatsTab(ttk.Frame):
     def __init__(self, parent):
@@ -11,15 +11,37 @@ class StatsTab(ttk.Frame):
         self._build_ui()
 
     def _build_ui(self):
+        # Left side: existing Stats and World controls
+        left_frame = ttk.Frame(self)
+        left_frame.grid(row=0, column=0, sticky="nw")
+
+        # Right side: Equips
+        equips_frame = ttk.Frame(self)
+        equips_frame.grid(row=0, column=1, sticky="nw", padx=20)
+
+        self.columnconfigure(0, weight=0)
+        self.columnconfigure(1, weight=1)
+
         row = 0
-        ttk.Label(self, text="Stats").grid(
+
+        ttk.Label(left_frame, text="Stats").grid(
             row=row, column=0, sticky="w", padx=10, pady=5)
         row += 1
 
-        ttk.Label(self, text="Level:").grid(
+        ttk.Separator(left_frame, orient="horizontal").grid(
+            row=row, column=0, columnspan=2, sticky="ew", padx=10, pady=5
+        )
+        row += 1
+
+        for col in range(20):
+            left_frame.columnconfigure(col, weight=0)
+
+        left_frame.columnconfigure(1, weight=1)
+
+        ttk.Label(left_frame, text="Level:").grid(
             row=row, column=0, sticky="w", padx=25, pady=5)
         level_dropdown = ttk.Combobox(
-            self,
+            left_frame,
             textvariable=saveio.AppState.level_var,
             values=[str(i) for i in range(1, 11)],
             width=25,
@@ -31,34 +53,40 @@ class StatsTab(ttk.Frame):
             level_dropdown.bind(event, saveio.update_xp_from_level)
         row += 1
 
-        ttk.Label(self, text="XP:").grid(
+        ttk.Label(left_frame, text="XP:").grid(
             row=row, column=0, sticky="w", padx=25, pady=5)
-        ttk.Entry(self, textvariable=saveio.AppState.xp_var, width=25).grid(
+        ttk.Entry(left_frame, textvariable=saveio.AppState.xp_var, width=25).grid(
             row=row, column=1, padx=25, pady=5, sticky="w")
         row += 1
 
-        ttk.Label(self, text="Candy:").grid(
+        ttk.Label(left_frame, text="Candy:").grid(
             row=row, column=0, sticky="w", padx=25, pady=5)
-        ttk.Entry(self, textvariable=saveio.AppState.candy_var, width=25).grid(
+        ttk.Entry(left_frame, textvariable=saveio.AppState.candy_var, width=25).grid(
             row=row, column=1, padx=25, pady=5, sticky="w")
         row += 2
 
-        ttk.Label(self, text="World, Location and Position").grid(
+        ttk.Label(left_frame, text="World Info").grid(
             row=row, column=0, padx=10, pady=5, sticky="w")
         row += 1
-        ttk.Label(self, text="World:").grid(
+
+        ttk.Separator(left_frame, orient="horizontal").grid(
+            row=row, column=0, columnspan=2, sticky="ew", padx=10, pady=5
+        )
+        row += 1
+
+        ttk.Label(left_frame, text="World:").grid(
             row=row, column=0, padx=25, pady=5, sticky="w")
-        ttk.Combobox(self, textvariable=saveio.AppState.selected_world, values=list(
+        ttk.Combobox(left_frame, textvariable=saveio.AppState.selected_world, values=list(
             WORLD_PATHS.keys()), width=25, state="readonly").grid(row=row, column=1, padx=25, pady=5, sticky="w")
         row += 1
 
         # Location dropdown variable
         location_var = tk.StringVar(value="")  # initially empty
 
-        ttk.Label(self, text="Location:").grid(
+        ttk.Label(left_frame, text="Location:").grid(
             row=row, column=0, padx=25, pady=5, sticky="w")
         location_cb = ttk.Combobox(
-            self, textvariable=location_var, values=[], width=25, state="readonly")
+            left_frame, textvariable=location_var, values=[], width=25, state="readonly")
         location_cb.grid(row=row, column=1, padx=25, pady=5, sticky="w")
         row += 1
 
@@ -86,12 +114,63 @@ class StatsTab(ttk.Frame):
         location_var.trace_add("write", teleport_to_location)
 
         player_position_frame2 = create_vector_editor(
-            self, "Player Position:", saveio.AppState.player_position_vars)
+            left_frame, "Player Position:", saveio.AppState.player_position_vars)
         player_position_frame2.grid(
             row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
         row += 1
 
         camera_position_frame2 = create_vector_editor(
-            self, "Camera Position:", saveio.AppState.camera_position_vars)
+            left_frame, "Camera Position:", saveio.AppState.camera_position_vars)
         camera_position_frame2.grid(
             row=row, column=0, columnspan=2, sticky="w", padx=25, pady=5)
+
+        # Equips section
+        ttk.Label(equips_frame, text="Equipment").grid(
+            row=0, column=0, sticky="w", padx=10, pady=5
+        )
+
+        ttk.Separator(equips_frame, orient="horizontal").grid(
+            row=1, column=0, columnspan=3, sticky="ew", padx=10, pady=5
+        )
+
+        ttk.Label(equips_frame, text="Costumes:").grid(
+            row=2, column=0, columnspan=2, padx=25, pady=5, sticky="w"
+        )
+
+        row = 3
+
+        for i, name in enumerate(NAMES):
+            ttk.Label(equips_frame, text=name).grid(
+                row=row, column=0, padx=50, pady=5, sticky="w"
+            )
+
+            ttk.Combobox(
+                equips_frame,
+                textvariable=saveio.AppState.costume_vars[i],
+                values=COSTUME_OPTIONS,
+                width=15
+            ).grid(row=row, column=1, sticky="w", padx=10, pady=5)
+
+            row += 1
+
+        ttk.Label(equips_frame, text="Battle Stamps: (Not implemented yet)").grid(
+            row=row, column=0, columnspan=2, padx=25, pady=5, sticky="w"
+        )
+        row += 1
+
+        for i, name in enumerate(NAMES):
+            ttk.Label(equips_frame, text=name).grid(
+                row=row, column=0, padx=50, pady=5, sticky="w"
+            )
+
+            ttk.Combobox(
+                equips_frame,
+                textvariable=saveio.AppState.costume_vars[i],
+                values=COSTUME_OPTIONS,
+                width=15
+            ).grid(row=row, column=1, sticky="w", padx=10, pady=5)
+
+            row += 1
+
+        equips_frame.columnconfigure(0, weight=1)
+        equips_frame.columnconfigure(2, weight=1)
