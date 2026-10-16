@@ -4,6 +4,7 @@ import sys
 
 BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 CARDS_DIR = os.path.join(BASE_DIR, "images", "cards")
+COSTUME_DIR = os.path.join(BASE_DIR, "images", "costumes")
 STAMP_DIR = os.path.join(BASE_DIR, "images", "battle_stamps")
 
 NAMES = ["Reynold/Wren", "Everett", "Lucy"]
@@ -119,8 +120,8 @@ COSTUME_OPTIONS = [
     # Base Game Costumes
     "Robot", "Knight", "Statue Of Liberty",
     "Space Warrior", "Ninja", "Unicorn",
-    "Pumpkin", "Vampire", "French Fries",
-    "Black Cat", "Grubbin"
+    "French Fries", "Pumpkin", "Vampire",
+    "Grubbin", "Black Cat"
 ]
 
 COSTUME_DISPLAY_NAMES = {
@@ -131,11 +132,11 @@ COSTUME_DISPLAY_NAMES = {
     "Costume_SpaceWarrior": "Space Warrior",
     "Costume_Ninja": "Ninja",
     "Costume_Unicorn": "Unicorn",
+    "Costume_FrenchFries": "French Fries",
     "Costume_Pumpkin": "Pumpkin",
     "Costume_Vampire": "Vampire",
-    "Costume_FrenchFries": "French Fries",
-    "Costume_BlackCat": "Black Cat",
-    "Costume_Grubbin": "Grubbin"
+    "Costume_Grubbin": "Grubbin",
+    "Costume_BlackCat": "Black Cat"
 }
 
 CARD_NAMES = {
@@ -241,3 +242,8 @@ BATTLE_STAMP_IMAGES = {
 BATTLE_ITEM_PATTERN = re.compile(
     r'(BattleItem_(\w+)=InventoryItem\{[^}]*?CurrentAmount=)(\d+)(;[^}]*\})'
 )
+
+COSTUME_IMAGES = {
+    key: os.path.join(COSTUME_DIR, f"{key.lower()}.png")
+    for key in COSTUME_DISPLAY_NAMES
+}

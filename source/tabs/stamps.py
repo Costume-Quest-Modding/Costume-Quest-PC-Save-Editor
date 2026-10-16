@@ -21,21 +21,32 @@ class BattleStampsTab(ttk.Frame):
         ttk.Label(self, text="Battle Stamps").grid(
             row=0, column=0, padx=10, pady=5, sticky="w"
         )
-        ttk.Checkbutton(
-            self, text="Toggle All", variable=self.toggle_all_var,
-            command=self.toggle_all_stamps
-        ).grid(row=0, column=1, padx=2, pady=5)
+        ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var, command=self.toggle_all_stamps).grid(
+            row=0, column=1, padx=2, pady=5, sticky="w"
+        )
 
         ttk.Label(self, textvariable=self.progress_text).grid(
             row=0, column=2, padx=10, pady=5, sticky="w"
         )
 
+        ttk.Separator(self, orient="horizontal").grid(
+            row=1, column=0, columnspan=10, sticky="ew", padx=10, pady=5
+        )
+
         # Stamp entries grid
         items_per_col = 9
-        start_row = 1
+        start_row = 2
+
+        # Keep stamp names and entries together
+        # Let unused horizontal space remain at the right
+        for col in range(20):
+            self.columnconfigure(col, weight=0)
+
+        self.columnconfigure(9, weight=1)
+
         for i, (stamp_num, name) in enumerate(BATTLE_ITEM_NAMES.items()):
-            row = start_row + (i % items_per_col)
             col = (i // items_per_col) * 2
+            row = start_row + (i % items_per_col)
 
             lbl = ttk.Label(self, text=name)
             lbl.grid(row=row, column=col, sticky='w', padx=10, pady=2)
@@ -52,16 +63,23 @@ class BattleStampsTab(ttk.Frame):
             self.entries[stamp_num] = entry
 
         # Missing stamps section
-        last_row = start_row + (len(BATTLE_ITEM_NAMES) //
-                                items_per_col + 1) * items_per_col
+        last_row = start_row + (
+            (len(BATTLE_ITEM_NAMES) - 1) // items_per_col + 1
+        ) * items_per_col
+
+        ttk.Separator(self, orient="horizontal").grid(
+            row=last_row, column=0, columnspan=10, sticky="ew", padx=10, pady=5
+        )
+
         missing_frame = ttk.Frame(self)
-        missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
+        missing_frame.grid(row=last_row + 1, column=0, columnspan=10, sticky="ew")
         missing_frame.columnconfigure(1, weight=1)
 
         ttk.Label(missing_frame, text="Missing Stamps:").grid(
             row=0, column=0, padx=10, pady=5, sticky="w"
         )
-        ttk.Label(missing_frame, textvariable=self.missing_stamps_var, anchor="w", wraplength=400).grid(
+        self.missing_stamps_label = ttk.Label(missing_frame, textvariable=self.missing_stamps_var, anchor="w", wraplength=400)
+        self.missing_stamps_label.grid(
             row=0, column=1, sticky="ew", padx=10, pady=5
         )
 
@@ -71,9 +89,9 @@ class BattleStampsTab(ttk.Frame):
     def _update_wrap(self, event=None):
         width = self.winfo_width()
         if width > 150:
-            # Only one missing stamps label exists
-            self.children.get(list(self.children.keys())[-1]).children.get(list(self.children.get(
-                list(self.children.keys())[-1]).children.keys())[1]).config(wraplength=width - 150)
+            self.missing_stamps_label.configure(
+                wraplength=width - 150
+            )
 
     def update_progress(self):
         total = len(self.entries)

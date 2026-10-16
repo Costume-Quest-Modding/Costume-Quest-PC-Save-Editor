@@ -22,7 +22,7 @@ class StatsTab(ttk.Frame):
             self,
             textvariable=saveio.AppState.level_var,
             values=[str(i) for i in range(1, 11)],
-            width=31,
+            width=25,
             state="readonly",
         )
         level_dropdown.grid(row=row, column=1, sticky="w", padx=25, pady=5)
@@ -33,13 +33,13 @@ class StatsTab(ttk.Frame):
 
         ttk.Label(self, text="XP:").grid(
             row=row, column=0, sticky="w", padx=25, pady=5)
-        ttk.Entry(self, textvariable=saveio.AppState.xp_var, width=33).grid(
+        ttk.Entry(self, textvariable=saveio.AppState.xp_var, width=25).grid(
             row=row, column=1, padx=25, pady=5, sticky="w")
         row += 1
 
         ttk.Label(self, text="Candy:").grid(
             row=row, column=0, sticky="w", padx=25, pady=5)
-        ttk.Entry(self, textvariable=saveio.AppState.candy_var, width=33).grid(
+        ttk.Entry(self, textvariable=saveio.AppState.candy_var, width=25).grid(
             row=row, column=1, padx=25, pady=5, sticky="w")
         row += 2
 
@@ -49,7 +49,7 @@ class StatsTab(ttk.Frame):
         ttk.Label(self, text="World:").grid(
             row=row, column=0, padx=25, pady=5, sticky="w")
         ttk.Combobox(self, textvariable=saveio.AppState.selected_world, values=list(
-            WORLD_PATHS.keys()), width=31, state="readonly").grid(row=row, column=1, padx=25, pady=5, sticky="w")
+            WORLD_PATHS.keys()), width=25, state="readonly").grid(row=row, column=1, padx=25, pady=5, sticky="w")
         row += 1
 
         # Location dropdown variable
@@ -58,7 +58,7 @@ class StatsTab(ttk.Frame):
         ttk.Label(self, text="Location:").grid(
             row=row, column=0, padx=25, pady=5, sticky="w")
         location_cb = ttk.Combobox(
-            self, textvariable=location_var, values=[], width=31, state="readonly")
+            self, textvariable=location_var, values=[], width=25, state="readonly")
         location_cb.grid(row=row, column=1, padx=25, pady=5, sticky="w")
         row += 1
 

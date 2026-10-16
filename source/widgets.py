@@ -4,19 +4,36 @@ import os
 from PIL import Image, ImageTk
 
 # Creates a editor for vectors (PlayerPosition and CameraPosition)
+
+
 def create_vector_editor(parent, label_text, variables, state="normal"):
     frame = ttk.Frame(parent)
-    frame.columnconfigure(1, weight=1)
-    ttk.Label(frame, text=label_text).grid(row=0, column=0, sticky="w")
+
+    # Keep the heading in its original position
+    ttk.Label(frame, text=label_text).grid(
+        row=0, column=0, sticky="w"
+    )
+
+    # Move coordinate labels and textboxes to the right
+    coords_frame = ttk.Frame(frame)
+    coords_frame.grid(row=1, column=0, sticky="w", padx=(120, 0))
+
     for i, (axis, var) in enumerate(zip(["X", "Y", "Z"], variables)):
-        ttk.Label(frame, text=f"{axis}:").grid(
-            row=i + 1, column=1, padx=10, pady=2)
-        if state == "readonly":  # use label instead of entry
-            ttk.Label(frame, textvariable=var).grid(
-                row=i + 1, column=2, padx=10, pady=2, sticky="w")
-        else:  # normal editable entry
-            ttk.Entry(frame, textvariable=var, state=state).grid(
-                row=i + 1, column=2, padx=10, pady=2, sticky="w")
+        ttk.Label(coords_frame, text=f"{axis}:").grid(
+            row=i, column=0, sticky="w", padx=(25, 5), pady=5
+        )
+
+        if state == "readonly":
+            ttk.Label(coords_frame, textvariable=var, width=25).grid(
+                row=i, column=1, sticky="w", padx=25, pady=5
+            )
+        else:
+            ttk.Entry(
+                coords_frame, textvariable=var, width=25, state=state
+            ).grid(
+                row=i, column=1, sticky="w", padx=25, pady=5
+            )
+
     return frame
 
 # Simple text tooltip for any widget

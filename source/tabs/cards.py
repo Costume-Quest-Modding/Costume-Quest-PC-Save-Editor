@@ -35,9 +35,21 @@ class CardsTab(ttk.Frame):
         ttk.Label(self, textvariable=self.progress_text).grid(
             row=0, column=2, padx=10, pady=5, sticky="w")
 
+        ttk.Separator(self, orient="horizontal").grid(
+            row=1, column=0, columnspan=10, sticky="ew", padx=10, pady=5
+        )
+
         # Card entries grid
         cards_per_col = 18
-        start_row = 1
+        start_row = 2
+
+        # Keep card names and entries together
+        # Let unused horizontal space remain at the right
+        for col in range(20):
+            self.columnconfigure(col, weight=0)
+
+        self.columnconfigure(9, weight=1)
+
         for i, card_num in enumerate(CARD_IDS):
             col = (i // cards_per_col) * 2
             row = start_row + (i % cards_per_col)
@@ -58,10 +70,16 @@ class CardsTab(ttk.Frame):
             self.entries[card_num] = entry
 
         # Missing cards section
-        last_row = start_row + cards_per_col * \
-            ((len(CARD_IDS) + cards_per_col - 1) // cards_per_col)
+        last_row = start_row + (
+            (len(CARD_IDS) - 1) // cards_per_col + 1
+        ) * cards_per_col
+
+        ttk.Separator(self, orient="horizontal").grid(
+            row=last_row, column=0, columnspan=10, sticky="ew", padx=10, pady=5
+        )
+
         missing_frame = ttk.Frame(self)
-        missing_frame.grid(row=last_row, column=0, columnspan=10, sticky="ew")
+        missing_frame.grid(row=last_row + 1, column=0, columnspan=10, sticky="ew")
         missing_frame.columnconfigure(1, weight=1)
 
         ttk.Label(missing_frame, text="Missing Cards:").grid(
@@ -95,7 +113,9 @@ class CardsTab(ttk.Frame):
     def _update_wrap(self, event=None):
         width = self.winfo_width()
         if width > 150:
-            self.missing_cards_label.config(wraplength=width - 150)
+            self.missing_cards_label.configure(
+                wraplength=width - 150
+            )
 
     def update_progress(self):
         total = len(self.entries)

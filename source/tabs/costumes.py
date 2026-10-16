@@ -1,12 +1,15 @@
+import os
 import tkinter as tk
 from tkinter import ttk
 import saveio
-from constants import (COSTUME_OPTIONS, NAMES)
+from widgets import ImageTooltip
+from constants import (COSTUME_DISPLAY_NAMES, COSTUME_IMAGES, COSTUME_OPTIONS, NAMES)
 
 class CostumesTab(ttk.Frame):
     def __init__(self, parent, progress_text_var=None):
         super().__init__(parent)
         self.entries = {}
+        self.image_tooltips = []
         self.toggle_all_var = tk.StringVar(value="0")
         self.progress_text = progress_text_var
         self.missing_costumes_var = tk.StringVar(value="All")
@@ -20,30 +23,50 @@ class CostumesTab(ttk.Frame):
         row = 0
 
         ttk.Label(self, text="Costumes").grid(
-            row=row, column=0, padx=10, pady=5, sticky="w")
-        ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var,
-                        command=self.toggle_all_costumes).grid(row=row, column=1, sticky="w", padx=10, pady=5)
+            row=row, column=0, padx=10, pady=5, sticky="w"
+        )
+        
+        ttk.Checkbutton(self, text="Toggle All", variable=self.toggle_all_var, command=self.toggle_all_costumes).grid(
+            row=row, column=1, padx=10, pady=5, sticky="w"
+        )
+        
         ttk.Label(self, textvariable=self.progress_text).grid(
-            row=0, column=2, padx=10, pady=5, sticky="w")
+            row=0, column=2, padx=10, pady=5, sticky="w"
+        )
+
+        ttk.Separator(self, orient="horizontal").grid(
+            row=1, column=0, columnspan=10, sticky="ew", padx=10, pady=5
+        )
+
         # Costume entries grid
-        costumes_per_col = 5
-        start_row = 1
-        for i, name in enumerate(COSTUME_OPTIONS):
+        costumes_per_col = 3
+        start_row = 2
+        for i, (costume_num, name) in enumerate(COSTUME_DISPLAY_NAMES.items()):
             col = (i // costumes_per_col)
             row = start_row + (i % costumes_per_col)
 
             var = tk.StringVar(value="0")
             var.trace_add("write", lambda *args: self.on_change())
-            ttk.Checkbutton(
+
+            check = ttk.Checkbutton(
                 self,
                 text=name,
                 variable=var,
                 onvalue="1",
                 offvalue="0",
                 width=15
-            ).grid(row=row, column=col + 1, sticky="w", padx=10, pady=5)
+            )
+            check.grid(row=row, column=col, sticky="w", padx=10, pady=5)
+            
         
-            self.entries[name] = var
+            # Image tooltip
+            img_path = COSTUME_IMAGES.get(costume_num)
+
+            if img_path and os.path.isfile(img_path):
+                tooltip = ImageTooltip(check, img_path)
+                self.image_tooltips.append(tooltip)
+
+            self.entries[costume_num] = var
 
         row += 6
 

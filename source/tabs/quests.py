@@ -14,9 +14,6 @@ class QuestsTab(ttk.Frame):
             row=0, column=0, sticky="w", padx=10, pady=5
         )
 
-        ttk.Label(self, text="Note: Quests won't update till another save has occurred.", anchor="center").grid(
-            row=2, column=0, sticky="ew", padx=20, pady=5
-        )
         
         quest_summary_var = tk.StringVar(
             value="Completed: 0 / 0    In Progress: 0    Not Started: 0"
@@ -24,6 +21,10 @@ class QuestsTab(ttk.Frame):
 
         ttk.Label(self, textvariable=quest_summary_var).grid(
             row=0, column=0, sticky="e", padx=10, pady=5
+        )
+
+        ttk.Separator(self, orient="horizontal").grid(
+            row=1, column=0, columnspan=10, sticky="ew", padx=10, pady=5
         )
 
         # === Scrollable Canvas ===
@@ -57,9 +58,17 @@ class QuestsTab(ttk.Frame):
             canvas.configure(scrollregion=canvas.bbox("all"))
 
 
-        canvas.grid(row=1, column=0, sticky="nsew")
-        scrollbar.grid(row=1, column=1, sticky="ns")
-        self.rowconfigure(1, weight=1)
+        # Scrollable quest list
+        canvas.grid(row=2, column=0, sticky="nsew")
+        scrollbar.grid(row=2, column=1, sticky="ns")
+
+        # Bottom note
+        ttk.Label(self, text="Note: Quests won't update till another save has occurred.", anchor="center").grid(
+            row=3, column=0, columnspan=2, sticky="ew", padx=20, pady=5
+        )
+
+        # Allow quest list to expand
+        self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
 
         # === Mouse wheel support ===

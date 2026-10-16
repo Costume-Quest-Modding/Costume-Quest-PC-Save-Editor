@@ -321,6 +321,7 @@ QUESTS = {
         }
     },
     "Fall Valley": {
+        # World 3 Info NEEDS FINISHED AND VERIFIED
         "The Original Costume Quest": {
             "questtype": "Main",
             "description": "Get our costumes back from the Repugians!",
