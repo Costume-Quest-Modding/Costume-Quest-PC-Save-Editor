@@ -2,10 +2,9 @@
 
 A Python GUI Save Editor/Viewer for the Steam release of Costume Quest — Edit and view save data safely, with save backups and a simple UI.
 
-Supports Costume Quest and Grubbins on Ice save files. Currently doesn't support Costume Quest 2.
-> ⚠️ **Note:** DLC save file support is still in the works. Alpha 1.2 is out NOW.
+Supports Costume Quest save files. Currently doesn't support Grubbins on Ice and Costume Quest 2.
 
-![CQ PC Save Editor Summary](https://i.imgur.com/fymJ6kZ.png)
+![CQ PC Save Editor Summary](https://i.imgur.com/MAhnfn8.png)
 
 ---
 
@@ -67,5 +66,5 @@ python -m source.main
 ---
 
 ## ⚠️ Known limitations
-- DLC support is in the works. Expect bugs while things get ironed out.  
+- DLC support is on hold. This will be brought back after Main Game is finished and v1.0 is released.  
 - On Linux, tkinter may not be installed by default — install the distribution package (e.g., `sudo apt install python3-tk`).
