@@ -108,8 +108,8 @@ def extract_equipped_stamps(text):
         return ""
 
     return [
-        get_stamp("Everett"),
         get_stamp("Reynold") if "Reynold" in entries else get_stamp("Wren"),
+        get_stamp("Everett"),
         get_stamp("Lucy"),
     ]
 
@@ -269,7 +269,8 @@ def replace_equipped_stamps(text, stamps):
         display: internal
         for internal, display in BATTLE_ITEM_NAMES.items()
     }
-
+    
+    stamps = [stamps[1], stamps[0], stamps[2]]
     characters = ["Everett", middle_character, "Lucy"]
     entries = []
 
