@@ -54,7 +54,7 @@ def create_menu(root, frames_refs):
         label="About",
         command=lambda: messagebox.showinfo(
             "About",
-            "Costume Quest PC Save Editor - Alpha Version 1.2\n"
+            "Costume Quest PC Save Editor - Alpha Version 1.3\n"
             "Made by: DeathMaster001\n\n"
             "A save editor for Costume Quest (PC/Steam).\n"
             "Edit player stats, costumes, quests, cards, battle stamps, and more."
