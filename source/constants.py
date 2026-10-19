@@ -23,10 +23,7 @@ COSTUME_PIECES = {
         "CostumePiece_AluminumFoil": "Aluminum Foil"
     },
     "Knight": {
-        "CostumePattern_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
+        # TODO: Fill in actual pattern/piece IDs from save file
     },
     "Statue of Liberty": {
         "CostumePattern_StatueOfLiberty": "Statue of Liberty Pattern",
@@ -65,16 +62,10 @@ COSTUME_PIECES = {
         "CostumePiece_WhiteMakeup": "White Makeup",
     },
     "French Fries": {
-        "CostumePattern_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
+        # TODO: Fill in actual pattern/piece IDs from save file
     },
     "Black Cat": {
-        "CostumePattern_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
-        "CostumePiece_": "",
+        # TODO: Fill in actual pattern/piece IDs from save file
     },
     "Grubbin": {
         "CostumePattern_Grubbin": "Grubbin Pattern",
