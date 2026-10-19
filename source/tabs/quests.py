@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from state import AppState
-from quests_info import (QUESTS)
+from ..state import AppState
+from ..quests_info import (QUESTS)
 
 class QuestsTab(ttk.Frame):
     def __init__(self, parent):
@@ -82,7 +82,14 @@ class QuestsTab(ttk.Frame):
                     "units"
                 )
 
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        def _bind_mousewheel(event):
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+        def _unbind_mousewheel(event):
+            canvas.unbind_all("<MouseWheel>")
+
+        canvas.bind("<Enter>", _bind_mousewheel)
+        canvas.bind("<Leave>", _unbind_mousewheel)
 
         # === Toggle helper ===
 

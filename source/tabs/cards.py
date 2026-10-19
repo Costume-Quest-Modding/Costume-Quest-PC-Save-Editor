@@ -1,8 +1,8 @@
 import os
 import tkinter as tk
 from tkinter import ttk
-from widgets import ImageTooltip
-from constants import (CARD_NAMES, CARD_IMAGES)
+from ..widgets import ImageTooltip
+from ..constants import (CARD_NAMES, CARD_IMAGES)
 
 CARD_IDS = range(1, 55)
 

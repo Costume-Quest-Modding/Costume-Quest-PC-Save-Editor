@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-import saveio
-from widgets import Tooltip
-from constants import (NAMES, COSTUME_DISPLAY_NAMES, COSTUME_OPTIONS)
+from .. import saveio
+from ..widgets import Tooltip
+from ..constants import (NAMES, COSTUME_DISPLAY_NAMES, COSTUME_OPTIONS)
 
 class SummaryTab(ttk.Frame):
     def __init__(self, parent, battle_progress_text, cards_progress_text, costumes_progress_text):

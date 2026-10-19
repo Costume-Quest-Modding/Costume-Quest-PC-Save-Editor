@@ -1,14 +1,14 @@
 import os
-import saveio
+from . import saveio
 import tkinter as tk
 from tkinter import ttk, messagebox
-from widgets import create_vector_editor
-from tabs.stamps import BattleStampsTab
-from tabs.cards import CardsTab
-from tabs.quests import QuestsTab
-from tabs.costumes import CostumesTab
-from tabs.stats import StatsTab
-from tabs.summary import SummaryTab
+from .widgets import create_vector_editor
+from .tabs.stamps import BattleStampsTab
+from .tabs.cards import CardsTab
+from .tabs.quests import QuestsTab
+from .tabs.costumes import CostumesTab
+from .tabs.stats import StatsTab
+from .tabs.summary import SummaryTab
 
 # ---------- UI builder ----------
 
@@ -118,7 +118,6 @@ def create_tabs(root):
     frames["Cards"] = cards_frame
 
     # Create CostumesTab instance
-    progress_var = tk.StringVar(value="0 / 0 (0%)")
     costumes_frame = CostumesTab(
         notebook,
         progress_text_var=costumes_progress_text

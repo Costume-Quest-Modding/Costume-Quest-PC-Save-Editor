@@ -3,33 +3,15 @@ import shutil
 from datetime import datetime
 from tkinter import filedialog, messagebox
 import tkinter as tk
-import save_data
-from save_data import extract_save_data, extract_quests, calculate_level_from_xp
-from state import AppState
-from constants import (
+from . import save_data
+from .save_data import extract_save_data, extract_quests, calculate_level_from_xp, update_current_candy
+from .state import AppState
+from .constants import (
     COSTUME_DISPLAY_NAMES, XP_THRESHOLDS, WORLD_PATHS, CARD_PATTERN,
     BATTLE_ITEM_NAMES, BATTLE_ITEM_PATTERN
 )
 
 # ---------------- utility / parsing ----------------
-
-def update_current_candy(text, new_value):
-    "Update only the CurrentCandy field without touching other MaxCandyAmount fields."
-    candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
-    if not candy_matches:
-        # No CandyAmount found, append new field
-        insert_point = text.find("EquippedCostumes=")
-        new_line = f"CandyAmount={new_value};\n"
-        if insert_point != -1:
-            return text[:insert_point] + new_line + text[insert_point:]
-        else:
-            return text.strip() + "\n" + new_line
-
-    # Replace only the last occurrence
-    last_match = candy_matches[-1]
-    start, end = last_match.span(1)  # only the number itself
-    updated_text = text[:start] + str(new_value) + text[end:]
-    return updated_text
 
 
 def update_xp_from_level(*args):

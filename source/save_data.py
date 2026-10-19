@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import re
-import saveio
-from constants import WORLD_PATHS, BATTLE_ITEM_NAMES, XP_THRESHOLDS, COSTUME_DISPLAY_NAMES
+from .constants import WORLD_PATHS, BATTLE_ITEM_NAMES, XP_THRESHOLDS, COSTUME_DISPLAY_NAMES
 
 @dataclass(frozen=True)
 class ParsedSaveData:
@@ -30,7 +29,7 @@ def extract_save_data(text) -> ParsedSaveData:
         if c.strip()
     ] if costume_match else []
 
-    costumes += ["None"] * (3 - len(costumes))
+    costumes = (costumes + ["None"] * 3)[:3]
         
     xp = extract_int(r"ExperiencePoints\s*=\s*(\d+);", text)
     robot_jumps = extract_int(r"RobotRampJumos=(\d+)", text)
@@ -115,6 +114,22 @@ def extract_equipped_stamps(text):
 
 # ---------------- helpers ----------------
 
+def update_current_candy(text, new_value):
+    """Update only the last CandyAmount field without touching other MaxCandyAmount fields."""
+    import re
+    candy_matches = list(re.finditer(r"CandyAmount\s*=\s*(\d+);", text))
+    if not candy_matches:
+        insert_point = text.find("EquippedCostumes=")
+        new_line = f"CandyAmount={new_value};\n"
+        if insert_point != -1:
+            return text[:insert_point] + new_line + text[insert_point:]
+        else:
+            return text.strip() + "\n" + new_line
+    last_match = candy_matches[-1]
+    start, end = last_match.span(1)
+    return text[:start] + str(new_value) + text[end:]
+
+
 def update_or_add_field(text, field_name, new_value):
     is_vector = field_name in ["PlayerPosition", "CameraPosition"]
 
@@ -167,7 +182,7 @@ def update_save_data(
 ):
     text = update_or_add_field(text, "Level", get_level_path_from_selected_world(selected_world))
     text = update_or_add_field(text, "ExperiencePoints", xp)
-    text = saveio.update_current_candy(text, new_candy)
+    text = update_current_candy(text, new_candy)
     text = update_or_add_field(text, "TotalCandyAmount", new_total)
     text = update_or_add_field(text, "PlayerPosition", player_pos)
     text = update_or_add_field(text, "CameraPosition", camera_pos)

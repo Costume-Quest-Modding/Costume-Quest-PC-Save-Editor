@@ -1,6 +1,5 @@
 # save_state.py
 import tkinter as tk
-from save_data import calculate_level_from_xp
 
 
 class AppState:

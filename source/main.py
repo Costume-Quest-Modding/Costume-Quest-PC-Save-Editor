@@ -1,8 +1,6 @@
 import os
-import saveio
-import ui
+from . import saveio, ui, constants
 import tkinter as tk
-import constants
 from tkinter import ttk
 
 

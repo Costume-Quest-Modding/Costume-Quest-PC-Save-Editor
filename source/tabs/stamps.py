@@ -1,8 +1,8 @@
 import os
 import tkinter as tk
 from tkinter import ttk
-from widgets import ImageTooltip
-from constants import (BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES)
+from ..widgets import ImageTooltip
+from ..constants import (BATTLE_ITEM_NAMES, BATTLE_STAMP_IMAGES)
 
 class BattleStampsTab(ttk.Frame):
     def __init__(self, parent, progress_text_var=None):

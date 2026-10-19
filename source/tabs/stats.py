@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-import saveio
-from widgets import create_vector_editor
-from constants import (BATTLE_ITEM_NAMES, COSTUME_OPTIONS, NAMES, WORLD_PATHS, DEBUG_TELEPORTS)
+from .. import saveio
+from ..widgets import create_vector_editor
+from ..constants import (BATTLE_ITEM_NAMES, COSTUME_OPTIONS, NAMES, WORLD_PATHS, DEBUG_TELEPORTS)
 
 class StatsTab(ttk.Frame):
     def __init__(self, parent):

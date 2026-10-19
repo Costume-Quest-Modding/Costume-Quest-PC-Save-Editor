@@ -1,9 +1,9 @@
 import os
 import tkinter as tk
 from tkinter import ttk
-import saveio
-from widgets import ImageTooltip
-from constants import (COSTUME_DISPLAY_NAMES, COSTUME_IMAGES, COSTUME_OPTIONS, NAMES)
+from .. import saveio
+from ..widgets import ImageTooltip
+from ..constants import (COSTUME_DISPLAY_NAMES, COSTUME_IMAGES, COSTUME_OPTIONS, NAMES)
 
 class CostumesTab(ttk.Frame):
     def __init__(self, parent, progress_text_var=None):
