@@ -37,6 +37,7 @@ class AppState:
 
     quest_flags = []
     quest_flags_var = None
+    auto_backup_var = None
 
     @classmethod
     def init_vars(cls, root):
@@ -65,3 +66,4 @@ class AppState:
 
         cls.quest_flags = []
         cls.quest_flags_var = tk.StringVar()
+        cls.auto_backup_var = tk.BooleanVar(value=True)

@@ -1,5 +1,7 @@
+import os
 import re
 import shutil
+import tempfile
 from datetime import datetime
 from tkinter import filedialog, messagebox
 import tkinter as tk
@@ -12,6 +14,31 @@ from .constants import (
 )
 
 # ---------------- utility / parsing ----------------
+
+def _auto_backup(path):
+    """Create a timestamped backup of the save file. Returns backup path or None."""
+    try:
+        backup_path = f"{path}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        shutil.copy2(path, backup_path)
+        return backup_path
+    except Exception:
+        return None
+
+
+def _atomic_write_bytes(path, data: bytes):
+    """Write bytes atomically: write to temp file in same dir, then os.replace."""
+    directory = os.path.dirname(os.path.abspath(path)) or "."
+    fd, tmp_path = tempfile.mkstemp(dir=directory)
+    try:
+        with os.fdopen(fd, 'wb') as f:
+            f.write(data)
+        os.replace(tmp_path, path)
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 def update_xp_from_level(*args):
@@ -47,8 +74,9 @@ def open_save_dialog():
             binary_data = f.read()
         header = binary_data[:8]
         raw = binary_data[8:]
-        # decode whole raw text
-        raw_text = raw.decode(errors="ignore")
+        # decode whole raw text; surrogateescape preserves any non-UTF-8
+        # bytes so they round-trip byte-identical on save (no silent loss)
+        raw_text = raw.decode("utf-8", errors="surrogateescape")
 
         parsed = extract_save_data(raw_text)
     except Exception as e:
@@ -158,12 +186,25 @@ def save_changes(AppState, cards_entries, battle_entries):
             battle_entries
         )
 
-        with open(path, "wb") as f:
-            f.write(AppState.save_header)
-            f.write(updated.encode("utf-8"))
+        # Validate the updated data parses before writing
+        try:
+            extract_save_data(updated)
+        except Exception as ve:
+            messagebox.showerror("Error", f"Validation failed, save aborted:\n{ve}")
+            return False
+
+        # Auto-backup before overwriting (respects File menu toggle)
+        auto_backup = AppState.auto_backup_var.get() if getattr(AppState, 'auto_backup_var', None) is not None else True
+        backup_path = _auto_backup(path) if auto_backup else None
+
+        # Atomic write
+        _atomic_write_bytes(path, AppState.save_header + updated.encode("utf-8", errors="surrogateescape"))
 
         AppState.save_text_data = updated
-        messagebox.showinfo("Saved", "Save file updated!")
+        msg = "Save file updated!"
+        if backup_path:
+            msg += f"\nBackup: {backup_path}"
+        messagebox.showinfo("Saved", msg)
         return True
 
     except Exception as e:
@@ -230,9 +271,8 @@ def save_as(AppState, cards_entries, battle_entries):
                 f.write("\n".join(data))
 
         else:
-            with open(path, "wb") as f:
-                f.write(AppState.save_header)
-                f.write(updated.encode("utf-8"))
+            # Binary save - use atomic write for safety
+            _atomic_write_bytes(path, AppState.save_header + updated.encode("utf-8", errors="surrogateescape"))
 
         messagebox.showinfo("Success", f"File successfully saved to {path}")
         return True

@@ -26,7 +26,9 @@ def create_menu(root, frames_refs):
         saveio.AppState, frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
     file_menu.add_command(label="Save As...", command=lambda: saveio.save_as(
         saveio.AppState, frames_refs["Cards"].entries, frames_refs["Battle Stamps"].entries))
+    file_menu.add_separator()
     file_menu.add_command(label="Backup Save File", command=saveio.backup_save)
+    file_menu.add_checkbutton(label="Auto-backup on save", variable=saveio.AppState.auto_backup_var)
     file_menu.add_separator()
     file_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="File", menu=file_menu)
@@ -44,7 +46,11 @@ def create_menu(root, frames_refs):
             " - Open: Load a Costume Quest save file.\n"
             " - Save: Save changes to the current file.\n"
             " - Save As...: Save to a new file location (.json or .txt allowed).\n"
-            " - Backup Save File: Make a backup of your current save.\n\n"
+            " - Backup Save File: Make a manual backup of your current save.\n"
+            " - Auto-backup on save: When checked (default), a timestamped backup is made automatically before every save.\n\n"
+            "Save Safety:\n"
+            " - Edited data is validated before writing — if it doesn't parse, the save is aborted.\n"
+            " - Saves are written atomically, so a crash mid-save can't corrupt your file.\n\n"
             "Tips:\n"
             " - Hover over labels for more info (tooltips).\n"
             " - Ensure you save changes before closing the editor."
